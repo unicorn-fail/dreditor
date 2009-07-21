@@ -38,6 +38,18 @@ Drupal.behaviors.patchReviewer = function (context) {
   });
 };
 
+/**
+ * Create diff outline and highlighting from plaintext code.
+ *
+ * @param context
+ *   The context to work on.
+ * @param code
+ *   Plain-text code to parse.
+ *
+ * @todo Rewrite parser to work line-by-line; also to allow '@@ ...' in outline,
+ *   i.e. .splitText("\n").
+ * @todo Move setup and storage of outline menu and pastie outside.
+ */
 Drupal.patch.behaviors.diffView = function (context, code) {
   var $body = $(context);
 
@@ -62,8 +74,6 @@ Drupal.patch.behaviors.diffView = function (context, code) {
 
   // Remove duplicate/empty PREs.
   code = code.replace(/<pre>\n<\/pre>/g, '');
-  // Remove linefeeds between PREs.
-  //code = code.replace(/(<\/pre>)\n(<pre>)/g, '$1$2');
   // Wrap all other lines in PREs for copy/pasting.
   code = code.replace(/^( .*)$/mg, '<pre class="code">$1<span /></pre>');
   // Wrap code in container.
@@ -81,7 +91,9 @@ Drupal.patch.behaviors.diffView = function (context, code) {
     this(context);
   });
 
-  // 
+  // Copy any selection.
+  // @todo Basic concept only; we actually don't want to re-display code until
+  //   it's pasted/submitted back into the original page.
   $('#code', context).mouseup(function () {
     var sel = document.getSelection().toString().replace(/\r\n|\r/g, "\n").replace(/\n\n/g, "\n");
     if (sel) {
@@ -93,7 +105,6 @@ Drupal.patch.behaviors.diffView = function (context, code) {
 jQuery(document).ready(function () {
   // Setup file review area/overlay.
   var $file = $('<div id="file-wrapper"><div id="file"></div></div>').hide();
-  //$file.css({ position: 'fixed' });
   $file.appendTo('body');
 
   Drupal.behaviors.patchReviewer(this);
