@@ -85,6 +85,9 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
 
   // Convert CRLF, CR into LF.
   code = code.replace(/\r\n|\r/g, "\n");
+  // Escape all HTML.
+  code = code.replace(/</g, '&lt;');
+  code = code.replace(/>/g, '&gt;');
   // Remove cruft: Unversioned files.
   code = code.replace(/^\? .+\n/mg, '');
 

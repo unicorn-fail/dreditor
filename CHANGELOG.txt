@@ -1,0 +1,14 @@
+// $Id$
+
+Dreditor x.x-x.x, xxxx-xx-xx
+----------------------------
+
+
+Dreditor x.x-1.x, xxxx-xx-xx
+----------------------------
+by sun: Fixed HTML tags in files are not escaped.
+#526522 by sun: Fixed missing cancel button.
+by sun: Fixed comments.
+by sun: Initial commit of Dreditor (2009-07-21).
+
+
