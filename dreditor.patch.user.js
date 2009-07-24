@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Dreditor: Patch review
-// @namespace      http://unleashedmind.com/greasemonkey
+// @namespace      http://drupal.org/project/dreditor
 // @description    Highlights and outlines diff syntax in patch files.
 // @author         Daniel F. Kudwien (sun)
 // @version        0.1
@@ -22,14 +22,12 @@ Drupal.dreditor.setup = function (context) {
   // Add sidebar, containing ul#menu by default for convenience.
   var $bar = $('<div id="bar"></div>').append('<ul id="menu"></ul>').appendTo('#dreditor');
   // Add cancel button to tear down Dreditor.
-  $('<input id="cancel" type="button" value="Cancel" />').click(function () {
+  $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />').click(function () {
     return Drupal.dreditor.tearDown(context);
   }).appendTo($bar);
 
   // @todo Behaviors of this user script are not invoked with regular behaviors.
-  //   Invoking Drupal.attachBehaviors() attached behaviors twice.
-  // Drupal.attachBehaviors(context);
-  Drupal.behaviors.dreditorPatchReview(context);
+  Drupal.attachBehaviors(context);
 };
 
 Drupal.dreditor.tearDown = function (context) {
@@ -40,30 +38,36 @@ Drupal.dreditor.tearDown = function (context) {
   return false;
 };
 
+/**
+ * Attach patch review editor to issue attachments.
+ */
 Drupal.behaviors.dreditorPatchReview = function (context) {
-  $('#attachments a:not(.dreditor-patchreview-processed), #comments table.comment-upload-attachments a:not(.dreditor-patchreview-processed)', context).each(function () {
-    $(this).addClass('dreditor-patchreview-processed');
-    if (this.href.indexOf('.patch') == -1) {
-      return;
-    }
-    var $link = $('<a href="' + this.href + '">review</a>').click(function () {
-      // Load file.
-      $.get(this.href, function (content, status) {
-        if (status == 'success') {
-          // Show overlay.
-          $('#dreditor-wrapper', context).animate({ height: '90%' }).show();
-          // Apply Dreditor(.patchReview).behaviors.
-          $.each(Drupal.dreditor.behaviors, function () {
-            this(context, content);
-          });
-          // Apply Drupal behaviors.
-          Drupal.attachBehaviors(context);
-        }
+  $('#attachments:not(.dreditor-patchreview-processed), #comments table.comment-upload-attachments:not(.dreditor-patchreview-processed)', context)
+    .addClass('dreditor-patchreview-processed')
+    .find('a').each(function () {
+      if (this.href.indexOf('.patch') == -1) {
+        return;
+      }
+      // Generate review link.
+      var $link = $('<a id="dreditor-patchreview" class="dreditor-button" href="' + this.href + '">review</a>').click(function () {
+        // Load file.
+        $.get(this.href, function (content, status) {
+          if (status == 'success') {
+            // Show overlay.
+            $('#dreditor-wrapper', context).animate({ height: '90%' }).show();
+            // Apply Dreditor(.patchReview).behaviors.
+            $.each(Drupal.dreditor.behaviors, function () {
+              this(context, content);
+            });
+            // Apply Drupal behaviors.
+            Drupal.attachBehaviors(context);
+          }
+        });
+        return false;
       });
-      return false;
+      // Append review link to parent table cell.
+      $link.appendTo(this.parentNode);
     });
-    $link.appendTo(this.parentNode).before(' [ ').after(' ]');
-  });
 };
 
 /**
@@ -141,9 +145,10 @@ GM_addStyle(" \
 #dreditor-wrapper { position: fixed; z-index: 1000; width: 100%; top: 0; } \
 #dreditor { position: relative; width: 90%; height: 90%; margin: auto auto; background-color: #fff; } \
 #dreditor #bar { position: absolute; width: 230px; height: 100%; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
-#dreditor input[type=button], #dreditor input[type=submit] { background: transparent url(/sites/all/themes/bluebeach/header-back.png) repeat-x 0 0; border: 1px solid #06c; color: #fff; cursor: pointer; font: 11px sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 2px 10px; text-transform: uppercase; -moz-border-radius: 10px; -webkit-border-radius: 10px; } \
-#dreditor input[type=button]:hover, #dreditor input[type=submit]:hover { background-position: 0 -30px; } \
-#dreditor #cancel { position: absolute; bottom: 8px; } \
+.dreditor-button, #content a.dreditor-button { background: transparent url(/sites/all/themes/bluebeach/header-back.png) repeat-x 0 -30px; border: 1px solid #06c; color: #fff; cursor: pointer; font: 11px sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 1px 9px; text-transform: uppercase; text-decoration: none; -moz-border-radius: 9px; -webkit-border-radius: 9px; border-radius: 9px; } \
+.dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 0; } \
+.dreditor-patchreview-processed .dreditor-button { margin-left: 1em; } \
+#dreditor-cancel { position: absolute; bottom: 8px; } \
 #dreditor #menu { margin: 0; padding: 0; } \
 #dreditor #menu li { margin: 0; padding: 0 10px 0; list-style: none; } \
 #dreditor a { text-decoration: none; } \
