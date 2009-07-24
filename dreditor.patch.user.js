@@ -73,13 +73,15 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
 /**
  * Create diff outline and highlighting from plaintext code.
  *
+ * We parse all lines of the file into separate DOM elements to be able to
+ * attach data (e.g. comments) to selected lines and generate a "jump menu"
+ * for files and hunks.
+ *
  * @param context
  *   The context to work on.
  * @param code
  *   Plain-text code to parse.
  *
- * @todo Rewrite parser to work line-by-line; also to allow '@@ ...' in outline,
- *   i.e. .splitText("\n").
  * @todo Move setup and storage of outline menu and pastie outside.
  * @todo Rework namespace: dreditor, behaviors, patchReview.
  */
@@ -92,34 +94,51 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
   // Escape all HTML.
   code = code.replace(/</g, '&lt;');
   code = code.replace(/>/g, '&gt;');
-  // Remove cruft: IDE comments.
-  code = code.replace(/^\# .+\n/mg, '');
-  // Remove cruft: Unversioned files.
-  code = code.replace(/^\? .+\n/mg, '');
+  // Remove cruft: IDE comments and unversioned files.
+  code = code.replace(/^\# .+\n|^\? .+\n/mg, '');
 
-  // Build hunk menu.
+  // Setup code container.
+  var $code = $('<div id="code"></div>');
   var $menu = $('#menu', context);
-  code = code.replace(/^(\+\+\+ )([^\s]+)(\s.*)/mg, function (full, match1, match2, match3) {
-    $menu.append('<li><a href="#' + match2 + '">' + match2 + '</a></li>');
-    return match1 + '<a id="' + match2 + '">' + match2 + '</a>' + match3;
-  });
+  var $lastFile;
 
-  // Colorize file diff lines.
-  code = code.replace(/^((Index|===|RCS|retrieving|diff|\-\-\- |\+\+\+ |@@ ).*)$/mig, '<pre class="code file">$1</pre>');
-  // Colorize old code, but skip file diff lines.
-  code = code.replace(/^((?!\-\-\-)\-.*)$/mg, '<pre class="code old">$1<span /></pre>');
-  // Colorize new code, but skip file diff lines.
-  code = code.replace(/^((?!\+\+\+)\+.*)$/mg, '<pre class="code new">$1<span /></pre>');
+  code = code.split('\n');
+  for (var n in code) {
+    var line = code[n];
+    // Build file menu.
+    line = line.replace(/^(\+\+\+ )([^\s]+)(\s.*)/, function (full, match1, match2, match3) {
+      $lastFile = $('<li><a href="#' + match2 + '">' + match2 + '</a></li>');
+      $menu.append($lastFile);
+      return match1 + '<a id="' + match2 + '">' + match2 + '</a>' + match3;
+    });
+    // Build hunk menu.
+    line = line.replace(/^(@@ .+ @@\s+)([^\s]+\s[^\s\(]*)/, function (full, match1, match2) {
+      $lastFile.append('<li><a href="#' + match2 + '">' + match2 + '</a></li>');
+      return match1 + '<a id="' + match2 + '">' + match2 + '</a>';
+    });
 
-  // Remove duplicate/empty PREs.
-  code = code.replace(/<pre>\n<\/pre>/g, '');
-  // Wrap all other lines in PREs for copy/pasting.
-  code = code.replace(/^((?!\<pre).*)$/mg, '<pre class="code">$1<span /></pre>');
-  // Wrap code in container.
-  code = '<div id="code">' + code + '</div>';
+    // Colorize file diff lines.
+    if (line.match(/^((Index|===|RCS|retrieving|diff|\-\-\- |\+\+\+ |@@ ).*)$/i)) {
+      line = '<pre class="code file">' + line + '</pre>';
+    }
+    // Colorize old code, but skip file diff lines.
+    else if (line.match(/^((?!\-\-\-)\-.*)$/)) {
+      line = '<pre class="code old">' + line + '<span /></pre>';
+    }
+    // Colorize new code, but skip file diff lines.
+    else if (line.match(/^((?!\+\+\+)\+.*)$/)) {
+      line = '<pre class="code new">' + line + '<span /></pre>';
+    }
+    // Wrap all other lines in PREs for copy/pasting.
+    else {
+      line = '<pre class="code">' + line + '<span /></pre>';
+    }
 
+    // Append code line to body.
+    $code.append(line);
+  }
   // Append code to body.
-  $dreditor.append(code);
+  $code.appendTo($dreditor);
 
   // Add Pastie.
   var $bar = $('#bar', context);
@@ -128,7 +147,7 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
   // Copy any selection.
   // @todo Basic concept only; we actually don't want to re-display code until
   //   it's pasted/submitted back into the original page.
-  $('#code', file_context).mouseup(function () {
+  $code.mouseup(function () {
     var sel = document.getSelection().toString().replace(/\r\n|\r/g, "\n").replace(/\n\n/g, "\n");
     if (sel) {
       $('#pastie', context).val(sel);
