@@ -15,6 +15,7 @@ Drupal.dreditor = Drupal.dreditor || { behaviors: {} };
 
 Drupal.dreditor.setup = function (context) {
   // Setup Dreditor overlay.
+  $('<div id="dreditor-overlay"></div>').css({ opacity: 0 }).appendTo('body').animate({ opacity: 0.7 });
   var $file = $('<div id="dreditor-wrapper"></div>').hide();
   // Add Dreditor content area.
   $file.append('<div id="dreditor"></div>').appendTo('body');
@@ -25,15 +26,12 @@ Drupal.dreditor.setup = function (context) {
   $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />').click(function () {
     return Drupal.dreditor.tearDown(context);
   }).appendTo($bar);
-
-  // @todo Behaviors of this user script are not invoked with regular behaviors.
-  Drupal.attachBehaviors(context);
 };
 
 Drupal.dreditor.tearDown = function (context) {
-  $('#dreditor-wrapper', context).animate({ height: '0' }, function () {
+  $('#dreditor-overlay, #dreditor-wrapper', context).animate({ height: 0 }, function () {
     $(this).remove();
-    Drupal.dreditor.setup(context);
+    // Drupal.dreditor.setup(context);
   });
   return false;
 };
@@ -54,7 +52,8 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
         $.get(this.href, function (content, status) {
           if (status == 'success') {
             // Show overlay.
-            $('#dreditor-wrapper', context).animate({ height: '90%' }).show();
+            Drupal.dreditor.setup(context);
+            $('#dreditor-wrapper', context).animate({ height: '100%' }).show();
             // Apply Dreditor(.patchReview).behaviors.
             $.each(Drupal.dreditor.behaviors, function () {
               this(context, content);
@@ -88,6 +87,8 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
 Drupal.dreditor.behaviors.diffView = function (context, code) {
   var $dreditor = $('#dreditor', context);
   var file_context = $dreditor.get(0);
+  // Initialize review comments.
+  Drupal.dreditor.comments = [];
 
   // Convert CRLF, CR into LF.
   code = code.replace(/\r\n|\r/g, "\n");
@@ -119,19 +120,19 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
 
     // Colorize file diff lines.
     if (line.match(/^((Index|===|RCS|retrieving|diff|\-\-\- |\+\+\+ |@@ ).*)$/i)) {
-      line = '<pre class="code file">' + line + '</pre>';
+      line = '<pre class="file">' + line + '</pre>';
     }
     // Colorize old code, but skip file diff lines.
     else if (line.match(/^((?!\-\-\-)\-.*)$/)) {
-      line = '<pre class="code old">' + line + '<span /></pre>';
+      line = '<pre class="old">' + line + '<span /></pre>';
     }
     // Colorize new code, but skip file diff lines.
     else if (line.match(/^((?!\+\+\+)\+.*)$/)) {
-      line = '<pre class="code new">' + line + '<span /></pre>';
+      line = '<pre class="new">' + line + '<span /></pre>';
     }
     // Wrap all other lines in PREs for copy/pasting.
     else {
-      line = '<pre class="code">' + line + '<span /></pre>';
+      line = '<pre>' + line + '<span /></pre>';
     }
 
     // Append code line to body.
@@ -141,28 +142,63 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
   $code.appendTo($dreditor);
 
   // Add Pastie.
-  var $bar = $('#bar', context);
-  $bar.append('<textarea id="pastie" class="resizable"></textarea>');
+  var $pastie = $('<div id="pastie"></div>').hide();
+  $pastie.append('<textarea class="resizable"></textarea>');
+  $('<input id="dreditor-submit" class="dreditor-button" type="button" value="Add" />')
+    .click(function () {
+      var $textarea = $(this).parent().find('textarea');
+      // If a comment was entered,
+      if ($.trim($textarea.val())) {
+        var $lines = $pastie.data('dreditor.lines');
+        // ...store it in a global stack
+        Drupal.dreditor.comments.push({
+          elements: $lines,
+          comment: $textarea.val()
+        });
+        var newid = Drupal.dreditor.comments.length - 1;
+        // ...and attach it to the selected code.
+        $lines.data('dreditor.comment', newid).addClass('has-comment').click(function () {
+          var id = $(this).data('dreditor.comment');
+          alert(Drupal.dreditor.comments[id].comment);
+          return false;
+        });
+      }
+    })
+    .appendTo($pastie);
+  $pastie.appendTo('#bar');
 
   // Copy any selection.
-  // @todo Basic concept only; we actually don't want to re-display code until
-  //   it's pasted/submitted back into the original page.
   $code.mouseup(function () {
-    var sel = document.getSelection().toString().replace(/\r\n|\r/g, "\n").replace(/\n\n/g, "\n");
-    if (sel) {
-      $('#pastie', context).val(sel);
+    var range = window.getSelection().getRangeAt(0);
+    if (!range.toString()) {
+      return;
     }
+
+    // Grep selected lines.
+    var $lines = $([]);
+    var next = range.startContainer.parentNode;
+    while (next != range.endContainer.parentNode) {
+      $lines = $lines.add(next);
+      next = next.nextSibling;
+    }
+    $lines = $lines.add(range.endContainer.parentNode);
+
+    // Trigger pastie.
+    $pastie.data('dreditor.lines', $lines)
+      .show();
   });
 };
 
 jQuery(document).ready(function () {
-  Drupal.dreditor.setup(this);
+  // @todo Behaviors of this user script are not invoked with regular behaviors.
+  Drupal.attachBehaviors(this);
 });
 
 // Add custom stylesheet.
 GM_addStyle(" \
+#dreditor-overlay { position: fixed; z-index: 999; width: 100%; height: 100%; top: 0; background-color: #fff; } \
 #dreditor-wrapper { position: fixed; z-index: 1000; width: 100%; top: 0; } \
-#dreditor { position: relative; width: 90%; height: 90%; margin: auto auto; background-color: #fff; } \
+#dreditor { position: relative; width: 95%; height: 90%; margin: auto auto; background-color: #fff; border: 1px solid #ccc; } \
 #dreditor #bar { position: absolute; width: 230px; height: 100%; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
 .dreditor-button, #content a.dreditor-button { background: transparent url(/sites/all/themes/bluebeach/header-back.png) repeat-x 0 -30px; border: 1px solid #06c; color: #fff; cursor: pointer; font: 11px sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 1px 9px; text-transform: uppercase; text-decoration: none; -moz-border-radius: 9px; -webkit-border-radius: 9px; border-radius: 9px; } \
 .dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 0; } \
@@ -178,4 +214,5 @@ GM_addStyle(" \
 #dreditor #code .file { color: #088; } \
 #dreditor #code .new { color: #00d; } \
 #dreditor #code .old { color: #d00; } \
+#dreditor #code .has-comment { background-color: #eee; } \
 ");

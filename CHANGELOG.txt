@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: First pass on patch review comments; storage and retrieval done.
 by sun: Changed parser to process patch files line by line.
 by sun: Fixed arbitrary diff lines are not wrapped in <pre>.
 by sun: Fixed compatibility with patches generated via git.
