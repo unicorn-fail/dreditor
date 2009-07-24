@@ -88,12 +88,14 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
   // Escape all HTML.
   code = code.replace(/</g, '&lt;');
   code = code.replace(/>/g, '&gt;');
+  // Remove cruft: IDE comments.
+  code = code.replace(/^\# .+\n/mg, '');
   // Remove cruft: Unversioned files.
   code = code.replace(/^\? .+\n/mg, '');
 
   // Build hunk menu.
   var $menu = $('#menu', context);
-  code = code.replace(/^(\+\+\+ )([^\t]+)(\t.*)/mg, function (full, match1, match2, match3) {
+  code = code.replace(/^(\+\+\+ )([^\s]+)(\s.*)/mg, function (full, match1, match2, match3) {
     $menu.append('<li><a href="#' + match2 + '">' + match2 + '</a></li>');
     return match1 + '<a id="' + match2 + '">' + match2 + '</a>' + match3;
   });
