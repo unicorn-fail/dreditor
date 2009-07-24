@@ -114,7 +114,7 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
   // Remove duplicate/empty PREs.
   code = code.replace(/<pre>\n<\/pre>/g, '');
   // Wrap all other lines in PREs for copy/pasting.
-  code = code.replace(/^( .*)$/mg, '<pre class="code">$1<span /></pre>');
+  code = code.replace(/^((?!\<pre).*)$/mg, '<pre class="code">$1<span /></pre>');
   // Wrap code in container.
   code = '<div id="code">' + code + '</div>';
 

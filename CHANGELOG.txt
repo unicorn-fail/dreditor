@@ -4,9 +4,10 @@ Dreditor x.x-x.x, xxxx-xx-xx
 ----------------------------
 
 
-Dreditor x.x-1.x, xxxx-xx-xx
+Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
-#430290 by sun: Fixed compatibility with patches generated via git.
+by sun: Fixed arbitrary diff lines are not wrapped in <pre>.
+by sun: Fixed compatibility with patches generated via git.
 by sun: Added new Dreditor button/UI styling.
 by sun: Fixed Dreditor patch review behavior applied multiple times.
 by sun: Fixed user script namespace.
