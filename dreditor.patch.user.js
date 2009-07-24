@@ -105,7 +105,7 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
   });
 
   // Colorize file diff lines.
-  code = code.replace(/^((Index|===|RCS|retrieving|diff|\-\-\- |\+\+\+ |@@ ).*)$/mg, '<pre class="code file">$1</pre>');
+  code = code.replace(/^((Index|===|RCS|retrieving|diff|\-\-\- |\+\+\+ |@@ ).*)$/mig, '<pre class="code file">$1</pre>');
   // Colorize old code, but skip file diff lines.
   code = code.replace(/^((?!\-\-\-)\-.*)$/mg, '<pre class="code old">$1<span /></pre>');
   // Colorize new code, but skip file diff lines.
