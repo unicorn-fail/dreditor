@@ -147,9 +147,10 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
   $('<input id="dreditor-submit" class="dreditor-button" type="button" value="Add" />')
     .click(function () {
       var $textarea = $(this).parent().find('textarea');
+      var $lines = $pastie.data('dreditor.lines');
+      $lines.removeClass('selected');
       // If a comment was entered,
       if ($.trim($textarea.val())) {
-        var $lines = $pastie.data('dreditor.lines');
         // ...store it in a global stack
         Drupal.dreditor.comments.push({
           elements: $lines,
@@ -163,6 +164,9 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
           return false;
         });
       }
+      // Reset pastie in any case.
+      $textarea.val('');
+      $(this).hide();
     })
     .appendTo($pastie);
   $pastie.appendTo('#bar');
@@ -177,15 +181,23 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
     // Grep selected lines.
     var $lines = $([]);
     var next = range.startContainer.parentNode;
-    while (next != range.endContainer.parentNode) {
+    var last = range.endContainer.parentNode;
+    // If full lines where selected, retrieve the line right before the end of
+    // selection.
+    if (range.endOffset == 0) {
+      last = last.previousSibling;
+    }
+    while (next && next != last) {
       $lines = $lines.add(next);
       next = next.nextSibling;
     }
-    $lines = $lines.add(range.endContainer.parentNode);
+    $lines = $lines.add(last);
+    // Add temporary comment editing class.
+    $lines.addClass('selected');
 
     // Trigger pastie.
     $pastie.data('dreditor.lines', $lines)
-      .show();
+      .show().find('textarea').focus();
   });
 };
 
@@ -214,5 +226,6 @@ GM_addStyle(" \
 #dreditor #code .file { color: #088; } \
 #dreditor #code .new { color: #00d; } \
 #dreditor #code .old { color: #d00; } \
-#dreditor #code .has-comment { background-color: #eee; } \
+#dreditor #code .selected { background-color: #ffffdd; } \
+#dreditor #code .has-comment { background-color: #ffdddd; } \
 ");
