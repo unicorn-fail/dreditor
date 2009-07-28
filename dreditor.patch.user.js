@@ -75,10 +75,55 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
 
 Drupal.dreditor.patchReview = {
   behaviors: {},
+
   /**
    * Review comments storage.
    */
-  comments: []
+  comments: [],
+
+  getSelection: function () {
+    var range = window.getSelection().getRangeAt(0);
+    if (!range.toString()) {
+      return;
+    }
+
+    // Grep selected lines.
+    var $elements = $([]);
+    var next = range.startContainer;
+    var last = range.endContainer;
+    // If start/end containers are a text node, retrieve the parent node.
+    if (range.startContainer.nodeType != 1) {
+      next = next.parentNode;
+    }
+    if (range.endContainer.nodeType != 1) {
+      last = last.parentNode;
+    }
+    // If full lines where selected, retrieve the line right before the end of
+    // selection.
+    if (range.endOffset == 0) {
+      last = last.previousSibling;
+    }
+    while (next && next != last) {
+      $elements = $elements.add(next);
+      next = next.nextSibling;
+    }
+    $elements = $elements.add(last);
+    return $elements;
+  },
+
+  save: function (context, $elements) {
+    var $pastie = $('#pastie', context);
+
+    // Add temporary comment editing class.
+    $elements.addClass('selected');
+
+    $pastie.data('dreditor.lines', $elements);
+  },
+
+  load: function (id) {
+    var data = Drupal.dreditor.patchReview.comments[id];
+    return data;
+  }
 };
 
 /**
@@ -144,10 +189,10 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
       line = '<pre>' + line + '<span /></pre>';
     }
 
-    // Append code line to body.
+    // Append line to parsed code.
     $code.append(line);
   }
-  // Append code to body.
+  // Append parsed code to body.
   $code.appendTo($dreditor);
 
   // Add Pastie.
@@ -156,19 +201,19 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
   $('<input id="dreditor-submit" class="dreditor-button" type="button" value="Add" />')
     .click(function () {
       var $textarea = $(this).parent().find('textarea');
-      var $lines = $pastie.data('dreditor.lines');
+      var $elements = $pastie.data('dreditor.lines');
       // If a comment was entered,
       if ($.trim($textarea.val())) {
         // ...store it in a global stack
         Drupal.dreditor.patchReview.comments.push({
-          elements: $lines,
+          elements: $elements,
           comment: $textarea.val()
         });
         var newid = Drupal.dreditor.patchReview.comments.length - 1;
         // ...and attach it to the selected code.
-        $lines.data('dreditor.comment', newid).addClass('has-comment').click(function () {
-          var id = $(this).data('dreditor.comment');
-          alert(Drupal.dreditor.patchReview.comments[id].comment);
+        $elements.data('dreditor.patchReview.id', newid).addClass('has-comment').click(function () {
+          var data = Drupal.dreditor.patchReview.load($(this).data('dreditor.patchReview.id'));
+          alert(data.comment);
           return false;
         });
       }
@@ -183,38 +228,9 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
 
   // Attach pastie to any selection.
   $code.mouseup(function () {
-    var range = window.getSelection().getRangeAt(0);
-    if (!range.toString()) {
-      return;
-    }
-
-    // Grep selected lines.
-    var $lines = $([]);
-    var next = range.startContainer;
-    var last = range.endContainer;
-    // If start/end containers are a text node, retrieve the parent node.
-    if (range.startContainer.nodeType != 1) {
-      next = next.parentNode;
-    }
-    if (range.endContainer.nodeType != 1) {
-      last = last.parentNode;
-    }
-    // If full lines where selected, retrieve the line right before the end of
-    // selection.
-    if (range.endOffset == 0) {
-      last = last.previousSibling;
-    }
-    while (next && next != last) {
-      $lines = $lines.add(next);
-      next = next.nextSibling;
-    }
-    $lines = $lines.add(last);
-    // Add temporary comment editing class.
-    $lines.addClass('selected');
-
+    Drupal.dreditor.patchReview.save(context, Drupal.dreditor.patchReview.getSelection());
     // Trigger pastie.
-    $pastie.data('dreditor.lines', $lines)
-      .show().find('textarea').focus();
+    $pastie.show().find('textarea').focus();
   });
 };
 
