@@ -54,9 +54,13 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
             // Show overlay.
             Drupal.dreditor.setup(context);
             $('#dreditor-wrapper', context).animate({ height: '100%' }).show();
-            // Apply Dreditor(.patchReview).behaviors.
-            $.each(Drupal.dreditor.behaviors, function () {
+            // Apply patchReview behaviors.
+            $.each(Drupal.dreditor.patchReview.behaviors, function () {
               this(context, content);
+            });
+            // Apply Dreditor behaviors.
+            $.each(Drupal.dreditor.behaviors, function () {
+              this(context);
             });
             // Apply Drupal behaviors.
             Drupal.attachBehaviors(context);
@@ -67,6 +71,14 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
       // Append review link to parent table cell.
       $link.appendTo(this.parentNode);
     });
+};
+
+Drupal.dreditor.patchReview = {
+  behaviors: {},
+  /**
+   * Review comments storage.
+   */
+  comments: []
 };
 
 /**
@@ -81,14 +93,11 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
  * @param code
  *   Plain-text code to parse.
  *
- * @todo Move setup and storage of outline menu and pastie outside.
- * @todo Rework namespace: dreditor, behaviors, patchReview.
+ * @todo Move setup and storage of pastie elsewhere?
  */
-Drupal.dreditor.behaviors.diffView = function (context, code) {
+Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
   var $dreditor = $('#dreditor', context);
   var file_context = $dreditor.get(0);
-  // Initialize review comments.
-  Drupal.dreditor.comments = [];
 
   // Convert CRLF, CR into LF.
   code = code.replace(/\r\n|\r/g, "\n");
@@ -151,15 +160,15 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
       // If a comment was entered,
       if ($.trim($textarea.val())) {
         // ...store it in a global stack
-        Drupal.dreditor.comments.push({
+        Drupal.dreditor.patchReview.comments.push({
           elements: $lines,
           comment: $textarea.val()
         });
-        var newid = Drupal.dreditor.comments.length - 1;
+        var newid = Drupal.dreditor.patchReview.comments.length - 1;
         // ...and attach it to the selected code.
         $lines.data('dreditor.comment', newid).addClass('has-comment').click(function () {
           var id = $(this).data('dreditor.comment');
-          alert(Drupal.dreditor.comments[id].comment);
+          alert(Drupal.dreditor.patchReview.comments[id].comment);
           return false;
         });
       }
@@ -172,7 +181,7 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
     .appendTo($pastie);
   $pastie.appendTo('#bar');
 
-  // Copy any selection.
+  // Attach pastie to any selection.
   $code.mouseup(function () {
     var range = window.getSelection().getRangeAt(0);
     if (!range.toString()) {

@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Changed patchReview namespace to build an application context.
 by sun: Fixed selection range not always matching proper start/end.
 by sun: UX: Added highlighting of currently selected code.
 by sun: Fixed selection contains next line in certain situations.
