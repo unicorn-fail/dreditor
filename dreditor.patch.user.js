@@ -148,7 +148,6 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
     .click(function () {
       var $textarea = $(this).parent().find('textarea');
       var $lines = $pastie.data('dreditor.lines');
-      $lines.removeClass('selected');
       // If a comment was entered,
       if ($.trim($textarea.val())) {
         // ...store it in a global stack
@@ -166,7 +165,9 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
       }
       // Reset pastie in any case.
       $textarea.val('');
-      $(this).hide();
+      $pastie.hide();
+      // Remove selection.
+      $code.find('.selected').removeClass('selected');
     })
     .appendTo($pastie);
   $pastie.appendTo('#bar');
@@ -180,8 +181,15 @@ Drupal.dreditor.behaviors.diffView = function (context, code) {
 
     // Grep selected lines.
     var $lines = $([]);
-    var next = range.startContainer.parentNode;
-    var last = range.endContainer.parentNode;
+    var next = range.startContainer;
+    var last = range.endContainer;
+    // If start/end containers are a text node, retrieve the parent node.
+    if (range.startContainer.nodeType != 1) {
+      next = next.parentNode;
+    }
+    if (range.endContainer.nodeType != 1) {
+      last = last.parentNode;
+    }
     // If full lines where selected, retrieve the line right before the end of
     // selection.
     if (range.endOffset == 0) {
