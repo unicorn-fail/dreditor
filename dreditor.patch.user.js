@@ -74,6 +74,9 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
 };
 
 Drupal.dreditor.patchReview = {
+  /**
+   * patchReview behaviors stack.
+   */
   behaviors: {},
 
   /**
@@ -81,6 +84,9 @@ Drupal.dreditor.patchReview = {
    */
   comments: [],
 
+  /**
+   * Return currently selected code lines as jQuery object.
+   */
   getSelection: function () {
     var $elements = $([]);
 
@@ -114,7 +120,7 @@ Drupal.dreditor.patchReview = {
 
   save: function (context, $elements) {
     if (!$elements.length) {
-      return;
+      return $elements;
     }
     var $pastie = $('#pastie', context);
 
@@ -122,6 +128,7 @@ Drupal.dreditor.patchReview = {
     $elements.addClass('selected');
 
     $pastie.data('dreditor.patchReview.elements', $elements);
+    return $elements;
   },
 
   load: function (id) {
@@ -201,8 +208,10 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
 
   // Add Pastie.
   var $pastie = $('<div id="pastie"></div>').hide();
+  // Add comment textarea.
   $pastie.append('<textarea class="resizable" rows="10"></textarea>');
-  $('<input id="dreditor-submit" class="dreditor-button" type="button" value="Save" />')
+  // Add comment save button.
+  $('<input id="dreditor-save" class="dreditor-button" type="button" value="Save" />')
     .click(function () {
       var $textarea = $(this).parent().find('textarea');
       // @todo From here, that's the real save/load.  Yuck. :)
@@ -229,14 +238,35 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
           var data = Drupal.dreditor.patchReview.load($(this).data('dreditor.patchReview.id'));
           $textarea.val(data.comment);
           $pastie.data('dreditor.patchReview.elements', data.elements);
-          $pastie.show();
+          $pastie.find('#dreditor-delete').andSelf().show();
           data.elements.addClass('selected');
           return false;
         });
       }
       // Reset pastie in any case.
       $textarea.val('');
-      $pastie.hide();
+      $pastie.find('#dreditor-delete').andSelf().hide();
+      // Remove selection.
+      $code.find('.selected').removeClass('selected');
+    })
+    .appendTo($pastie);
+
+  // Add comment delete button.
+  $('<input id="dreditor-delete" class="dreditor-button" type="button" value="Delete" />').hide()
+    .click(function () {
+      var $textarea = $(this).parent().find('textarea');
+      var $elements = $pastie.data('dreditor.patchReview.elements');
+      var id = $elements.data('dreditor.patchReview.id');
+      if (id) {
+        Drupal.dreditor.patchReview.comments[id].elements
+          .removeClass('has-comment')
+          .removeData('dreditor.patchReview.id')
+          .unbind('click');
+        delete Drupal.dreditor.patchReview.comments[id];
+      }
+      // Reset pastie in any case.
+      $textarea.val('');
+      $pastie.find('#dreditor-delete').andSelf().hide();
       // Remove selection.
       $code.find('.selected').removeClass('selected');
     })
@@ -245,9 +275,11 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
 
   // Attach pastie to any selection.
   $code.mouseup(function () {
-    Drupal.dreditor.patchReview.save(context, Drupal.dreditor.patchReview.getSelection());
-    // Trigger pastie.
-    $pastie.show().find('textarea').focus();
+    var $elements = Drupal.dreditor.patchReview.save(context, Drupal.dreditor.patchReview.getSelection());
+    if ($elements.length) {
+      // Trigger pastie.
+      $pastie.show().find('textarea').focus();
+    }
   });
 };
 

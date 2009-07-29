@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Added functionality to delete comments.
 by sun: Fixed $elements undefined error when clicking on lines with comment.
 by sun: Added saving/loading of attached element comments.
 by sun: Added preliminary API functions for patchReview.
