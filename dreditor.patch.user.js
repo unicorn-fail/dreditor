@@ -23,15 +23,34 @@ Drupal.dreditor.setup = function (context) {
   // Add sidebar, containing ul#menu by default for convenience.
   var $bar = $('<div id="bar"></div>').append('<ul id="menu"></ul>').appendTo('#dreditor');
   // Add cancel button to tear down Dreditor.
-  $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />').click(function () {
-    return Drupal.dreditor.tearDown(context);
-  }).appendTo($bar);
+  $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />')
+    .click(function () {
+      return Drupal.dreditor.tearDown(context);
+    })
+    .appendTo($bar);
+
+  // Setup application.
+  var args = arguments;
+  // Cut out the application name (2nd argument).
+  var application = Array.prototype.splice.call(args, 1, 1);
+  // Apply application behaviors with any additional arguments.
+  $.each(Drupal.dreditor[application].behaviors, function () {
+    this.apply(context, args);
+  });
+  // Apply Dreditor behaviors.
+  $.each(Drupal.dreditor.behaviors, function () {
+    this(context);
+  });
+  // Apply Drupal behaviors.
+  Drupal.attachBehaviors(context);
+
+  // Display Dreditor.
+  $('#dreditor-wrapper', context).animate({ height: '100%' });
 };
 
 Drupal.dreditor.tearDown = function (context) {
   $('#dreditor-overlay, #dreditor-wrapper', context).animate({ height: 0 }, function () {
     $(this).remove();
-    // Drupal.dreditor.setup(context);
   });
   return false;
 };
@@ -51,19 +70,8 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
         // Load file.
         $.get(this.href, function (content, status) {
           if (status == 'success') {
-            // Show overlay.
-            Drupal.dreditor.setup(context);
-            $('#dreditor-wrapper', context).animate({ height: '100%' }).show();
-            // Apply patchReview behaviors.
-            $.each(Drupal.dreditor.patchReview.behaviors, function () {
-              this(context, content);
-            });
-            // Apply Dreditor behaviors.
-            $.each(Drupal.dreditor.behaviors, function () {
-              this(context);
-            });
-            // Apply Drupal behaviors.
-            Drupal.attachBehaviors(context);
+            // Invoke Dreditor.
+            Drupal.dreditor.setup(context, 'patchReview', content);
           }
         });
         return false;
