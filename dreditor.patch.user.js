@@ -198,22 +198,35 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
   // Add Pastie.
   var $pastie = $('<div id="pastie"></div>').hide();
   $pastie.append('<textarea class="resizable"></textarea>');
-  $('<input id="dreditor-submit" class="dreditor-button" type="button" value="Add" />')
+  $('<input id="dreditor-submit" class="dreditor-button" type="button" value="Save" />')
     .click(function () {
       var $textarea = $(this).parent().find('textarea');
+      // @todo From here, that's the real save/load.  Yuck. :)
       var $elements = $pastie.data('dreditor.lines');
+      var id = $elements.data('dreditor.patchReview.id');
       // If a comment was entered,
       if ($.trim($textarea.val())) {
-        // ...store it in a global stack
-        Drupal.dreditor.patchReview.comments.push({
-          elements: $elements,
-          comment: $textarea.val()
-        });
-        var newid = Drupal.dreditor.patchReview.comments.length - 1;
+        if (id) {
+          Drupal.dreditor.patchReview.comments[id] = {
+            elements: $elements,
+            comment: $textarea.val()
+          };
+        }
+        else {
+          // ...store it in a global stack
+          Drupal.dreditor.patchReview.comments.push({
+            elements: $elements,
+            comment: $textarea.val()
+          });
+          id = Drupal.dreditor.patchReview.comments.length - 1;
+        }
         // ...and attach it to the selected code.
-        $elements.data('dreditor.patchReview.id', newid).addClass('has-comment').click(function () {
+        $elements.data('dreditor.patchReview.id', id).addClass('has-comment').click(function () {
           var data = Drupal.dreditor.patchReview.load($(this).data('dreditor.patchReview.id'));
-          alert(data.comment);
+          $textarea.val(data.comment);
+          $pastie.data('dreditor.lines', data.elements);
+          $pastie.show();
+          data.elements.addClass('selected');
           return false;
         });
       }
