@@ -80,11 +80,6 @@ Drupal.dreditor.patchReview = {
   behaviors: {},
 
   /**
-   * Review comments storage.
-   */
-  comments: [],
-
-  /**
    * Return currently selected code lines as jQuery object.
    */
   getSelection: function () {
@@ -129,11 +124,51 @@ Drupal.dreditor.patchReview = {
 
     $pastie.data('dreditor.patchReview.elements', $elements);
     return $elements;
+  }
+};
+
+Drupal.dreditor.patchReview.comment = {
+  /**
+   * Review comments storage.
+   */
+  comments: [],
+
+  /**
+   * Create or update a comment.
+   *
+   * If data already contains an id, the existing comment is updated.
+   *
+   * @return
+   *   The stored data, including new id for new comments.
+   */
+  save: function (data) {
+    if (data.id) {
+      this.comments[id] = data;
+    }
+    else {
+      this.comments.push(data);
+      var id = this.comments.length - 1;
+      data.id = this.comments[id].id = id;
+    }
+    return data;
   },
 
   load: function (id) {
-    var data = Drupal.dreditor.patchReview.comments[id];
-    return data;
+    if (typeof id !== undefined && typeof this.comments[id] == 'object') {
+      var data = this.comments[id];
+    }
+    return data || {};
+  },
+
+  delete: function (id) {
+    var data = this.load(id);
+    if (data && data.id && this.comments[data.id]) {
+      this.comments[data.id].elements
+        .removeClass('has-comment')
+        .removeData('dreditor.patchReview.id')
+        .unbind('click');
+      delete this.comments[id];
+    }
   }
 };
 
@@ -219,23 +254,14 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
       var id = $elements.data('dreditor.patchReview.id');
       // If a comment was entered,
       if ($.trim($textarea.val())) {
-        if (id) {
-          Drupal.dreditor.patchReview.comments[id] = {
-            elements: $elements,
-            comment: $textarea.val()
-          };
-        }
-        else {
-          // ...store it in a global stack
-          Drupal.dreditor.patchReview.comments.push({
-            elements: $elements,
-            comment: $textarea.val()
-          });
-          id = Drupal.dreditor.patchReview.comments.length - 1;
-        }
+        var data = Drupal.dreditor.patchReview.comment.save({
+          id: id,
+          elements: $elements,
+          comment: $textarea.val()
+        });
         // ...and attach it to the selected code.
-        $elements.data('dreditor.patchReview.id', id).addClass('has-comment').click(function () {
-          var data = Drupal.dreditor.patchReview.load($(this).data('dreditor.patchReview.id'));
+        $elements.data('dreditor.patchReview.id', data.id).addClass('has-comment').click(function () {
+          var data = Drupal.dreditor.patchReview.comment.load($(this).data('dreditor.patchReview.id'));
           $textarea.val(data.comment);
           $pastie.data('dreditor.patchReview.elements', data.elements);
           $pastie.find('#dreditor-delete').andSelf().show();
@@ -258,11 +284,7 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
       var $elements = $pastie.data('dreditor.patchReview.elements');
       var id = $elements.data('dreditor.patchReview.id');
       if (id) {
-        Drupal.dreditor.patchReview.comments[id].elements
-          .removeClass('has-comment')
-          .removeData('dreditor.patchReview.id')
-          .unbind('click');
-        delete Drupal.dreditor.patchReview.comments[id];
+        Drupal.dreditor.patchReview.comment.delete(id);
       }
       // Reset pastie in any case.
       $textarea.val('');
