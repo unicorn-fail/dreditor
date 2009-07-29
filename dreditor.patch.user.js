@@ -82,13 +82,14 @@ Drupal.dreditor.patchReview = {
   comments: [],
 
   getSelection: function () {
+    var $elements = $([]);
+
     var range = window.getSelection().getRangeAt(0);
     if (!range.toString()) {
-      return;
+      return $elements;
     }
 
     // Grep selected lines.
-    var $elements = $([]);
     var next = range.startContainer;
     var last = range.endContainer;
     // If start/end containers are a text node, retrieve the parent node.
@@ -112,12 +113,15 @@ Drupal.dreditor.patchReview = {
   },
 
   save: function (context, $elements) {
+    if (!$elements.length) {
+      return;
+    }
     var $pastie = $('#pastie', context);
 
     // Add temporary comment editing class.
     $elements.addClass('selected');
 
-    $pastie.data('dreditor.lines', $elements);
+    $pastie.data('dreditor.patchReview.elements', $elements);
   },
 
   load: function (id) {
@@ -197,12 +201,12 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
 
   // Add Pastie.
   var $pastie = $('<div id="pastie"></div>').hide();
-  $pastie.append('<textarea class="resizable"></textarea>');
+  $pastie.append('<textarea class="resizable" rows="10"></textarea>');
   $('<input id="dreditor-submit" class="dreditor-button" type="button" value="Save" />')
     .click(function () {
       var $textarea = $(this).parent().find('textarea');
       // @todo From here, that's the real save/load.  Yuck. :)
-      var $elements = $pastie.data('dreditor.lines');
+      var $elements = $pastie.data('dreditor.patchReview.elements');
       var id = $elements.data('dreditor.patchReview.id');
       // If a comment was entered,
       if ($.trim($textarea.val())) {
@@ -224,7 +228,7 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
         $elements.data('dreditor.patchReview.id', id).addClass('has-comment').click(function () {
           var data = Drupal.dreditor.patchReview.load($(this).data('dreditor.patchReview.id'));
           $textarea.val(data.comment);
-          $pastie.data('dreditor.lines', data.elements);
+          $pastie.data('dreditor.patchReview.elements', data.elements);
           $pastie.show();
           data.elements.addClass('selected');
           return false;
