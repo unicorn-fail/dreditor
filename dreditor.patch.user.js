@@ -80,6 +80,11 @@ Drupal.dreditor.patchReview = {
   behaviors: {},
 
   /**
+   * Current selection storage.
+   */
+  elements: $([]),
+
+  /**
    * Return currently selected code lines as jQuery object.
    */
   getSelection: function () {
@@ -113,16 +118,14 @@ Drupal.dreditor.patchReview = {
     return $elements;
   },
 
-  save: function (context, $elements) {
+  addSelection: function ($elements) {
     if (!$elements.length) {
       return $elements;
     }
-    var $pastie = $('#pastie', context);
-
     // Add temporary comment editing class.
     $elements.addClass('selected');
 
-    $pastie.data('dreditor.patchReview.elements', $elements);
+    this.elements = this.elements.add($elements);
     return $elements;
   }
 };
@@ -150,6 +153,7 @@ Drupal.dreditor.patchReview.comment = {
       var id = this.comments.length - 1;
       data.id = this.comments[id].id = id;
     }
+    this.comments[id].elements.data('dreditor.patchReview.id', data.id).addClass('has-comment');
     return data;
   },
 
@@ -249,8 +253,7 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
   $('<input id="dreditor-save" class="dreditor-button" type="button" value="Save" />')
     .click(function () {
       var $textarea = $(this).parent().find('textarea');
-      // @todo From here, that's the real save/load.  Yuck. :)
-      var $elements = $pastie.data('dreditor.patchReview.elements');
+      var $elements = Drupal.dreditor.patchReview.elements;
       var id = $elements.data('dreditor.patchReview.id');
       // If a comment was entered,
       if ($.trim($textarea.val())) {
@@ -260,10 +263,10 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
           comment: $textarea.val()
         });
         // ...and attach it to the selected code.
-        $elements.data('dreditor.patchReview.id', data.id).addClass('has-comment').click(function () {
+        $elements.click(function () {
           var data = Drupal.dreditor.patchReview.comment.load($(this).data('dreditor.patchReview.id'));
           $textarea.val(data.comment);
-          $pastie.data('dreditor.patchReview.elements', data.elements);
+          Drupal.dreditor.patchReview.elements = data.elements;
           $pastie.find('#dreditor-delete').andSelf().show();
           data.elements.addClass('selected');
           return false;
@@ -273,6 +276,7 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
       $textarea.val('');
       $pastie.find('#dreditor-delete').andSelf().hide();
       // Remove selection.
+      Drupal.dreditor.patchReview.elements = $([]);
       $code.find('.selected').removeClass('selected');
     })
     .appendTo($pastie);
@@ -281,8 +285,7 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
   $('<input id="dreditor-delete" class="dreditor-button" type="button" value="Delete" />').hide()
     .click(function () {
       var $textarea = $(this).parent().find('textarea');
-      var $elements = $pastie.data('dreditor.patchReview.elements');
-      var id = $elements.data('dreditor.patchReview.id');
+      var id = Drupal.dreditor.patchReview.elements.data('dreditor.patchReview.id');
       if (id) {
         Drupal.dreditor.patchReview.comment.delete(id);
       }
@@ -290,6 +293,7 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
       $textarea.val('');
       $pastie.find('#dreditor-delete').andSelf().hide();
       // Remove selection.
+      Drupal.dreditor.patchReview.elements = $([]);
       $code.find('.selected').removeClass('selected');
     })
     .appendTo($pastie);
@@ -297,7 +301,7 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
 
   // Attach pastie to any selection.
   $code.mouseup(function () {
-    var $elements = Drupal.dreditor.patchReview.save(context, Drupal.dreditor.patchReview.getSelection());
+    var $elements = Drupal.dreditor.patchReview.addSelection(Drupal.dreditor.patchReview.getSelection());
     if ($elements.length) {
       // Trigger pastie.
       $pastie.show().find('textarea').focus();
