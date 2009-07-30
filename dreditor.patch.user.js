@@ -16,12 +16,18 @@ Drupal.dreditor = Drupal.dreditor || { behaviors: {} };
 Drupal.dreditor.setup = function (context) {
   // Setup Dreditor overlay.
   $('<div id="dreditor-overlay"></div>').css({ opacity: 0 }).appendTo('body').animate({ opacity: 0.7 });
-  var $file = $('<div id="dreditor-wrapper"></div>').hide();
+  var $wrapper = $('<div id="dreditor-wrapper"></div>').css({ height: 0 });
   // Add Dreditor content area.
-  $file.append('<div id="dreditor"></div>').appendTo('body');
+  var $dreditor = $('<div id="dreditor"></div>').appendTo($wrapper);
+  $wrapper.appendTo('body');
 
-  // Add sidebar, containing ul#menu by default for convenience.
-  var $bar = $('<div id="bar"></div>').append('<ul id="menu"></ul>').appendTo('#dreditor');
+  // Setup Dreditor context.
+  Drupal.dreditor.context = $dreditor.get(0);
+
+  // Add sidebar.
+  var $bar = $('<div id="bar"></div>').prependTo($dreditor);
+  // Add ul#menu to sidebar by default for convenience.
+  $('<ul id="menu"></ul>').appendTo($bar);
   // Add cancel button to tear down Dreditor.
   $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />')
     .click(function () {
@@ -33,16 +39,19 @@ Drupal.dreditor.setup = function (context) {
   var args = arguments;
   // Cut out the application name (2nd argument).
   var application = Array.prototype.splice.call(args, 1, 1);
-  // Apply application behaviors with any additional arguments.
+  // Replace context with Dreditor context.
+  args = Array.prototype.slice.call(args, 1);
+  Array.prototype.unshift.call(args, Drupal.dreditor.context);
+  // Apply application behaviors, passing any additional arguments.
   $.each(Drupal.dreditor[application].behaviors, function () {
-    this.apply(context, args);
+    this.apply(Drupal.dreditor.context, args);
   });
   // Apply Dreditor behaviors.
   $.each(Drupal.dreditor.behaviors, function () {
-    this(context);
+    this(Drupal.dreditor.context);
   });
   // Apply Drupal behaviors.
-  Drupal.attachBehaviors(context);
+  Drupal.attachBehaviors(Drupal.dreditor.context);
 
   // Display Dreditor.
   $('#dreditor-wrapper', context).animate({ height: '100%' });
@@ -53,6 +62,74 @@ Drupal.dreditor.tearDown = function (context) {
     $(this).remove();
   });
   return false;
+};
+
+/**
+ * Parse CSS classes of a DOM element into parameters.
+ *
+ * Required, because jQuery.data() somehow seems to forget about previously
+ * stored data in DOM elements; most probably due to context mismatches.
+ *
+ * Syntax for CSS classes is "<prefix>-name-value".
+ *
+ * @param element
+ *   A DOM element containing CSS classes to parse.
+ * @param prefix
+ *   The parameter prefix to search for.
+ */
+Drupal.dreditor.getParams = function(element, prefix) {
+  var classes = element.className.split(' ');
+  var length = prefix.length;
+  var params = {};
+  for (var i in classes) {
+    if (classes[i].substr(0, length + 1) == prefix + '-') {
+      var parts = classes[i].split('-');
+      var value = parts.slice(2).join('-');
+      params[parts[1]] = value;
+      // Convert numeric values.
+      if (parseInt(value, 10) == value) {
+        params[parts[1]] = parseInt(value, 10);
+      }
+    }
+  }
+  return params;
+};
+
+/**
+ * Dreditor JavaScript form API.
+ *
+ * Due to Greasemonkey limitations, we have to instantiate new form objects in
+ * a wrapper object to pass Drupal.dreditor.form as context to the prototype.
+ */
+Drupal.dreditor.form = {
+  forms: [],
+
+  create: function (id) {
+    // We must pass this as wrapping object.
+    return new this.form(this, id);
+  }
+};
+Drupal.dreditor.form.form = function (o, id) {
+  var self = this;
+
+  $.extend(true, self, $('<form id="' + id + '"></form>'));
+
+  self.submit(function (e) {
+    var op = e.originalEvent.explicitOriginalTarget.value;
+    if (self.submitHandlers[op]) {
+      self.submitHandlers[op](this, self);
+    }
+    return false;
+  });
+};
+Drupal.dreditor.form.form.prototype = {
+  submitHandlers: {},
+
+  addButton: function (op, onSubmit) {
+    this.submitHandlers[op] = onSubmit;
+    this.append('<input name="op" class="dreditor-button" type="submit" value="' + op + '" />');
+    return this;
+  }
 };
 
 /**
@@ -81,6 +158,15 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
     });
 };
 
+/**
+ * Dreditor patchReview application.
+ *
+ * This is two-fold:
+ * - Drupal.dreditor.patchReview: Handles selections and storage/retrieval of
+ *   temporary comment data.
+ * - Drupal.dreditor.patchReview.comment: An API to load/save/delete permanent
+ *   comments being attached to code lines.
+ */
 Drupal.dreditor.patchReview = {
   /**
    * patchReview behaviors stack.
@@ -88,9 +174,18 @@ Drupal.dreditor.patchReview = {
   behaviors: {},
 
   /**
-   * Current selection storage.
+   * Current selection jQuery DOM element stack.
    */
-  elements: $([]),
+  data: {
+    elements: $([])
+  },
+
+  resetData: function () {
+    this.data = {
+      elements: $([])
+    };
+    $('#code', Drupal.dreditor.context).find('.selected').removeClass('selected');
+  },
 
   /**
    * Return currently selected code lines as jQuery object.
@@ -133,7 +228,7 @@ Drupal.dreditor.patchReview = {
     // Add temporary comment editing class.
     $elements.addClass('selected');
 
-    this.elements = this.elements.add($elements);
+    this.data.elements = this.data.elements.add($elements);
     return $elements;
   }
 };
@@ -154,14 +249,20 @@ Drupal.dreditor.patchReview.comment = {
    */
   save: function (data) {
     if (data.id) {
-      this.comments[id] = data;
+      this.comments[data.id] = data;
     }
     else {
       this.comments.push(data);
-      var id = this.comments.length - 1;
-      data.id = this.comments[id].id = id;
+      var newid = this.comments.length - 1;
+      this.comments[newid].id = data.id = newid;
+      this.comments[data.id].elements.addClass('new-comment');
     }
-    this.comments[id].elements.data('dreditor.patchReview.id', data.id).addClass('has-comment');
+    this.comments[data.id].elements.data('dreditor.patchReview.id', data.id).addClass('has-comment');
+    this.comments[data.id].elements.addClass('comment-id-' + data.id);
+
+    $.each(Drupal.dreditor.patchReview.behaviors, function () {
+      this(Drupal.dreditor.context);
+    });
     return data;
   },
 
@@ -198,9 +299,12 @@ Drupal.dreditor.patchReview.comment = {
  *
  * @todo Move setup and storage of pastie elsewhere?
  */
-Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
-  var $dreditor = $('#dreditor', context);
-  var file_context = $dreditor.get(0);
+Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
+  // Ensure this is only executed once.
+  if ($('#code', context).length) {
+    return;
+  }
+  var $dreditor = $(context);
 
   // Convert CRLF, CR into LF.
   code = code.replace(/\r\n|\r/g, "\n");
@@ -254,57 +358,34 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
   $code.appendTo($dreditor);
 
   // Add Pastie.
-  var $pastie = $('<div id="pastie"></div>').hide();
-  // Add comment textarea.
-  $pastie.append('<textarea class="resizable" rows="10"></textarea>');
-  // Add comment save button.
-  $('<input id="dreditor-save" class="dreditor-button" type="button" value="Save" />')
-    .click(function () {
-      var $textarea = $(this).parent().find('textarea');
-      var $elements = Drupal.dreditor.patchReview.elements;
-      var id = $elements.data('dreditor.patchReview.id');
+  var $pastie = Drupal.dreditor.form.create('pastie').hide()
+    // Add comment textarea.
+    .append('<textarea name="comment" class="resizable" rows="10"></textarea>')
+    // Add comment save button.
+    .addButton('Save', function (form, $form) {
       // If a comment was entered,
-      if ($.trim($textarea.val())) {
+      if ($.trim(form.comment.value)) {
         var data = Drupal.dreditor.patchReview.comment.save({
-          id: id,
-          elements: $elements,
-          comment: $textarea.val()
-        });
-        // ...and attach it to the selected code.
-        $elements.click(function () {
-          var data = Drupal.dreditor.patchReview.comment.load($(this).data('dreditor.patchReview.id'));
-          $textarea.val(data.comment);
-          Drupal.dreditor.patchReview.elements = data.elements;
-          $pastie.find('#dreditor-delete').andSelf().show();
-          data.elements.addClass('selected');
-          return false;
+          id: Drupal.dreditor.patchReview.data.id,
+          elements: Drupal.dreditor.patchReview.data.elements,
+          comment: form.comment.value
         });
       }
       // Reset pastie in any case.
-      $textarea.val('');
-      $pastie.find('#dreditor-delete').andSelf().hide();
-      // Remove selection.
-      Drupal.dreditor.patchReview.elements = $([]);
-      $code.find('.selected').removeClass('selected');
+      form.comment.value = '';
+      $form.find('#dreditor-delete').andSelf().hide();
+      Drupal.dreditor.patchReview.resetData();
     })
-    .appendTo($pastie);
-
-  // Add comment delete button.
-  $('<input id="dreditor-delete" class="dreditor-button" type="button" value="Delete" />').hide()
-    .click(function () {
-      var $textarea = $(this).parent().find('textarea');
-      var id = Drupal.dreditor.patchReview.elements.data('dreditor.patchReview.id');
-      if (id) {
-        Drupal.dreditor.patchReview.comment.delete(id);
+    // Add comment delete button.
+    .addButton('Delete', function (form, $form) {
+      if (Drupal.dreditor.patchReview.data.id) {
+        Drupal.dreditor.patchReview.comment.delete(Drupal.dreditor.patchReview.data.id);
       }
       // Reset pastie in any case.
-      $textarea.val('');
-      $pastie.find('#dreditor-delete').andSelf().hide();
-      // Remove selection.
-      Drupal.dreditor.patchReview.elements = $([]);
-      $code.find('.selected').removeClass('selected');
-    })
-    .appendTo($pastie);
+      form.comment.value = '';
+      $form.find('#dreditor-delete').andSelf().hide();
+      Drupal.dreditor.patchReview.resetData();
+    });
   $pastie.appendTo('#bar');
 
   // Attach pastie to any selection.
@@ -314,6 +395,19 @@ Drupal.dreditor.patchReview.behaviors.patchReview = function (context, code) {
       // Trigger pastie.
       $pastie.show().find('textarea').focus();
     }
+  });
+};
+
+Drupal.dreditor.patchReview.behaviors.attachPastie = function (context) {
+  $('#code .has-comment.new-comment', context).removeClass('new-comment').click(function () {
+    var params = Drupal.dreditor.getParams(this, 'comment');
+    var data = Drupal.dreditor.patchReview.comment.load(params.id);
+    Drupal.dreditor.patchReview.data = data;
+    data.elements.addClass('selected');
+    $('#pastie')
+      .find('textarea').val(data.comment).end()
+      .find('#dreditor-delete').andSelf().show();
+    return false;
   });
 };
 

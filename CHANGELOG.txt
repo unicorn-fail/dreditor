@@ -6,6 +6,8 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Added JavaScript Form API.
+by sun: Revamped context control, permanent data storage.
 by sun: Moved attachment of behaviors into Dreditor setup.
 by sun: Added support for multiple selections attached to one comment.
 by sun: Added own API functions and registry for comment objects.
