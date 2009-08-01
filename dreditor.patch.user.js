@@ -38,20 +38,10 @@ Drupal.dreditor.setup = function (context) {
   // Setup application.
   var args = arguments;
   // Cut out the application name (2nd argument).
-  var application = Array.prototype.splice.call(args, 1, 1);
-  // Replace context with Dreditor context.
+  this.application = Array.prototype.splice.call(args, 1, 1);
+  // Remove global window context.
   args = Array.prototype.slice.call(args, 1);
-  Array.prototype.unshift.call(args, Drupal.dreditor.context);
-  // Apply application behaviors, passing any additional arguments.
-  $.each(Drupal.dreditor[application].behaviors, function () {
-    this.apply(Drupal.dreditor.context, args);
-  });
-  // Apply Dreditor behaviors.
-  $.each(Drupal.dreditor.behaviors, function () {
-    this(Drupal.dreditor.context);
-  });
-  // Apply Drupal behaviors.
-  Drupal.attachBehaviors(Drupal.dreditor.context);
+  this.attachBehaviors(args);
 
   // Display Dreditor.
   $('#dreditor-wrapper', context).animate({ height: '100%' });
@@ -62,6 +52,24 @@ Drupal.dreditor.tearDown = function (context) {
     $(this).remove();
   });
   return false;
+};
+
+Drupal.dreditor.attachBehaviors = function (args) {
+  if (args === undefined || typeof args != 'object') {
+    args = [];
+  }
+  // Add Dreditor context as first argument.
+  Array.prototype.unshift.call(args, Drupal.dreditor.context);
+  // Apply application behaviors, passing any additional arguments.
+  $.each(Drupal.dreditor[this.application].behaviors, function () {
+    this.apply(Drupal.dreditor.context, args);
+  });
+  // Apply Dreditor behaviors.
+  $.each(Drupal.dreditor.behaviors, function () {
+    this(Drupal.dreditor.context);
+  });
+  // Apply Drupal behaviors.
+  Drupal.attachBehaviors(Drupal.dreditor.context);
 };
 
 /**
@@ -265,6 +273,7 @@ Drupal.dreditor.patchReview = {
       }
       // Append pastie to sidebar, insert current comment and focus it.
       self.$form.appendTo('#bar').find('textarea').val(self.data.comment || '');
+      Drupal.dreditor.attachBehaviors();
     }
     // Focus pastie.
     self.$form.find('textarea').focus();
@@ -333,9 +342,7 @@ Drupal.dreditor.patchReview.comment = {
     }
     this.comments[data.id].elements.addClass('comment-id-' + data.id).addClass('has-comment');
 
-    $.each(Drupal.dreditor.patchReview.behaviors, function () {
-      this(Drupal.dreditor.context);
-    });
+    Drupal.dreditor.attachBehaviors();
     return data;
   },
 
@@ -375,7 +382,7 @@ Drupal.dreditor.patchReview.comment = {
  */
 Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   // Ensure this is only executed once.
-  if ($('#code', context).length) {
+  if ($('#code', context).length || !code) {
     return;
   }
 
