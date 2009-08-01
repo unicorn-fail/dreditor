@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Fixed comment deletion and re-binding of click event.
 by sun: Refactored comment form and current selection storage handling.
 by sun: Added JavaScript Form API.
 by sun: Revamped context control, permanent data storage.

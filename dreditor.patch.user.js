@@ -198,8 +198,8 @@ Drupal.dreditor.patchReview = {
 
   reset: function () {
     // Reset currently stored selection data.
+    this.data.elements.removeClass('selected');
     this.data = $.extend({}, this._empty);
-    $('#code', Drupal.dreditor.context).find('.selected').removeClass('selected');
     // Remove and delete pastie form.
     if (this.$form) {
       this.$form.remove();
@@ -244,7 +244,7 @@ Drupal.dreditor.patchReview = {
       self.$form.append('<textarea name="comment" class="resizable" rows="10"></textarea>');
       // Add comment save button.
       self.$form.addButton('Save', function (form, $form) {
-        // If a comment was entered,
+        // Store new comment, if non-empty.
         if ($.trim(form.comment.value)) {
           self.comment.save({
             id: self.data.id,
@@ -252,14 +252,14 @@ Drupal.dreditor.patchReview = {
             comment: form.comment.value
           });
         }
-        // Reset pastie in any case.
+        // Reset pastie.
         self.reset();
       });
       // Add comment delete button for existing comments.
       if (self.data.id !== undefined) {
         self.$form.addButton('Delete', function (form, $form) {
           self.comment.delete(self.data.id);
-          // Reset pastie in any case.
+          // Reset pastie.
           self.reset();
         });
       }
@@ -323,7 +323,7 @@ Drupal.dreditor.patchReview.comment = {
     if (data.id !== undefined) {
       this.comments[data.id] = data;
       // Mark new comments, if there are any.
-      this.comments[data.id].elements.find('.has-comment:not(.new-comment)').addClass('new-comment');
+      this.comments[data.id].elements.addClass('new-comment');
     }
     else {
       this.comments.push(data);
@@ -349,9 +349,11 @@ Drupal.dreditor.patchReview.comment = {
   delete: function (id) {
     var data = this.load(id);
     if (data && data.id !== undefined) {
-      this.comments[id].elements
+      data.elements
         .removeClass('has-comment')
-        .unbind('click');
+        .removeClass('comment-id-' + id)
+        // @todo For whatever reason, the click event is not unbound here.
+        .unbind('click.patchReview');
       delete this.comments[id];
     }
   }
@@ -441,16 +443,19 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
 };
 
 Drupal.dreditor.patchReview.behaviors.attachPastie = function (context) {
-  $('#code .has-comment.new-comment', context).removeClass('new-comment').click(function () {
-    // Load data from from element attributes.
-    var params = Drupal.dreditor.getParams(this, 'comment');
-    // Load comment and put data into selection storage.
-    var data = Drupal.dreditor.patchReview.comment.load(params.id);
-    Drupal.dreditor.patchReview.load(data);
-    // Display pastie.
-    Drupal.dreditor.patchReview.edit();
-    return false;
-  });
+  $('#code .has-comment.new-comment', context).removeClass('new-comment')
+    .unbind('click.patchReview').bind('click.patchReview', function () {
+      // Load data from from element attributes.
+      var params = Drupal.dreditor.getParams(this, 'comment');
+      // Load comment and put data into selection storage.
+      if (params.id !== undefined) {
+        var data = Drupal.dreditor.patchReview.comment.load(params.id);
+        Drupal.dreditor.patchReview.load(data);
+        // Display pastie.
+        Drupal.dreditor.patchReview.edit();
+      }
+      return false;
+    });
 };
 
 jQuery(document).ready(function () {
