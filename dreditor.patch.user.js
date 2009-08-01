@@ -518,12 +518,12 @@ GM_addStyle(" \
 #dreditor #menu li { margin: 0; padding: 0 10px 0; list-style: none; } \
 #dreditor a { text-decoration: none; } \
 #dreditor .form-textarea { width: 100%; height: 12em; font: 13px 'courier new', courier, 'lucida console'; color: #000; } \
-#dreditor #code { margin-left: 250px; border-left: 1px solid #ccc; padding-left: 10px; overflow: scroll; height: 100%; } \
+#dreditor #code { margin-left: 250px; border-left: 1px solid #ccc; padding-left: 10px; overflow: scroll; height: 100%; background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y 40em 0; } \
 #dreditor #code pre { margin: 0; font: 13px 'courier new', courier, 'lucida console'; background-color: transparent; border: 0; padding: 0; } \
 #dreditor #code pre span { display: inline-block; margin-left: 2px; width: 2px; height: 7px; background-color: #ddd; } \
 #dreditor #code .file { color: #088; } \
 #dreditor #code .new { color: #00d; } \
 #dreditor #code .old { color: #d00; } \
-#dreditor #code .has-comment { background-color: #ffdddd; } \
-#dreditor #code .selected { background-color: #ffffdd; } \
+#dreditor #code .has-comment { background-color: rgba(255, 200, 200, 0.5); } \
+#dreditor #code .selected { background-color: rgba(255, 255, 200, 0.5); } \
 ");
