@@ -253,7 +253,7 @@ Drupal.dreditor.patchReview = {
     if (!self.$form) {
       self.$form = Drupal.dreditor.form.create('pastie');
       // Add comment textarea.
-      self.$form.append('<textarea name="comment" class="resizable" rows="10"></textarea>');
+      self.$form.append('<textarea name="comment" class="form-textarea resizable" rows="10"></textarea>');
       // Add comment save button.
       self.$form.addButton('Save', function (form, $form) {
         // Store new comment, if non-empty.
@@ -517,7 +517,7 @@ GM_addStyle(" \
 #dreditor #menu { margin: 0; padding: 0; } \
 #dreditor #menu li { margin: 0; padding: 0 10px 0; list-style: none; } \
 #dreditor a { text-decoration: none; } \
-#dreditor #pastie { width: 100%; height: 12em; font: 13px 'courier new', courier, 'lucida console'; color: #000; } \
+#dreditor .form-textarea { width: 100%; height: 12em; font: 13px 'courier new', courier, 'lucida console'; color: #000; } \
 #dreditor #code { margin-left: 250px; border-left: 1px solid #ccc; padding-left: 10px; overflow: scroll; height: 100%; } \
 #dreditor #code pre { margin: 0; font: 13px 'courier new', courier, 'lucida console'; background-color: transparent; border: 0; padding: 0; } \
 #dreditor #code pre span { display: inline-block; margin-left: 2px; width: 2px; height: 7px; background-color: #ddd; } \
