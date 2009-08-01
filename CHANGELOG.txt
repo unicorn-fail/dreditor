@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Added paste button. With functionality! :)
 by sun: Fixed behaviors not applied to comment form.
 by sun: Fixed comment deletion and re-binding of click event.
 by sun: Refactored comment form and current selection storage handling.

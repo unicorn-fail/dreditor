@@ -28,12 +28,16 @@ Drupal.dreditor.setup = function (context) {
   var $bar = $('<div id="bar"></div>').prependTo($dreditor);
   // Add ul#menu to sidebar by default for convenience.
   $('<ul id="menu"></ul>').appendTo($bar);
+
+  // Add global Dreditor buttons container.
+  var $actions = $('<div id="dreditor-actions"></div>');
   // Add cancel button to tear down Dreditor.
   $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />')
     .click(function () {
       return Drupal.dreditor.tearDown(context);
     })
-    .appendTo($bar);
+    .appendTo($actions);
+  $actions.appendTo($bar);
 
   // Setup application.
   var args = arguments;
@@ -311,6 +315,24 @@ Drupal.dreditor.patchReview = {
     }
     $elements = $elements.add(last);
     return $elements;
+  },
+
+  paste: function () {
+    var html = '';
+    $.each(this.comment.comments, function () {
+      console.log(this, this.elements.text());
+      html += '<code>\n';
+      this.elements.each(function () {
+        html += $(this).text() + '\n';
+      });
+      html += '</code>\n';
+      html += '\n' + this.comment + '\n\n';
+    });
+    // Let's get some attention! :)
+    html += '\n\n<em>This review is powered by <a href="http://drupal.org/project/dreditor">Dreditor</a></em>\n';
+    var $commentField = $('#edit-comment');
+    $commentField.val($commentField.val() + html);
+    Drupal.dreditor.tearDown();
   }
 };
 
@@ -465,6 +487,18 @@ Drupal.dreditor.patchReview.behaviors.attachPastie = function (context) {
     });
 };
 
+Drupal.dreditor.patchReview.behaviors.saveButton = function (context) {
+  if (!$('#dreditor-actions #dreditor-save', context).length) {
+    // @todo Convert global Dreditor buttons into a Dreditor form.
+    var $save = $('<input id="dreditor-save" class="dreditor-button" type="submit" value="Paste" />');
+    $save.click(function () {
+      Drupal.dreditor.patchReview.paste();
+      return false;
+    });
+    $save.prependTo('#dreditor-actions');
+  }
+};
+
 jQuery(document).ready(function () {
   // @todo Behaviors of this user script are not invoked with regular behaviors.
   Drupal.attachBehaviors(this);
@@ -479,7 +513,7 @@ GM_addStyle(" \
 .dreditor-button, #content a.dreditor-button { background: transparent url(/sites/all/themes/bluebeach/header-back.png) repeat-x 0 -30px; border: 1px solid #06c; color: #fff; cursor: pointer; font: 11px sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 1px 9px; text-transform: uppercase; text-decoration: none; -moz-border-radius: 9px; -webkit-border-radius: 9px; border-radius: 9px; } \
 .dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 0; } \
 .dreditor-patchreview-processed .dreditor-button { margin-left: 1em; } \
-#dreditor-cancel { position: absolute; bottom: 8px; } \
+#dreditor-actions { position: absolute; bottom: 8px; } \
 #dreditor #menu { margin: 0; padding: 0; } \
 #dreditor #menu li { margin: 0; padding: 0 10px 0; list-style: none; } \
 #dreditor a { text-decoration: none; } \
