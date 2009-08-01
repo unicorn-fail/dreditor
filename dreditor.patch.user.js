@@ -109,25 +109,34 @@ Drupal.dreditor.form = {
     return new this.form(this, id);
   }
 };
+
 Drupal.dreditor.form.form = function (o, id) {
   var self = this;
 
+  // Turn this object into a jQuery object, being a form. :)
   $.extend(true, self, $('<form id="' + id + '"></form>'));
 
+  // Override the default submit handler.
   self.submit(function (e) {
+    // Invoke the submit handler of the clicked button.
     var op = e.originalEvent.explicitOriginalTarget.value;
     if (self.submitHandlers[op]) {
       self.submitHandlers[op](this, self);
     }
+    // Unless proven wrong, we remove the form after submission.
+    self.remove();
+    // We never really submit.
     return false;
   });
 };
+
 Drupal.dreditor.form.form.prototype = {
   submitHandlers: {},
 
   addButton: function (op, onSubmit) {
     this.submitHandlers[op] = onSubmit;
     this.append('<input name="op" class="dreditor-button" type="submit" value="' + op + '" />');
+    // Return the jQurey form object to allow for chaining.
     return this;
   }
 };
@@ -174,17 +183,91 @@ Drupal.dreditor.patchReview = {
   behaviors: {},
 
   /**
+   * Internal use only; return empty data.
+   */
+  _empty: {
+    elements: $([])
+  },
+
+  /**
    * Current selection jQuery DOM element stack.
    */
   data: {
     elements: $([])
   },
 
-  resetData: function () {
-    this.data = {
-      elements: $([])
-    };
+  reset: function () {
+    // Reset currently stored selection data.
+    this.data = $.extend({}, this._empty);
     $('#code', Drupal.dreditor.context).find('.selected').removeClass('selected');
+    // Remove and delete pastie form.
+    if (this.$form) {
+      this.$form.remove();
+      delete this.$form;
+    }
+  },
+
+  /**
+   * Load data into selection storage.
+   */
+  load: function (data) {
+    // Do not overwrite other comment data.
+    if (this.data.id !== data.id) {
+      this.reset();
+    }
+    this.data = data;
+  },
+
+  /**
+   * Add elements to current selection storage.
+   */
+  add: function ($elements) {
+    if (!$elements.length) {
+      return $elements;
+    }
+    // Add temporary comment editing class.
+    $elements.addClass('selected');
+
+    this.data.elements = this.data.elements.add($elements);
+    return $elements;
+  },
+
+  edit: function () {
+    var self = this;
+    // Mark current selection/commented code as selected.
+    self.data.elements.addClass('selected');
+
+    // Add Pastie.
+    if (!self.$form) {
+      self.$form = Drupal.dreditor.form.create('pastie');
+      // Add comment textarea.
+      self.$form.append('<textarea name="comment" class="resizable" rows="10"></textarea>');
+      // Add comment save button.
+      self.$form.addButton('Save', function (form, $form) {
+        // If a comment was entered,
+        if ($.trim(form.comment.value)) {
+          self.comment.save({
+            id: self.data.id,
+            elements: self.data.elements,
+            comment: form.comment.value
+          });
+        }
+        // Reset pastie in any case.
+        self.reset();
+      });
+      // Add comment delete button for existing comments.
+      if (self.data.id !== undefined) {
+        self.$form.addButton('Delete', function (form, $form) {
+          self.comment.delete(self.data.id);
+          // Reset pastie in any case.
+          self.reset();
+        });
+      }
+      // Append pastie to sidebar, insert current comment and focus it.
+      self.$form.appendTo('#bar').find('textarea').val(self.data.comment || '');
+    }
+    // Focus pastie.
+    self.$form.find('textarea').focus();
   },
 
   /**
@@ -219,17 +302,6 @@ Drupal.dreditor.patchReview = {
     }
     $elements = $elements.add(last);
     return $elements;
-  },
-
-  addSelection: function ($elements) {
-    if (!$elements.length) {
-      return $elements;
-    }
-    // Add temporary comment editing class.
-    $elements.addClass('selected');
-
-    this.data.elements = this.data.elements.add($elements);
-    return $elements;
   }
 };
 
@@ -248,8 +320,10 @@ Drupal.dreditor.patchReview.comment = {
    *   The stored data, including new id for new comments.
    */
   save: function (data) {
-    if (data.id) {
+    if (data.id !== undefined) {
       this.comments[data.id] = data;
+      // Mark new comments, if there are any.
+      this.comments[data.id].elements.find('.has-comment:not(.new-comment)').addClass('new-comment');
     }
     else {
       this.comments.push(data);
@@ -257,8 +331,7 @@ Drupal.dreditor.patchReview.comment = {
       this.comments[newid].id = data.id = newid;
       this.comments[data.id].elements.addClass('new-comment');
     }
-    this.comments[data.id].elements.data('dreditor.patchReview.id', data.id).addClass('has-comment');
-    this.comments[data.id].elements.addClass('comment-id-' + data.id);
+    this.comments[data.id].elements.addClass('comment-id-' + data.id).addClass('has-comment');
 
     $.each(Drupal.dreditor.patchReview.behaviors, function () {
       this(Drupal.dreditor.context);
@@ -275,10 +348,9 @@ Drupal.dreditor.patchReview.comment = {
 
   delete: function (id) {
     var data = this.load(id);
-    if (data && data.id && this.comments[data.id]) {
-      this.comments[data.id].elements
+    if (data && data.id !== undefined) {
+      this.comments[id].elements
         .removeClass('has-comment')
-        .removeData('dreditor.patchReview.id')
         .unbind('click');
       delete this.comments[id];
     }
@@ -304,7 +376,6 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   if ($('#code', context).length) {
     return;
   }
-  var $dreditor = $(context);
 
   // Convert CRLF, CR into LF.
   code = code.replace(/\r\n|\r/g, "\n");
@@ -355,58 +426,29 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     $code.append(line);
   }
   // Append parsed code to body.
-  $code.appendTo($dreditor);
-
-  // Add Pastie.
-  var $pastie = Drupal.dreditor.form.create('pastie').hide()
-    // Add comment textarea.
-    .append('<textarea name="comment" class="resizable" rows="10"></textarea>')
-    // Add comment save button.
-    .addButton('Save', function (form, $form) {
-      // If a comment was entered,
-      if ($.trim(form.comment.value)) {
-        var data = Drupal.dreditor.patchReview.comment.save({
-          id: Drupal.dreditor.patchReview.data.id,
-          elements: Drupal.dreditor.patchReview.data.elements,
-          comment: form.comment.value
-        });
-      }
-      // Reset pastie in any case.
-      form.comment.value = '';
-      $form.find('#dreditor-delete').andSelf().hide();
-      Drupal.dreditor.patchReview.resetData();
-    })
-    // Add comment delete button.
-    .addButton('Delete', function (form, $form) {
-      if (Drupal.dreditor.patchReview.data.id) {
-        Drupal.dreditor.patchReview.comment.delete(Drupal.dreditor.patchReview.data.id);
-      }
-      // Reset pastie in any case.
-      form.comment.value = '';
-      $form.find('#dreditor-delete').andSelf().hide();
-      Drupal.dreditor.patchReview.resetData();
-    });
-  $pastie.appendTo('#bar');
+  $code.appendTo(context);
 
   // Attach pastie to any selection.
   $code.mouseup(function () {
-    var $elements = Drupal.dreditor.patchReview.addSelection(Drupal.dreditor.patchReview.getSelection());
+    var $elements = Drupal.dreditor.patchReview.getSelection();
     if ($elements.length) {
-      // Trigger pastie.
-      $pastie.show().find('textarea').focus();
+      Drupal.dreditor.patchReview.add($elements);
+      // Display pastie.
+      Drupal.dreditor.patchReview.edit();
     }
+    return false;
   });
 };
 
 Drupal.dreditor.patchReview.behaviors.attachPastie = function (context) {
   $('#code .has-comment.new-comment', context).removeClass('new-comment').click(function () {
+    // Load data from from element attributes.
     var params = Drupal.dreditor.getParams(this, 'comment');
+    // Load comment and put data into selection storage.
     var data = Drupal.dreditor.patchReview.comment.load(params.id);
-    Drupal.dreditor.patchReview.data = data;
-    data.elements.addClass('selected');
-    $('#pastie')
-      .find('textarea').val(data.comment).end()
-      .find('#dreditor-delete').andSelf().show();
+    Drupal.dreditor.patchReview.load(data);
+    // Display pastie.
+    Drupal.dreditor.patchReview.edit();
     return false;
   });
 };
@@ -436,6 +478,6 @@ GM_addStyle(" \
 #dreditor #code .file { color: #088; } \
 #dreditor #code .new { color: #00d; } \
 #dreditor #code .old { color: #d00; } \
-#dreditor #code .selected { background-color: #ffffdd; } \
 #dreditor #code .has-comment { background-color: #ffdddd; } \
+#dreditor #code .selected { background-color: #ffffdd; } \
 ");
