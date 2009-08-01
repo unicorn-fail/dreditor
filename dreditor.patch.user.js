@@ -320,10 +320,18 @@ Drupal.dreditor.patchReview = {
   paste: function () {
     var html = '';
     $.each(this.comment.comments, function () {
-      console.log(this, this.elements.text());
       html += '<code>\n';
+      // Add hunk information.
+      html += this.elements.eq(0).prevAll('.file').eq(0).text() + '\n';
+      var lastline = this.elements.get(0).previousSibling;
       this.elements.each(function () {
-        html += $(this).text() + '\n';
+        var $element = $(this);
+        // Add a delimiter, in case a comment spans over multiple selections.
+        if (lastline != $element.get(0).previousSibling) {
+          html += '...\n';
+        }
+        html += $element.text() + '\n';
+        lastline = $element.get(0);
       });
       html += '</code>\n';
       html += '\n' + this.comment + '\n\n';
