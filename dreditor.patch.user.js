@@ -322,24 +322,37 @@ Drupal.dreditor.patchReview = {
     $.each(this.comment.comments, function () {
       html += '<code>\n';
       // Add hunk information.
-      html += this.elements.eq(0).prevAll('.file').eq(0).text() + '\n';
+      var lasthunk = this.elements.eq(0).prevAll('.file').get(0);
+      html += lasthunk.textContent + '\n';
+
       var lastline = this.elements.get(0).previousSibling;
+
       this.elements.each(function () {
         var $element = $(this);
+        // Add new last hunk, in case a comment spans over multiple hunks.
+        if (lasthunk != $element.prevAll('.file').get(0)) {
+          lasthunk = $element.prevAll('.file').get(0);
+          html += lasthunk.textContent + '\n';
+        }
         // Add a delimiter, in case a comment spans over multiple selections.
-        if (lastline != $element.get(0).previousSibling) {
+        else if (lastline != $element.get(0).previousSibling) {
           html += '...\n';
         }
         html += $element.text() + '\n';
+
+        // Use this line as previous line for next line.
         lastline = $element.get(0);
       });
+
       html += '</code>\n';
       html += '\n' + this.comment + '\n\n';
     });
     // Let's get some attention! :)
-    html += '\n\n<em>This review is powered by <a href="http://drupal.org/project/dreditor">Dreditor</a></em>\n';
+    html += '\n\n<em>This review is powered by <a href="http://drupal.org/project/dreditor">Dreditor</a>.</em>\n';
+    // Paste comment into issue comment textarea.
     var $commentField = $('#edit-comment');
     $commentField.val($commentField.val() + html);
+    // Close Dreditor.
     Drupal.dreditor.tearDown();
   }
 };
