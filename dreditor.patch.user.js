@@ -537,7 +537,8 @@ GM_addStyle(" \
 .dreditor-patchreview-processed .dreditor-button { margin-left: 1em; } \
 #dreditor-actions { position: absolute; bottom: 8px; } \
 #dreditor #menu { margin: 0; padding: 0; } \
-#dreditor #menu li { margin: 0; padding: 0 10px 0; list-style: none; } \
+#dreditor #menu li { list-style: none; margin: 0; overflow: hidden; padding: 0 10px 0; white-space: nowrap; } \
+#dreditor #menu li li { padding-right: 0; } \
 #dreditor a { text-decoration: none; } \
 #dreditor .form-textarea { width: 100%; height: 12em; font: 13px 'courier new', courier, 'lucida console'; color: #000; } \
 #dreditor #code { margin-left: 250px; border-left: 1px solid #ccc; padding-left: 10px; overflow: scroll; height: 100%; background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y 40em 0; } \
