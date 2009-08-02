@@ -440,18 +440,18 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   // Setup code container.
   var $code = $('<div id="code"></div>');
   var $menu = $('#menu', context);
-  var $lastFile;
+  var $lastFile = $('<li>Parse error</li>');
 
   code = code.split('\n');
   for (var n in code) {
     var line = code[n];
-    // Build file menu.
-    line = line.replace(/^(\+\+\+ )([^\s]+)(\s.*)/, function (full, match1, match2, match3) {
+    // Build file menu links.
+    line = line.replace(/^(\+\+\+ )([^\s]+)(\s.*)?/, function (full, match1, match2, match3) {
       $lastFile = $('<li><a href="#' + match2 + '">' + match2 + '</a></li>');
       $menu.append($lastFile);
       return match1 + '<a id="' + match2 + '">' + match2 + '</a>' + match3;
     });
-    // Build hunk menu.
+    // Build hunk menu links for file.
     line = line.replace(/^(@@ .+ @@\s+)([^\s]+\s[^\s\(]*)/, function (full, match1, match2) {
       $lastFile.append('<li><a href="#' + match2 + '">' + match2 + '</a></li>');
       return match1 + '<a id="' + match2 + '">' + match2 + '</a>';
@@ -533,6 +533,7 @@ GM_addStyle(" \
 #dreditor #bar { position: absolute; width: 230px; height: 100%; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
 .dreditor-button, #content a.dreditor-button { background: transparent url(/sites/all/themes/bluebeach/header-back.png) repeat-x 0 -30px; border: 1px solid #06c; color: #fff; cursor: pointer; font: 11px sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 1px 9px; text-transform: uppercase; text-decoration: none; -moz-border-radius: 9px; -webkit-border-radius: 9px; border-radius: 9px; } \
 .dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 0; } \
+#dreditor .dreditor-button { margin: 0 0.5em 0 0; } \
 .dreditor-patchreview-processed .dreditor-button { margin-left: 1em; } \
 #dreditor-actions { position: absolute; bottom: 8px; } \
 #dreditor #menu { margin: 0; padding: 0; } \
