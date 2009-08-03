@@ -321,6 +321,9 @@ Drupal.dreditor.patchReview = {
     var html = '';
     $.each(this.comment.comments, function () {
       html += '<code>\n';
+      // Add file information.
+      var lastfile = this.elements.eq(0).prevAll('.file:has(a.file)').get(0);
+      html += lastfile.textContent + '\n';
       // Add hunk information.
       var lasthunk = this.elements.eq(0).prevAll('.file').get(0);
       html += lasthunk.textContent + '\n';
@@ -329,6 +332,11 @@ Drupal.dreditor.patchReview = {
 
       this.elements.each(function () {
         var $element = $(this);
+        // Add new last file, in case a comment spans over multiple files.
+        if (lastfile != $element.prevAll('.file:has(a.file)').get(0)) {
+          lastfile = $element.prevAll('.file:has(a.file)').get(0);
+          html += lastfile.textContent + '\n';
+        }
         // Add new last hunk, in case a comment spans over multiple hunks.
         if (lasthunk != $element.prevAll('.file').get(0)) {
           lasthunk = $element.prevAll('.file').get(0);
@@ -449,12 +457,12 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     line = line.replace(/^(\+\+\+ )([^\s]+)(\s.*)?/, function (full, match1, match2, match3) {
       $lastFile = $('<li><a href="#' + match2 + '">' + match2 + '</a></li>');
       $menu.append($lastFile);
-      return match1 + '<a id="' + match2 + '">' + match2 + '</a>' + match3;
+      return match1 + '<a class="file" id="' + match2 + '">' + match2 + '</a>' + match3;
     });
     // Build hunk menu links for file.
     line = line.replace(/^(@@ .+ @@\s+)([^\s]+\s[^\s\(]*)/, function (full, match1, match2) {
       $lastFile.append('<li><a href="#' + match2 + '">' + match2 + '</a></li>');
-      return match1 + '<a id="' + match2 + '">' + match2 + '</a>';
+      return match1 + '<a class="hunk" id="' + match2 + '">' + match2 + '</a>';
     });
 
     // Colorize file diff lines.
