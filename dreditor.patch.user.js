@@ -449,9 +449,44 @@ Drupal.dreditor.patchReview.comment = {
         .removeClass('has-comment')
         .removeClass('comment-id-' + id)
         // @todo For whatever reason, the click event is not unbound here.
-        .unbind('click.patchReview');
+        .unbind('click.patchReview.editComment');
       delete this.comments[id];
     }
+  }
+};
+
+Drupal.dreditor.patchReview.overlay = {
+  element: null,
+  data: {},
+
+  setup: function () {
+    this.element = $('<div id="dreditor-overlay"></div>').hide().appendTo('#dreditor #bar');
+    return this;
+  },
+
+  load: function (data) {
+    // Setup overlay if required.
+    if (!this.element) {
+      this.setup();
+    }
+    if (data !== undefined && typeof data.comment == 'string') {
+      this.data = data;
+      this.element.empty();
+      // Do some basic text2html processing.
+      var content = data.comment.replace(/\n$[^<]/gm, '<br />\n');
+      // @todo jQuery seems to suck up newlines in child nodes (such as <code>).
+      this.element.append('<p>' + content + '</p>');
+    }
+  },
+
+  show: function () {
+    this.element.show();
+    return this;
+  },
+
+  hide: function () {
+    this.element.hide();
+    return this;
   }
 };
 
@@ -546,18 +581,35 @@ Drupal.dreditor.patchReview.behaviors.attachPastie = function (context) {
   // @todo Seems we need detaching behaviors, but only for certain DOM elements,
   //   wrapped in a jQuery object to eliminate the naive 'new-comment' handling.
   $('#code .has-comment.new-comment', context).removeClass('new-comment')
-    .unbind('click.patchReview').bind('click.patchReview', function () {
+    .unbind('click.patchReview.editComment').bind('click.patchReview.editComment', function () {
       // Load data from from element attributes.
       var params = Drupal.dreditor.getParams(this, 'comment');
-      // Load comment and put data into selection storage.
       if (params.id !== undefined) {
+        // Load comment and put data into selection storage.
         var data = Drupal.dreditor.patchReview.comment.load(params.id);
         Drupal.dreditor.patchReview.load(data);
         // Display pastie.
         Drupal.dreditor.patchReview.edit();
       }
       return false;
-    });
+    })
+    // Display existing comment on hover.
+    .hover(
+      function () {
+        // Load data from from element attributes.
+        var params = Drupal.dreditor.getParams(this, 'comment');
+        // Load comment and put data into selection storage.
+        if (params.id !== undefined) {
+          var data = Drupal.dreditor.patchReview.comment.load(params.id);
+          Drupal.dreditor.patchReview.overlay.load(data);
+          // Display overlay.
+          Drupal.dreditor.patchReview.overlay.show();
+        }
+      },
+      function () {
+        Drupal.dreditor.patchReview.overlay.hide();
+      }
+    );
 };
 
 Drupal.dreditor.patchReview.behaviors.saveButton = function (context) {
@@ -579,7 +631,6 @@ jQuery(document).ready(function () {
 
 // Add custom stylesheet.
 GM_addStyle(" \
-#dreditor-overlay { position: fixed; z-index: 999; width: 100%; height: 100%; top: 0; background-color: #fff; } \
 #dreditor-wrapper { position: fixed; z-index: 1000; width: 100%; top: 0; } \
 #dreditor { position: relative; width: 100%; height: 100%; background-color: #fff; border: 1px solid #ccc; } \
 #dreditor #bar { position: absolute; width: 230px; height: 100%; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
@@ -603,4 +654,5 @@ GM_addStyle(" \
 #dreditor #code .old { color: #d00; } \
 #dreditor #code .has-comment { background-color: rgba(255, 200, 200, 0.5); } \
 #dreditor #code .selected { background-color: rgba(255, 255, 200, 0.5); } \
+#dreditor-overlay { } \
 ");
