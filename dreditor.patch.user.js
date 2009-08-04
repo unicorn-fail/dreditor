@@ -255,7 +255,7 @@ Drupal.dreditor.patchReview = {
       // Add comment textarea.
       self.$form.append('<textarea name="comment" class="form-textarea resizable" rows="10"></textarea>');
       // Add comment save button.
-      self.$form.addButton('Save', function (form, $form) {
+      self.$form.addButton((self.data.id !== undefined ? 'Update' : 'Save'), function (form, $form) {
         // @todo For any reason, FF 3.5 breaks when trying to access
         //   form.comment.value. Works in FF 3.0.x. WTF?
         var value = $form.find('textarea').val();
