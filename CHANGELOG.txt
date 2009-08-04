@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#539322 by sun: Fixed 80 chars limit nitpicking helper looks broken.
 #539902 by sun: Fixed repeated selection of a line is output multiple times.
 #539886 by sun: Added Hide/Show button to temporarily dismiss Dreditor.
 #539310 by sun: Fixed subsequent selections cannot be copied as usual.

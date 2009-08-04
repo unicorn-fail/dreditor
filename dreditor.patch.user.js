@@ -34,6 +34,9 @@ Drupal.dreditor.setup = function (context) {
   // Add ul#menu to sidebar by default for convenience.
   $('<ul id="menu"></ul>').appendTo($bar);
 
+  // Add content region.
+  $('<div id="dreditor-content"></div>').appendTo($dreditor);
+
   // Add global Dreditor buttons container.
   var $actions = $('<div id="dreditor-actions"></div>');
   // Add hide/show button to temporarily dismiss Dreditor.
@@ -514,7 +517,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     $code.append(line);
   }
   // Append parsed code to body.
-  $code.appendTo(context);
+  $('#dreditor-content', context).append($code);
 
   // Attach pastie to any selection.
   $code.mouseup(function (e) {
@@ -533,6 +536,8 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
 };
 
 Drupal.dreditor.patchReview.behaviors.attachPastie = function (context) {
+  // @todo Seems we need detaching behaviors, but only for certain DOM elements,
+  //   wrapped in a jQuery object to eliminate the naive 'new-comment' handling.
   $('#code .has-comment.new-comment', context).removeClass('new-comment')
     .unbind('click.patchReview').bind('click.patchReview', function () {
       // Load data from from element attributes.
@@ -581,8 +586,10 @@ GM_addStyle(" \
 #dreditor #menu li li { padding-right: 0; } \
 #dreditor a { text-decoration: none; } \
 #dreditor .form-textarea { width: 100%; height: 12em; font: 13px 'courier new', courier, 'lucida console'; color: #000; } \
-#dreditor #code { margin-left: 250px; border-left: 1px solid #ccc; padding-left: 10px; overflow: scroll; height: 100%; } \
-#dreditor #code pre { background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y scroll 50em 0; border: 0; font: 13px 'courier new', courier, 'lucida console'; margin: 0; padding: 0; } \
+#dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; padding-left: 10px; overflow: scroll; height: 100%; } \
+#dreditor-content, pre { font: 13px 'courier new', courier, 'lucida console'; } \
+#dreditor #code { background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y scroll 50em 0; } \
+#dreditor #code pre { background-color: transparent; border: 0; margin: 0; padding: 0; } \
 #dreditor #code pre span { display: inline-block; margin-left: 2px; width: 2px; height: 7px; background-color: #ddd; } \
 #dreditor #code .file { color: #088; } \
 #dreditor #code .new { color: #00d; } \
