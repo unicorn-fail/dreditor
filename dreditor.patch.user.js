@@ -20,7 +20,6 @@ Drupal.dreditor = Drupal.dreditor || { behaviors: {} };
 
 Drupal.dreditor.setup = function (context) {
   // Setup Dreditor overlay.
-  var $overlay = $('<div id="dreditor-overlay"></div>').css({ opacity: 0 }).appendTo('body').animate({ opacity: 0.7 });
   var $wrapper = $('<div id="dreditor-wrapper"></div>').css({ height: 0 });
   // Add Dreditor content area.
   var $dreditor = $('<div id="dreditor"></div>').appendTo($wrapper);
@@ -43,13 +42,19 @@ Drupal.dreditor.setup = function (context) {
   $('<input id="dreditor-hide" class="dreditor-button" type="button" value="Hide" />')
     .toggle(
       function () {
-        $wrapper.add($overlay).animate({ height: '10%' });
-        this.value = 'Show';
+        var button = this;
+        $wrapper.animate({ height: 34 }, function () {
+          button.value = 'Show';
+          $('body', context).css({ overflow: 'auto' });
+        });
         return false;
       },
       function () {
-        $wrapper.add($overlay).animate({ height: '100%' });
-        this.value = 'Hide';
+        var button = this;
+        $('body', context).css({ overflow: 'hidden' });
+        $wrapper.animate({ height: '100%' }, function () {
+          button.value = 'Hide';
+        });
         return false;
       }
     )
@@ -66,16 +71,18 @@ Drupal.dreditor.setup = function (context) {
   var args = arguments;
   // Cut out the application name (2nd argument).
   this.application = Array.prototype.splice.call(args, 1, 1);
-  // Remove global window context.
+  // Remove global window context; new context is added by attachBehaviors().
   args = Array.prototype.slice.call(args, 1);
   this.attachBehaviors(args);
 
   // Display Dreditor.
+  $('body', context).css({ overflow: 'hidden' });
   $wrapper.animate({ height: '100%' });
 };
 
 Drupal.dreditor.tearDown = function (context) {
-  $('#dreditor-overlay, #dreditor-wrapper', context).animate({ height: 0 }, function () {
+  $('#dreditor-wrapper', context).animate({ height: 0 }, function () {
+    $('body', context).css({ overflow: 'auto' });
     $(this).remove();
   });
   return false;
@@ -574,13 +581,13 @@ jQuery(document).ready(function () {
 GM_addStyle(" \
 #dreditor-overlay { position: fixed; z-index: 999; width: 100%; height: 100%; top: 0; background-color: #fff; } \
 #dreditor-wrapper { position: fixed; z-index: 1000; width: 100%; top: 0; } \
-#dreditor { position: relative; width: 95%; height: 90%; margin: auto auto; background-color: #fff; border: 1px solid #ccc; } \
+#dreditor { position: relative; width: 100%; height: 100%; background-color: #fff; border: 1px solid #ccc; } \
 #dreditor #bar { position: absolute; width: 230px; height: 100%; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
 .dreditor-button, #content a.dreditor-button { background: transparent url(/sites/all/themes/bluebeach/header-back.png) repeat-x 0 -30px; border: 1px solid #06c; color: #fff; cursor: pointer; font: 11px sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 1px 9px; text-transform: uppercase; text-decoration: none; -moz-border-radius: 9px; -webkit-border-radius: 9px; border-radius: 9px; } \
 .dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 0; } \
 #dreditor .dreditor-button { margin: 0 0.5em 0 0; } \
 .dreditor-patchreview-processed .dreditor-button { margin-left: 1em; } \
-#dreditor-actions { position: absolute; bottom: 8px; } \
+#dreditor-actions { background-color: #fff; position: absolute; bottom: 8px; } \
 #dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; } \
 #dreditor #menu li { list-style: none; margin: 0; overflow: hidden; padding: 0 10px 0; white-space: nowrap; } \
 #dreditor #menu li li { padding-right: 0; } \
