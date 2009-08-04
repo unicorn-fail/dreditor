@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#539308 by sun: Fixed spacing of trailing white-space helper.
 #539278 by sun: Added (basic) display of existing comments on hover.
 #539198 by sun: Changed Dreditor to take 100% of available width/height.
 #539322 by sun: Fixed 80 chars limit nitpicking helper looks broken.

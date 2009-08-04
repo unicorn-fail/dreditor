@@ -648,7 +648,7 @@ GM_addStyle(" \
 #dreditor-content, pre { font: 13px 'courier new', courier, 'lucida console'; } \
 #dreditor #code { background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y scroll 50em 0; } \
 #dreditor #code pre { background-color: transparent; border: 0; margin: 0; padding: 0; } \
-#dreditor #code pre span { display: inline-block; margin-left: 2px; width: 2px; height: 7px; background-color: #ddd; } \
+#dreditor #code pre span { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
 #dreditor #code .file { color: #088; } \
 #dreditor #code .new { color: #00d; } \
 #dreditor #code .old { color: #d00; } \
