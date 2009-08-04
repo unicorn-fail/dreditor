@@ -547,7 +547,7 @@ GM_addStyle(" \
 #dreditor .dreditor-button { margin: 0 0.5em 0 0; } \
 .dreditor-patchreview-processed .dreditor-button { margin-left: 1em; } \
 #dreditor-actions { position: absolute; bottom: 8px; } \
-#dreditor #menu { margin: 0; padding: 0; } \
+#dreditor #menu { margin: 0; max-height: 130px; overflow-y: scroll; padding: 0; } \
 #dreditor #menu li { list-style: none; margin: 0; overflow: hidden; padding: 0 10px 0; white-space: nowrap; } \
 #dreditor #menu li li { padding-right: 0; } \
 #dreditor a { text-decoration: none; } \
