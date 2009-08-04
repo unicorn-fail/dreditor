@@ -286,9 +286,10 @@ Drupal.dreditor.patchReview = {
       // Append pastie to sidebar, insert current comment and focus it.
       self.$form.appendTo('#bar').find('textarea').val(self.data.comment || '');
       Drupal.dreditor.attachBehaviors();
+      // Focus pastie; only for initial comment selection to still allow for
+      // copying of file contents.
+      self.$form.find('textarea').focus();
     }
-    // Focus pastie.
-    self.$form.find('textarea').focus();
   },
 
   /**
@@ -499,7 +500,11 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   $code.appendTo(context);
 
   // Attach pastie to any selection.
-  $code.mouseup(function () {
+  $code.mouseup(function (e) {
+    // Only act on left/first mouse button to allow for subsequent selections.
+    if (e.which != 1) {
+      return;
+    }
     var $elements = Drupal.dreditor.patchReview.getSelection();
     if ($elements.length) {
       Drupal.dreditor.patchReview.add($elements);
