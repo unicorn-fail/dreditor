@@ -243,7 +243,7 @@ Drupal.dreditor.patchReview = {
    * Load data into selection storage.
    */
   load: function (data) {
-    // Do not overwrite other comment data.
+    // Do not overwrite other comment data; also works for the undefined case.
     if (this.data.id !== data.id) {
       this.reset();
     }
@@ -257,10 +257,7 @@ Drupal.dreditor.patchReview = {
     if (!$elements.length) {
       return $elements;
     }
-    // Add temporary comment editing class.
-    $elements.addClass('selected');
-
-    this.data.elements = this.data.elements.add($elements);
+    this.data.elements = this.data.elements.pushStack($elements);
     return $elements;
   },
 
