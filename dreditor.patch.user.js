@@ -553,7 +553,7 @@ GM_addStyle(" \
 #dreditor a { text-decoration: none; } \
 #dreditor .form-textarea { width: 100%; height: 12em; font: 13px 'courier new', courier, 'lucida console'; color: #000; } \
 #dreditor #code { margin-left: 250px; border-left: 1px solid #ccc; padding-left: 10px; overflow: scroll; height: 100%; } \
-#dreditor #code pre { background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y scroll 40em 0; border: 0; font: 13px 'courier new', courier, 'lucida console'; margin: 0; padding: 0; } \
+#dreditor #code pre { background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y scroll 50em 0; border: 0; font: 13px 'courier new', courier, 'lucida console'; margin: 0; padding: 0; } \
 #dreditor #code pre span { display: inline-block; margin-left: 2px; width: 2px; height: 7px; background-color: #ddd; } \
 #dreditor #code .file { color: #088; } \
 #dreditor #code .new { color: #00d; } \
