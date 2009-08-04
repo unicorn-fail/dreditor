@@ -256,12 +256,15 @@ Drupal.dreditor.patchReview = {
       self.$form.append('<textarea name="comment" class="form-textarea resizable" rows="10"></textarea>');
       // Add comment save button.
       self.$form.addButton('Save', function (form, $form) {
+        // @todo For any reason, FF 3.5 breaks when trying to access
+        //   form.comment.value. Works in FF 3.0.x. WTF?
+        var value = $form.find('textarea').val();
         // Store new comment, if non-empty.
-        if ($.trim(form.comment.value)) {
+        if ($.trim(value)) {
           self.comment.save({
             id: self.data.id,
             elements: self.data.elements,
-            comment: form.comment.value
+            comment: value
           });
         }
         // Reset pastie.
