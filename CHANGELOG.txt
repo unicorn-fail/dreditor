@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#539330 by sun: Added auto-jump to issue comment textarea after pasting.
 #539266 by sun: Changed Save button title into "Update" for existing comments.
 #539266 by sun: Added Cancel button to comment form.
 by sun: Fixed position of 80 chars limit nitpicking helper.

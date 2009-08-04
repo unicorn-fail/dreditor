@@ -368,6 +368,8 @@ Drupal.dreditor.patchReview = {
     // Paste comment into issue comment textarea.
     var $commentField = $('#edit-comment');
     $commentField.val($commentField.val() + html);
+    // Jump to the issue comment textarea after pasting.
+    window.location.hash = '#edit-comment';
     // Close Dreditor.
     Drupal.dreditor.tearDown();
   }
