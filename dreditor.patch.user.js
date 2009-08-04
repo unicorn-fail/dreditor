@@ -270,6 +270,11 @@ Drupal.dreditor.patchReview = {
         // Reset pastie.
         self.reset();
       });
+      // Add comment cancel button.
+      self.$form.addButton('Cancel', function (form, $form) {
+        // Reset pastie.
+        self.reset();
+      });
       // Add comment delete button for existing comments.
       if (self.data.id !== undefined) {
         self.$form.addButton('Delete', function (form, $form) {

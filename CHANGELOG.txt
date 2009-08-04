@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#539266 by sun: Added Cancel button to comment form.
 by sun: Fixed position of 80 chars limit nitpicking helper.
 by sun: Fixed 80 chars limit nitpicking helper does not scroll.
 #539218 by sun: Fixed (temporarily) height of outline menu exceeds Dreditor.
