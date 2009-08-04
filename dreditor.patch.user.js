@@ -10,12 +10,17 @@
 // Initialize window objects.
 $ = window.$ = window.jQuery = unsafeWindow.jQuery;
 Drupal = window.Drupal = unsafeWindow.Drupal;
+// Bail out in (the unlikely) case that JS has been disabled.
+if (Drupal === undefined) {
+  alert('JavaScript is disabled, but required for Dreditor.');
+  return false;
+}
 
 Drupal.dreditor = Drupal.dreditor || { behaviors: {} };
 
 Drupal.dreditor.setup = function (context) {
   // Setup Dreditor overlay.
-  $('<div id="dreditor-overlay"></div>').css({ opacity: 0 }).appendTo('body').animate({ opacity: 0.7 });
+  var $overlay = $('<div id="dreditor-overlay"></div>').css({ opacity: 0 }).appendTo('body').animate({ opacity: 0.7 });
   var $wrapper = $('<div id="dreditor-wrapper"></div>').css({ height: 0 });
   // Add Dreditor content area.
   var $dreditor = $('<div id="dreditor"></div>').appendTo($wrapper);
@@ -31,6 +36,21 @@ Drupal.dreditor.setup = function (context) {
 
   // Add global Dreditor buttons container.
   var $actions = $('<div id="dreditor-actions"></div>');
+  // Add hide/show button to temporarily dismiss Dreditor.
+  $('<input id="dreditor-hide" class="dreditor-button" type="button" value="Hide" />')
+    .toggle(
+      function () {
+        $wrapper.add($overlay).animate({ height: '10%' });
+        this.value = 'Show';
+        return false;
+      },
+      function () {
+        $wrapper.add($overlay).animate({ height: '100%' });
+        this.value = 'Hide';
+        return false;
+      }
+    )
+    .appendTo($actions);
   // Add cancel button to tear down Dreditor.
   $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />')
     .click(function () {
@@ -48,7 +68,7 @@ Drupal.dreditor.setup = function (context) {
   this.attachBehaviors(args);
 
   // Display Dreditor.
-  $('#dreditor-wrapper', context).animate({ height: '100%' });
+  $wrapper.animate({ height: '100%' });
 };
 
 Drupal.dreditor.tearDown = function (context) {
@@ -559,7 +579,7 @@ GM_addStyle(" \
 #dreditor .dreditor-button { margin: 0 0.5em 0 0; } \
 .dreditor-patchreview-processed .dreditor-button { margin-left: 1em; } \
 #dreditor-actions { position: absolute; bottom: 8px; } \
-#dreditor #menu { margin: 0; max-height: 130px; overflow-y: scroll; padding: 0; } \
+#dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; } \
 #dreditor #menu li { list-style: none; margin: 0; overflow: hidden; padding: 0 10px 0; white-space: nowrap; } \
 #dreditor #menu li li { padding-right: 0; } \
 #dreditor a { text-decoration: none; } \
