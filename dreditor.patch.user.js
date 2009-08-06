@@ -47,6 +47,7 @@ jQuery.extend({
     if (console !== undefined) {
       console.log(name, data);
     }
+    return this;
   }
 });
 // @todo Is this the right way?

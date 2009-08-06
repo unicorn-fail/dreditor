@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Fixed chaining in jQuery.debug().
 by sun: Added jQuery.debug() helper.  Core-worthy.
 #539308 by sun: Fixed spacing of trailing white-space helper.
 #539278 by sun: Added (basic) display of existing comments on hover.
