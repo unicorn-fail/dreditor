@@ -18,6 +18,40 @@ if (Drupal === undefined) {
 
 Drupal.dreditor = Drupal.dreditor || { behaviors: {} };
 
+/**
+ * Dreditor debugging helper.
+ *
+ * @usage
+ *   $.debug(var [, name]);
+ *   $variable.debug( [name] );
+ */
+jQuery.extend({
+  debug: function () {
+    // Setup debug storage in global window. We want to look into it.
+    window.debug = unsafeWindow.debug = window.debug || [];
+
+    args = jQuery.makeArray(arguments);
+    // Determine data source; this is an object for $variable.debug().
+    // Also determine the identifier to store data with.
+    if (typeof this == 'object') {
+      var name = (args.length ? args[0] : window.debug.length);
+      var data = this;
+    }
+    else {
+      var name = (args.length > 1 ? args.pop() : window.debug.length);
+      var data = args[0];
+    }
+    // Store data.
+    window.debug[name] = data;
+    // Dump data into Firebug console.
+    if (console !== undefined) {
+      console.log(name, data);
+    }
+  }
+});
+// @todo Is this the right way?
+jQuery.fn.debug = jQuery.debug;
+
 Drupal.dreditor.setup = function (context) {
   // Setup Dreditor overlay.
   var $wrapper = $('<div id="dreditor-wrapper"></div>').css({ height: 0 });
@@ -70,7 +104,7 @@ Drupal.dreditor.setup = function (context) {
   // Setup application.
   var args = arguments;
   // Cut out the application name (2nd argument).
-  this.application = Array.prototype.splice.call(args, 1, 1);
+  this.application = Array.prototype.splice.call(args, 1, 1)[0];
   // Remove global window context; new context is added by attachBehaviors().
   args = Array.prototype.slice.call(args, 1);
   this.attachBehaviors(args);
