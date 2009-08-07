@@ -525,15 +525,15 @@ Drupal.dreditor.patchReview.comment = {
   save: function (data) {
     if (data.id !== undefined) {
       this.comments[data.id] = data;
-      // Mark new comments, if there are any.
-      $(this.comments[data.id].elements).addClass('new-comment');
     }
     else {
       this.comments.push(data);
+      // Return value of .push() is not suitable for real ids.
       var newid = this.comments.length - 1;
       this.comments[newid].id = data.id = newid;
-      $(this.comments[data.id].elements).addClass('new-comment');
     }
+    // Mark new comments, if there are any.
+    $(this.comments[data.id].elements).addClass('new-comment');
     $(this.comments[data.id].elements).addClass('comment-id-' + data.id).addClass('has-comment');
 
     Drupal.dreditor.attachBehaviors();
@@ -557,6 +557,7 @@ Drupal.dreditor.patchReview.comment = {
         .unbind('click.patchReview.editComment');
       delete this.comments[id];
     }
+    return data || {};
   }
 };
 
