@@ -332,14 +332,25 @@ Drupal.dreditor.patchReview = {
 
   /**
    * Add elements to current selection storage.
+   *
+   * $.unique() invoked via $.add() fails to apply and identify an existing
+   * DOM element id (which is internally done via $.data()). Additionally, ===
+   * in $.inArray() fails to identify DOM elements coming from .getSelection(),
+   * which are already in our stack. Hence, we need custom code to merge DOM
+   * elements of a new selection into our stack.
+   *
+   * After merging, all elements in the stack are re-ordered by their actual
+   * DOM position.
    */
   add: function (elements) {
     if (!elements.length) {
       return elements;
     }
+    // Merge new elements.
     var self = this;
     $.each(elements, function () {
       var newelement = this, merge = true;
+      // Check whether this element is already in the stack.
       $.each(self.data.elements, function () {
         if (this == newelement) {
           merge = false;
@@ -350,6 +361,7 @@ Drupal.dreditor.patchReview = {
         self.data.elements.push(newelement);
       }
     });
+    // Re-order elements by their actual DOM position.
     self.data.elements.sort(sortOrder);
     return elements;
   },
