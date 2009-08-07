@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name           Dreditor: Patch review
+// @name           Dreditor
 // @namespace      http://drupal.org/project/dreditor
-// @description    Highlights and outlines diff syntax in patch files.
+// @description    Awesomeness for drupal.org.
 // @author         Daniel F. Kudwien (sun)
 // @version        0.1
 // @include        http://drupal.org/node/*
