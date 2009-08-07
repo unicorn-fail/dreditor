@@ -469,8 +469,19 @@ Drupal.dreditor.patchReview = {
     return elements;
   },
 
+  /**
+   * Wrapper around jQuery's sortOrder() to sort review comments.
+   */
+  sort: function (a, b) {
+    if (!a || !b) {
+      return 0;
+    }
+    return sortOrder(a.elements[0], b.elements[0]);
+  },
+
   paste: function () {
     var html = '';
+    this.comment.comments.sort(this.sort);
     $.each(this.comment.comments, function (index, comment) {
       // Skip deleted (undefined) comments; this would return window here.
       if (!comment) {
