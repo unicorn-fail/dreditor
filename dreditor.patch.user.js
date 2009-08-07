@@ -5,6 +5,7 @@
 // @author         Daniel F. Kudwien (sun)
 // @version        0.1
 // @include        http://drupal.org/node/*
+// @include        http://drupal.org/comment/reply/*
 // ==/UserScript==
 
 // Initialize window objects.
@@ -849,6 +850,40 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
       });
       // Prepend commit message button to comment form.
       $link.prependTo(this);
+    });
+};
+
+/**
+ * Attach image attachment inline HTML injector to file attachments.
+ */
+Drupal.behaviors.dreditorInlineImage = function (context) {
+  // Do nothing if the user does not have access to the "Documentation" input
+  // format.
+  if (!$('#edit-format-5').length) {
+    return;
+  }
+  $('#comment-upload-attachments:not(.dreditor-inlineimage-processed)', context)
+    .addClass('dreditor-inlineimage-processed')
+    .find('div.description').each(function () {
+      var url = $(this).text();
+      // Only process image attachments.
+      if (!url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
+        return;
+      }
+      // Fix bug in comment_upload's preview issue attachment URLs.
+      url = url.replace(/\/files\/(?!issues\/)/, '/files/issues/');
+      // Generate inline image button.
+      var $button = $('<a class="dreditor-button dreditor-inlineimage" href="javascript:void(0);">Embed</a>').click(function () {
+        var desc = $(this).parent().siblings('input').val();
+        var image = '<img src="' + url + '" alt="' + desc + '" />';
+        // Append image to issue comment textarea (context is AHAH content here).
+        $('#edit-comment').val($('#edit-comment').val() + "\n" + image + "\n");
+        // Ensure the "Documentation" input format is enabled.
+        $('#edit-format-5').select();
+        return false;
+      });
+      // Append inline image button to attachment.
+      $button.appendTo(this);
     });
 };
 
