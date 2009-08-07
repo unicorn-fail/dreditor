@@ -429,10 +429,10 @@ Drupal.dreditor.patchReview = {
     var next = range.startContainer;
     var last = range.endContainer;
     // If start/end containers are a text node, retrieve the parent node.
-    while (next && next.nodeType != 1 && next.nodeName != 'PRE') {
+    while (next && next.nodeName != 'PRE') {
       next = next.parentNode;
     }
-    while (last && last.nodeType != 1 && last.nodeName != 'PRE') {
+    while (last && last.nodeName != 'PRE') {
       last = last.parentNode;
     }
     // If full lines where selected, retrieve the line right before the end of
@@ -456,10 +456,14 @@ Drupal.dreditor.patchReview = {
       html += '<code>\n';
       // Add file information.
       var lastfile = $elements.eq(0).prevAll('.file:has(a.file)').get(0);
-      html += lastfile.textContent + '\n';
+      if (lastfile) {
+        html += lastfile.textContent + '\n';
+      }
       // Add hunk information.
       var lasthunk = $elements.eq(0).prevAll('.file').get(0);
-      html += lasthunk.textContent + '\n';
+      if (lasthunk) {
+        html += lasthunk.textContent + '\n';
+      }
 
       var lastline = $elements.get(0).previousSibling;
 

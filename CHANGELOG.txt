@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Fixed getSelection fails if diff control lines are selected.
 #539902 by sun: Added docs for this insane code.
 #539902 by sun: Fixed various problems with jQuery's .add() method not working
   on DOM selection range elements merged into another stack of elements.  We now
