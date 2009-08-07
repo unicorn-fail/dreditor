@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#543178 by sun: Added a delimiter between patch submitters and commenters.
 #543178 by sun: Changed algorithm for user list in commit message.
 by sun: Renamed script to Dreditor, auto-generated GM name: dreditor.user.js.
 #543174 by sun: Changed double quotes to single quotes in commit message.

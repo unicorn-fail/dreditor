@@ -839,15 +839,24 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         // Start with all patch submitters.
         var contributors = submitters;
         // Add 10% of # of all follow-ups as commenters.
-        $.each(commenters.slice(0, $comments.length / 10), function(index, name) {
-          // Skip already listed contributors.
-          for (var i in contributors) {
-            if (contributors[i] == name) {
-              return;
+        var max = parseInt(($comments.length || 1) / 10, 10);
+        if (max) {
+          // Add a delimiter between patch submitters and commenters.
+          contributors.push('-');
+          $.each(commenters, function(index, name) {
+            if (max < 1) {
+              return false;
             }
-          }
-          contributors.push(name);
-        });
+            // Skip already listed contributors.
+            for (var i in contributors) {
+              if (contributors[i] == name) {
+                return;
+              }
+            }
+            contributors.push(name);
+            max--;
+          });
+        }
         // Build commit message.
         var message = '#' + window.location.href.match(/node\/(\d+)/)[1] + ' ';
         message += 'by ' + contributors.join(', ');
