@@ -819,15 +819,27 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
           }
         });
         // Retrieve all comments in this issue.
-        // @todo Add original post, if it contains an attachment.
         var $comments = $('#comments div.comment', context);
-        // Build list of all patch submitters and contributors, ordered by
-        // involvement.
-        var commenters = $comments.find('div.author a').not(':contains("System Message")').countvalues();
-        var submitters = $comments.filter(':has(.comment-upload-attachments a[href*=.patch])').find('div.author a').countvalues();
-        // Start with the top 3 patch submitters.
-        var contributors = submitters.slice(0, 3);
-        $.each(commenters, function(index, name) {
+        // Build list of top commenters.
+        var commenters = $comments.find('div.author a')
+          // Skip test bot.
+          .not(':contains("System Message")')
+          // Add original poster.
+          .add('div.node .info-page a')
+          // Count and sort by occurrences.
+          .countvalues();
+        // Build list of top patch submitters.
+        var submitters = $comments
+          // Filter comments by those having patches.
+          .filter(':has(.comment-upload-attachments a[href*=.patch])').find('div.author a')
+          // Add original post if it contains a patch.
+          .add('div.node:has(#attachments a[href*=.patch]) .info-page a')
+          // Count and sort by occurrences.
+          .countvalues();
+        // Start with all patch submitters.
+        var contributors = submitters;
+        // Add 10% of # of all follow-ups as commenters.
+        $.each(commenters.slice(0, $comments.length / 10), function(index, name) {
           // Skip already listed contributors.
           for (var i in contributors) {
             if (contributors[i] == name) {
@@ -835,10 +847,6 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
             }
           }
           contributors.push(name);
-          // Stop at a maximum of 6 contributors.
-          if (contributors.length == 6) {
-            return false;
-          }
         });
         // Build commit message.
         var message = '#' + window.location.href.match(/node\/(\d+)/)[1] + ' ';
