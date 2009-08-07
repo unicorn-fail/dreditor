@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#541512 by sun: Fixed padded area of code lines does not trigger pastie.
 #541234 by sun: Fixed various bugs regarding deleted comments and added basic
   protection against recursive setup of Dreditor.
 by sun: Minor clean-up.

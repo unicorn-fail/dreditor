@@ -790,9 +790,9 @@ GM_addStyle(" \
 #dreditor #menu li li { padding-right: 0; } \
 #dreditor a { text-decoration: none; } \
 #dreditor .form-textarea { width: 100%; height: 12em; font: 13px 'courier new', courier, 'lucida console'; color: #000; } \
-#dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; padding-left: 10px; overflow: scroll; height: 100%; } \
+#dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; overflow: scroll; height: 100%; } \
 #dreditor-content, pre { font: 13px 'courier new', courier, 'lucida console'; } \
-#dreditor #code { background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y scroll 50em 0; } \
+#dreditor #code { background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y scroll 50em 0; padding-left: 10px; } \
 #dreditor #code pre { background-color: transparent; border: 0; margin: 0; padding: 0; } \
 #dreditor #code pre span { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
 #dreditor #code .file { color: #088; } \
