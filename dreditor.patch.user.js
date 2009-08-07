@@ -218,6 +218,41 @@ Drupal.dreditor.form.form.prototype = {
   }
 };
 
+// Copied from jQuery 1.3.2.
+var sortOrder;
+
+if ( document.documentElement.compareDocumentPosition ) {
+	sortOrder = function( a, b ) {
+		var ret = a.compareDocumentPosition(b) & 4 ? -1 : a === b ? 0 : 1;
+		if ( ret === 0 ) {
+			hasDuplicate = true;
+		}
+		return ret;
+	};
+} else if ( "sourceIndex" in document.documentElement ) {
+	sortOrder = function( a, b ) {
+		var ret = a.sourceIndex - b.sourceIndex;
+		if ( ret === 0 ) {
+			hasDuplicate = true;
+		}
+		return ret;
+	};
+} else if ( document.createRange ) {
+	sortOrder = function( a, b ) {
+		var aRange = a.ownerDocument.createRange(), bRange = b.ownerDocument.createRange();
+		aRange.selectNode(a);
+		aRange.collapse(true);
+		bRange.selectNode(b);
+		bRange.collapse(true);
+		var ret = aRange.compareBoundaryPoints(Range.START_TO_END, bRange);
+		if ( ret === 0 ) {
+			hasDuplicate = true;
+		}
+		return ret;
+	};
+}
+// end sortOrder
+
 /**
  * Attach patch review editor to issue attachments.
  */
@@ -263,19 +298,19 @@ Drupal.dreditor.patchReview = {
    * Internal use only; return empty data.
    */
   _empty: {
-    elements: $([])
+    elements: []
   },
 
   /**
    * Current selection jQuery DOM element stack.
    */
   data: {
-    elements: $([])
+    elements: []
   },
 
   reset: function () {
     // Reset currently stored selection data.
-    this.data.elements.removeClass('selected');
+    $(this.data.elements).removeClass('selected');
     this.data = $.extend({}, this._empty);
     // Remove and delete pastie form.
     if (this.$form) {
@@ -298,18 +333,31 @@ Drupal.dreditor.patchReview = {
   /**
    * Add elements to current selection storage.
    */
-  add: function ($elements) {
-    if (!$elements.length) {
-      return $elements;
+  add: function (elements) {
+    if (!elements.length) {
+      return elements;
     }
-    this.data.elements = this.data.elements.pushStack($elements);
-    return $elements;
+    var self = this;
+    $.each(elements, function () {
+      var newelement = this, merge = true;
+      $.each(self.data.elements, function () {
+        if (this == newelement) {
+          merge = false;
+          return;
+        }
+      });
+      if (merge) {
+        self.data.elements.push(newelement);
+      }
+    });
+    self.data.elements.sort(sortOrder);
+    return elements;
   },
 
   edit: function () {
     var self = this;
     // Mark current selection/commented code as selected.
-    self.data.elements.addClass('selected');
+    $(self.data.elements).addClass('selected');
 
     // Add Pastie.
     if (!self.$form) {
@@ -358,21 +406,21 @@ Drupal.dreditor.patchReview = {
    * Return currently selected code lines as jQuery object.
    */
   getSelection: function () {
-    var $elements = $([]);
+    var elements = [];
 
     var range = window.getSelection().getRangeAt(0);
     if (!range.toString()) {
-      return $elements;
+      return elements;
     }
 
     // Grep selected lines.
     var next = range.startContainer;
     var last = range.endContainer;
     // If start/end containers are a text node, retrieve the parent node.
-    if (range.startContainer.nodeType != 1) {
+    while (next && next.nodeType != 1 && next.nodeName != 'PRE') {
       next = next.parentNode;
     }
-    if (range.endContainer.nodeType != 1) {
+    while (last && last.nodeType != 1 && last.nodeName != 'PRE') {
       last = last.parentNode;
     }
     // If full lines where selected, retrieve the line right before the end of
@@ -380,28 +428,30 @@ Drupal.dreditor.patchReview = {
     if (range.endOffset == 0) {
       last = last.previousSibling;
     }
+
     while (next && next != last) {
-      $elements = $elements.add(next);
+      elements.push(next);
       next = next.nextSibling;
     }
-    $elements = $elements.add(last);
-    return $elements;
+    elements.push(last);
+    return elements;
   },
 
   paste: function () {
     var html = '';
     $.each(this.comment.comments, function () {
+      var $elements = $(this.elements);
       html += '<code>\n';
       // Add file information.
-      var lastfile = this.elements.eq(0).prevAll('.file:has(a.file)').get(0);
+      var lastfile = $elements.eq(0).prevAll('.file:has(a.file)').get(0);
       html += lastfile.textContent + '\n';
       // Add hunk information.
-      var lasthunk = this.elements.eq(0).prevAll('.file').get(0);
+      var lasthunk = $elements.eq(0).prevAll('.file').get(0);
       html += lasthunk.textContent + '\n';
 
-      var lastline = this.elements.get(0).previousSibling;
+      var lastline = $elements.get(0).previousSibling;
 
-      this.elements.each(function () {
+      $elements.each(function () {
         var $element = $(this);
         // Add new last file, in case a comment spans over multiple files.
         if (lastfile != $element.prevAll('.file:has(a.file)').get(0)) {
@@ -456,15 +506,15 @@ Drupal.dreditor.patchReview.comment = {
     if (data.id !== undefined) {
       this.comments[data.id] = data;
       // Mark new comments, if there are any.
-      this.comments[data.id].elements.addClass('new-comment');
+      $(this.comments[data.id].elements).addClass('new-comment');
     }
     else {
       this.comments.push(data);
       var newid = this.comments.length - 1;
       this.comments[newid].id = data.id = newid;
-      this.comments[data.id].elements.addClass('new-comment');
+      $(this.comments[data.id].elements).addClass('new-comment');
     }
-    this.comments[data.id].elements.addClass('comment-id-' + data.id).addClass('has-comment');
+    $(this.comments[data.id].elements).addClass('comment-id-' + data.id).addClass('has-comment');
 
     Drupal.dreditor.attachBehaviors();
     return data;
@@ -480,7 +530,7 @@ Drupal.dreditor.patchReview.comment = {
   delete: function (id) {
     var data = this.load(id);
     if (data && data.id !== undefined) {
-      data.elements
+      $(data.elements)
         .removeClass('has-comment')
         .removeClass('comment-id-' + id)
         // @todo For whatever reason, the click event is not unbound here.
@@ -598,13 +648,13 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
 
   // Attach pastie to any selection.
   $code.mouseup(function (e) {
-    // Only act on left/first mouse button to allow for subsequent selections.
+    // Only act on left/first mouse button.
     if (e.which != 1) {
       return;
     }
-    var $elements = Drupal.dreditor.patchReview.getSelection();
-    if ($elements.length) {
-      Drupal.dreditor.patchReview.add($elements);
+    var elements = Drupal.dreditor.patchReview.getSelection();
+    if (elements.length) {
+      Drupal.dreditor.patchReview.add(elements);
       // Display pastie.
       Drupal.dreditor.patchReview.edit();
     }

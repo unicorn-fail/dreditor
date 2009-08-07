@@ -6,6 +6,12 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#539902 by sun: Fixed various problems with jQuery's .add() method not working
+  on DOM selection range elements merged into another stack of elements.  We now
+  store plain DOM elements, perform the merging of multiple selections manually,
+  and additionally forked the sortOrder() function from jQuery 1.3.2 to sort all
+  elements in the stack by their actual DOM position.  This may be reverted when
+  drupal.org updates to D7 and jQuery 1.3+.
 by sun: Fixed chaining in jQuery.debug().
 by sun: Added jQuery.debug() helper.  Core-worthy.
 #539308 by sun: Fixed spacing of trailing white-space helper.
