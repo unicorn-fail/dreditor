@@ -56,6 +56,11 @@ Drupal.dreditor = {
 
   setup: function (context) {
     var self = this;
+    // Prevent repeated setup (not supported yet).
+    if (self.$dreditor) {
+      self.show();
+      return false;
+    }
     // Setup Dreditor overlay.
     self.$wrapper = $('<div id="dreditor-wrapper"></div>').css({ height: 0 });
     // Add Dreditor content area.
@@ -287,11 +292,7 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
         return;
       }
       // Generate review link.
-      var $link = $('<a id="dreditor-patchreview" class="dreditor-button" href="' + this.href + '">review</a>').click(function () {
-        if (Drupal.dreditor.$dreditor) {
-          Drupal.dreditor.show();
-          return false;
-        }
+      var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">review</a>').click(function () {
         // Load file.
         $.get(this.href, function (content, status) {
           if (status == 'success') {
@@ -780,8 +781,79 @@ Drupal.dreditor.patchReview.behaviors.saveButton = function (context) {
   }
 };
 
+/**
+ * Attach commit message generator to issue comment form.
+ */
+Drupal.behaviors.dreditorCommitMessage = function (context) {
+  $('#edit-comment-wrapper:not(.dreditor-commitmessage-processed)', context)
+    .addClass('dreditor-commitmessage-processed')
+    .each(function () {
+      // Generate commit message button.
+      var $link = $('<a class="dreditor-button dreditor-commitmessage" href="javascript:void(0);">Create commit message</a>').click(function () {
+        // A port of PHP's array_count_values(), combined with a keysort.
+        $.fn.extend({
+          countvalues: function () {
+            var elems = this.get();
+            // Count array values.
+            var counts = {}, i = elems.length, j;
+            while (i--) {
+              var value = elems[i].textContent;
+              j = counts[value];
+              counts[value] = (j ? j + 1 : 1);
+            }
+            // Sort value counts by counts.
+            var temp = [];
+            for (var key in counts) {
+              temp.push([ counts[key], key ]);
+            }
+            temp.sort(function (a, b) {
+              return a[0] > b[0];
+            });
+            // Return the list of values, ordered by counts (descending).
+            var result = [], i = temp.length;
+            while (i--) {
+              result.push(temp[i][1]);
+            }
+            return result;
+          }
+        });
+        // Retrieve all comments in this issue.
+        // @todo Add original post, if it contains an attachment.
+        var $comments = $('#comments div.comment', context);
+        // Build list of all patch submitters and contributors, ordered by
+        // involvement.
+        var commenters = $comments.find('div.author a').not(':contains("System Message")').countvalues();
+        var submitters = $comments.filter(':has(.comment-upload-attachments a[href*=.patch])').find('div.author a').countvalues();
+        // Start with the top 3 patch submitters.
+        var contributors = submitters.slice(0, 3);
+        $.each(commenters, function(index, name) {
+          // Skip already listed contributors.
+          for (var i in contributors) {
+            if (contributors[i] == name) {
+              return;
+            }
+          }
+          contributors.push(name);
+          // Stop at a maximum of 6 contributors.
+          if (contributors.length == 6) {
+            return false;
+          }
+        });
+        // Build commit message.
+        var message = '#' + window.location.href.match(/node\/(\d+)/)[1] + ' ';
+        message += 'by ' + contributors.join(', ');
+        message += ': ' + $('h1.title').html() + '.';
+        // Prepend commit message to issue comment textarea.
+        $('#edit-comment', context).val(message + "\n\n" + $('#edit-comment', context).val());
+        return false;
+      });
+      // Prepend commit message button to comment form.
+      $link.prependTo(this);
+    });
+};
+
+// @todo Behaviors of Dreditor are not invoked with regular behaviors.
 jQuery(document).ready(function () {
-  // @todo Behaviors of this user script are not invoked with regular behaviors.
   Drupal.attachBehaviors(this);
 });
 
