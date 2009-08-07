@@ -76,16 +76,20 @@ Drupal.dreditor.setup = function (context) {
   // Add hide/show button to temporarily dismiss Dreditor.
   $('<input id="dreditor-hide" class="dreditor-button" type="button" value="Hide" />')
     .toggle(
+      // Hide Dreditor.
       function () {
         var button = this;
+        button.value = 'Show';
         $wrapper.animate({ height: 34 }, function () {
-          button.value = 'Show';
+          $dreditor.find('> div:not(#dreditor-actions)').hide();
           $('body', context).css({ overflow: 'auto' });
         });
         return false;
       },
+      // Show Dreditor.
       function () {
         var button = this;
+        $dreditor.find('> div:not(#dreditor-actions)').show();
         $('body', context).css({ overflow: 'hidden' });
         $wrapper.animate({ height: '100%' }, function () {
           button.value = 'Hide';
@@ -100,7 +104,7 @@ Drupal.dreditor.setup = function (context) {
       return Drupal.dreditor.tearDown(context);
     })
     .appendTo($actions);
-  $actions.appendTo($bar);
+  $actions.appendTo($dreditor);
 
   // Setup application.
   var args = arguments;
@@ -734,12 +738,13 @@ jQuery(document).ready(function () {
 GM_addStyle(" \
 #dreditor-wrapper { position: fixed; z-index: 1000; width: 100%; top: 0; } \
 #dreditor { position: relative; width: 100%; height: 100%; background-color: #fff; border: 1px solid #ccc; } \
-#dreditor #bar { position: absolute; width: 230px; height: 100%; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
+#dreditor #bar, #dreditor-actions { width: 230px; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
+#dreditor #bar { position: absolute; height: 100%; } \
+#dreditor-actions { background-color: #fff; bottom: 0; padding-top: 5px; padding-bottom: 5px; position: absolute; } \
 .dreditor-button, #content a.dreditor-button { background: transparent url(/sites/all/themes/bluebeach/header-back.png) repeat-x 0 -30px; border: 1px solid #06c; color: #fff; cursor: pointer; font: 11px sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 1px 9px; text-transform: uppercase; text-decoration: none; -moz-border-radius: 9px; -webkit-border-radius: 9px; border-radius: 9px; } \
 .dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 0; } \
 #dreditor .dreditor-button { margin: 0 0.5em 0 0; } \
 .dreditor-patchreview-processed .dreditor-button { margin-left: 1em; } \
-#dreditor-actions { background-color: #fff; position: absolute; bottom: 8px; } \
 #dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; } \
 #dreditor #menu li { list-style: none; margin: 0; overflow: hidden; padding: 0 10px 0; white-space: nowrap; } \
 #dreditor #menu li li { padding-right: 0; } \
