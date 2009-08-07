@@ -16,8 +16,6 @@ if (Drupal === undefined) {
   return false;
 }
 
-Drupal.dreditor = Drupal.dreditor || { behaviors: {} };
-
 /**
  * Dreditor debugging helper.
  *
@@ -53,127 +51,148 @@ jQuery.extend({
 // @todo Is this the right way?
 jQuery.fn.debug = jQuery.debug;
 
-Drupal.dreditor.setup = function (context) {
-  // Setup Dreditor overlay.
-  var $wrapper = $('<div id="dreditor-wrapper"></div>').css({ height: 0 });
-  // Add Dreditor content area.
-  var $dreditor = $('<div id="dreditor"></div>').appendTo($wrapper);
-  $wrapper.appendTo('body');
+Drupal.dreditor = {
+  behaviors: {},
 
-  // Setup Dreditor context.
-  Drupal.dreditor.context = $dreditor.get(0);
+  setup: function (context) {
+    var self = this;
+    // Setup Dreditor overlay.
+    self.$wrapper = $('<div id="dreditor-wrapper"></div>').css({ height: 0 });
+    // Add Dreditor content area.
+    self.$dreditor = $('<div id="dreditor"></div>').appendTo(self.$wrapper);
+    self.$wrapper.appendTo('body');
 
-  // Add sidebar.
-  var $bar = $('<div id="bar"></div>').prependTo($dreditor);
-  // Add ul#menu to sidebar by default for convenience.
-  $('<ul id="menu"></ul>').appendTo($bar);
+    // Setup Dreditor context.
+    Drupal.dreditor.context = self.$dreditor.get(0);
 
-  // Add content region.
-  $('<div id="dreditor-content"></div>').appendTo($dreditor);
+    // Add sidebar.
+    var $bar = $('<div id="bar"></div>').prependTo(self.$dreditor);
+    // Add ul#menu to sidebar by default for convenience.
+    $('<ul id="menu"></ul>').appendTo($bar);
 
-  // Add global Dreditor buttons container.
-  var $actions = $('<div id="dreditor-actions"></div>');
-  // Add hide/show button to temporarily dismiss Dreditor.
-  $('<input id="dreditor-hide" class="dreditor-button" type="button" value="Hide" />')
-    .toggle(
-      // Hide Dreditor.
-      function () {
-        var button = this;
-        button.value = 'Show';
-        $wrapper.animate({ height: 34 }, function () {
-          $dreditor.find('> div:not(#dreditor-actions)').hide();
-          $('body', context).css({ overflow: 'auto' });
-        });
-        return false;
-      },
-      // Show Dreditor.
-      function () {
-        var button = this;
-        $dreditor.find('> div:not(#dreditor-actions)').show();
-        $('body', context).css({ overflow: 'hidden' });
-        $wrapper.animate({ height: '100%' }, function () {
-          button.value = 'Hide';
-        });
-        return false;
-      }
-    )
-    .appendTo($actions);
-  // Add cancel button to tear down Dreditor.
-  $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />')
-    .click(function () {
-      return Drupal.dreditor.tearDown(context);
-    })
-    .appendTo($actions);
-  $actions.appendTo($dreditor);
+    // Add content region.
+    $('<div id="dreditor-content"></div>').appendTo(self.$dreditor);
 
-  // Setup application.
-  var args = arguments;
-  // Cut out the application name (2nd argument).
-  this.application = Array.prototype.splice.call(args, 1, 1)[0];
-  // Remove global window context; new context is added by attachBehaviors().
-  args = Array.prototype.slice.call(args, 1);
-  this.attachBehaviors(args);
+    // Add global Dreditor buttons container.
+    var $actions = $('<div id="dreditor-actions"></div>');
+    // Add hide/show button to temporarily dismiss Dreditor.
+    $('<input id="dreditor-hide" class="dreditor-button" type="button" value="Hide" />')
+      .toggle(
+        function () {
+          self.hide();
+        },
+        function () {
+          self.show();
+        }
+      )
+      .appendTo($actions);
+    // Add cancel button to tear down Dreditor.
+    $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />')
+      .click(function () {
+        return Drupal.dreditor.tearDown(context);
+      })
+      .appendTo($actions);
+    $actions.appendTo(self.$dreditor);
 
-  // Display Dreditor.
-  $('body', context).css({ overflow: 'hidden' });
-  $wrapper.animate({ height: '100%' });
-};
+    // Setup application.
+    var args = arguments;
+    // Cut out the application name (2nd argument).
+    this.application = Array.prototype.splice.call(args, 1, 1)[0];
+    // Remove global window context; new context is added by attachBehaviors().
+    args = Array.prototype.slice.call(args, 1);
+    this.attachBehaviors(args);
 
-Drupal.dreditor.tearDown = function (context) {
-  $('#dreditor-wrapper', context).animate({ height: 0 }, function () {
-    $('body', context).css({ overflow: 'auto' });
-    $(this).remove();
-  });
-  return false;
-};
+    // Display Dreditor.
+    self.show();
+  },
 
-Drupal.dreditor.attachBehaviors = function (args) {
-  if (args === undefined || typeof args != 'object') {
-    args = [];
-  }
-  // Add Dreditor context as first argument.
-  Array.prototype.unshift.call(args, Drupal.dreditor.context);
-  // Apply application behaviors, passing any additional arguments.
-  $.each(Drupal.dreditor[this.application].behaviors, function () {
-    this.apply(Drupal.dreditor.context, args);
-  });
-  // Apply Dreditor behaviors.
-  $.each(Drupal.dreditor.behaviors, function () {
-    this(Drupal.dreditor.context);
-  });
-  // Apply Drupal behaviors.
-  Drupal.attachBehaviors(Drupal.dreditor.context);
-};
+  tearDown: function (context) {
+    var self = this;
+    self.$wrapper.animate({ height: 0 }, function () {
+      $('body', context).css({ overflow: 'auto' });
+      $(this).remove();
+      delete self.$dreditor;
+      delete self.$wrapper;
+    });
+    return false;
+  },
 
-/**
- * Parse CSS classes of a DOM element into parameters.
- *
- * Required, because jQuery.data() somehow seems to forget about previously
- * stored data in DOM elements; most probably due to context mismatches.
- *
- * Syntax for CSS classes is "<prefix>-name-value".
- *
- * @param element
- *   A DOM element containing CSS classes to parse.
- * @param prefix
- *   The parameter prefix to search for.
- */
-Drupal.dreditor.getParams = function(element, prefix) {
-  var classes = element.className.split(' ');
-  var length = prefix.length;
-  var params = {};
-  for (var i in classes) {
-    if (classes[i].substr(0, length + 1) == prefix + '-') {
-      var parts = classes[i].split('-');
-      var value = parts.slice(2).join('-');
-      params[parts[1]] = value;
-      // Convert numeric values.
-      if (parseInt(value, 10) == value) {
-        params[parts[1]] = parseInt(value, 10);
+  /**
+   * Hide Dreditor.
+   */
+  hide: function () {
+    var self = this;
+    var button = self.$dreditor.find('#dreditor-hide').get(0);
+    button.value = 'Show';
+    self.$wrapper.animate({ height: 34 }, function () {
+      self.$dreditor.find('> div:not(#dreditor-actions)').hide();
+      $('body').css({ overflow: 'auto' });
+    });
+    return false;
+  },
+
+  /**
+   * Show Dreditor.
+   */
+  show: function () {
+    var self = this;
+    var button = self.$dreditor.find('#dreditor-hide').get(0);
+    self.$dreditor.find('> div:not(#dreditor-actions)').show();
+    $('body').css({ overflow: 'hidden' });
+    self.$wrapper.animate({ height: '100%' }, function () {
+      button.value = 'Hide';
+    });
+    return false;
+  },
+
+  attachBehaviors: function (args) {
+    if (args === undefined || typeof args != 'object') {
+      args = [];
+    }
+    // Add Dreditor context as first argument.
+    Array.prototype.unshift.call(args, Drupal.dreditor.context);
+    // Apply application behaviors, passing any additional arguments.
+    $.each(Drupal.dreditor[this.application].behaviors, function () {
+      this.apply(Drupal.dreditor.context, args);
+    });
+    // Apply Dreditor behaviors.
+    $.each(Drupal.dreditor.behaviors, function () {
+      this(Drupal.dreditor.context);
+    });
+    // Apply Drupal behaviors.
+    Drupal.attachBehaviors(Drupal.dreditor.context);
+  },
+
+  /**
+   * Parse CSS classes of a DOM element into parameters.
+   *
+   * Required, because jQuery.data() somehow seems to forget about previously
+   * stored data in DOM elements; most probably due to context mismatches.
+   *
+   * Syntax for CSS classes is "<prefix>-name-value".
+   *
+   * @param element
+   *   A DOM element containing CSS classes to parse.
+   * @param prefix
+   *   The parameter prefix to search for.
+   */
+  getParams: function(element, prefix) {
+    var classes = element.className.split(' ');
+    var length = prefix.length;
+    var params = {};
+    for (var i in classes) {
+      if (classes[i].substr(0, length + 1) == prefix + '-') {
+        var parts = classes[i].split('-');
+        var value = parts.slice(2).join('-');
+        params[parts[1]] = value;
+        // Convert numeric values.
+        if (parseInt(value, 10) == value) {
+          params[parts[1]] = parseInt(value, 10);
+        }
       }
     }
+    return params;
   }
-  return params;
 };
 
 /**
@@ -269,6 +288,10 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
       }
       // Generate review link.
       var $link = $('<a id="dreditor-patchreview" class="dreditor-button" href="' + this.href + '">review</a>').click(function () {
+        if (Drupal.dreditor.$dreditor) {
+          Drupal.dreditor.show();
+          return false;
+        }
         // Load file.
         $.get(this.href, function (content, status) {
           if (status == 'success') {
@@ -299,13 +322,6 @@ Drupal.dreditor.patchReview = {
   behaviors: {},
 
   /**
-   * Internal use only; return empty data.
-   */
-  _empty: {
-    elements: []
-  },
-
-  /**
    * Current selection jQuery DOM element stack.
    */
   data: {
@@ -315,7 +331,7 @@ Drupal.dreditor.patchReview = {
   reset: function () {
     // Reset currently stored selection data.
     $(this.data.elements).removeClass('selected');
-    this.data = $.extend({}, this._empty);
+    this.data = { elements: [] };
     // Remove and delete pastie form.
     if (this.$form) {
       this.$form.remove();
@@ -386,7 +402,7 @@ Drupal.dreditor.patchReview = {
         //   form.comment.value. Works in FF 3.0.x. WTF?
         var value = $form.find('textarea').val();
         // Store new comment, if non-empty.
-        if ($.trim(value)) {
+        if ($.trim(value).length) {
           self.comment.save({
             id: self.data.id,
             elements: self.data.elements,
@@ -455,16 +471,20 @@ Drupal.dreditor.patchReview = {
 
   paste: function () {
     var html = '';
-    $.each(this.comment.comments, function () {
+    $.each(this.comment.comments, function (index, comment) {
+      // Skip deleted (undefined) comments; this would return window here.
+      if (!comment) {
+        return true;
+      }
       var $elements = $(this.elements);
       html += '<code>\n';
       // Add file information.
-      var lastfile = $elements.eq(0).prevAll('.file:has(a.file)').get(0);
+      var lastfile = $elements.eq(0).prevAll('pre.file:has(> a.file)').get(0);
       if (lastfile) {
         html += lastfile.textContent + '\n';
       }
       // Add hunk information.
-      var lasthunk = $elements.eq(0).prevAll('.file').get(0);
+      var lasthunk = $elements.eq(0).prevAll('pre.file').get(0);
       if (lasthunk) {
         html += lasthunk.textContent + '\n';
       }
@@ -474,17 +494,17 @@ Drupal.dreditor.patchReview = {
       $elements.each(function () {
         var $element = $(this);
         // Add new last file, in case a comment spans over multiple files.
-        if (lastfile != $element.prevAll('.file:has(a.file)').get(0)) {
-          lastfile = $element.prevAll('.file:has(a.file)').get(0);
+        if (lastfile && lastfile != $element.prevAll('pre.file:has(> a.file)').get(0)) {
+          lastfile = $element.prevAll('pre.file:has(> a.file)').get(0);
           html += lastfile.textContent + '\n';
         }
         // Add new last hunk, in case a comment spans over multiple hunks.
-        if (lasthunk != $element.prevAll('.file').get(0)) {
-          lasthunk = $element.prevAll('.file').get(0);
+        if (lasthunk && lasthunk != $element.prevAll('pre.file').get(0)) {
+          lasthunk = $element.prevAll('pre.file').get(0);
           html += lasthunk.textContent + '\n';
         }
         // Add a delimiter, in case a comment spans over multiple selections.
-        else if (lastline != $element.get(0).previousSibling) {
+        else if (lastline && lastline != $element.get(0).previousSibling) {
           html += '...\n';
         }
         html += $element.text() + '\n';
@@ -497,7 +517,26 @@ Drupal.dreditor.patchReview = {
       html += '\n' + this.comment + '\n\n';
     });
     // Let's get some attention! :)
-    html += '\n\n<em>This review is powered by <a href="http://drupal.org/project/dreditor">Dreditor</a>.</em>\n';
+    function shuffle(array) {
+      for(var j, x, i = array.length; i; j = parseInt(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
+      return array;
+    }
+    var daysToCodeFreeze = parseInt((new Date(2009, 9 - 1, 1) - new Date()) / 1000 / 60 / 60 / 24, 10);
+    var messages = [
+      'This review is powered by <a href="@dreditor-url">Dreditor</a>.',
+      'I\'m on crack.  <a href="@dreditor-url">Are you, too?</a>'
+    ];
+    if (daysToCodeFreeze) {
+      $.merge(messages, [
+        '@days to code freeze.  <a href="@dreditor-url">Better review yourself.</a>',
+        'Beer-o-mania starts in @days!  <a href="@dreditor-url">Don\'t drink and patch.</a>'
+      ]);
+    }
+    var message = shuffle(messages)[0];
+    message = message.replace('@dreditor-url', 'http://drupal.org/project/dreditor');
+    message = message.replace('@days', daysToCodeFreeze + ' days');
+    html += '\n\n<em>' + message + '</em>\n';
+
     // Paste comment into issue comment textarea.
     var $commentField = $('#edit-comment');
     $commentField.val($commentField.val() + html);

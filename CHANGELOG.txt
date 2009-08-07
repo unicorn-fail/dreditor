@@ -6,6 +6,8 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#541234 by sun: Fixed various bugs regarding deleted comments and added basic
+  protection against recursive setup of Dreditor.
 by sun: Minor clean-up.
 #541224 by sun: Fixed "Hide" display looks all goofed up.
 by sun: Fixed getSelection fails if diff control lines are selected.
