@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#543174 by sun: Changed double quotes to single quotes in commit message.
 #541524 by sun: Added button to embed image attachments.
 #541434 by sun: Added behavior to generate commit message.
 #541492 by sun: Fixed review comments are not pasted in source order.

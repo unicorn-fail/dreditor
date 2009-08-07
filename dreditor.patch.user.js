@@ -843,7 +843,8 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         // Build commit message.
         var message = '#' + window.location.href.match(/node\/(\d+)/)[1] + ' ';
         message += 'by ' + contributors.join(', ');
-        message += ': ' + $('h1.title').html() + '.';
+        // Replace double quotes with single quotes for cvs command line.
+        message += ': ' + $('h1.title').html().replace('"', "'", 'g') + '.';
         // Prepend commit message to issue comment textarea.
         $('#edit-comment', context).val(message + "\n\n" + $('#edit-comment', context).val());
         return false;
