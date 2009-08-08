@@ -6,6 +6,7 @@
 // @version        0.1
 // @include        http://drupal.org/node/*
 // @include        http://drupal.org/comment/reply/*
+// @include        http://drupal.org/project/*
 // ==/UserScript==
 
 // Initialize window objects.
@@ -902,6 +903,18 @@ Drupal.behaviors.dreditorInlineImage = function (context) {
       });
       // Append inline image button to attachment.
       $button.appendTo(this);
+    });
+};
+
+/**
+ * Attach issue count to project issue tables.
+ */
+Drupal.behaviors.dreditorIssueCount = function (context) {
+  $('table.project-issue:not(.dreditor-issuecount-processed)', context)
+    .addClass('dreditor-issuecount-processed')
+    .each(function () {
+      var $table = $(this);
+      $table.before('<div class="dreditor-issuecount"><label>Displaying ' + $table.find('tbody tr').length + ($table.parent().parent().find('.pager').length ? '+' : '') + ' issues.</div>');
     });
 };
 
