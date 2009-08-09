@@ -1019,3 +1019,42 @@ GM_addStyle(" \
 #dreditor #code .selected { background-color: rgba(255, 255, 200, 0.5); } \
 #dreditor-overlay { } \
 ");
+
+/**
+ * Check for new Dreditor versions.
+ *
+ * GM functions can be invoked from GM environment only.
+ */
+dreditorUpdateCheck = function () {
+  if (typeof GM_xmlhttpRequest != 'function') {
+    return;
+  }
+  var version = GM_getValue('version', '');
+  var lastChecked = GM_getValue('update.last', 0);
+  var now = parseInt(new Date() / 1000, 10);
+  var interval = 60 * 60 * 24 * 3; // Check every 3 days.
+  if (lastChecked - now < -interval) {
+    GM_xmlhttpRequest({
+      method: 'GET',
+      url: 'http://cvs.drupal.org/viewvc.py/drupal/contributions/modules/dreditor/CHANGELOG.txt?view=co',
+      onload: function (responseDetails) {
+        GM_setValue('update.last', now);
+        if (responseDetails.status == 200) {
+          var newversion = responseDetails.responseText.match(/\$Id.+\$/)[0];
+          if (newversion == version) {
+            return;
+          }
+          var doUpdate = window.confirm('A new version of Dreditor is available. Shall we visit the project page to update?');
+          if (doUpdate) {
+            window.open('http://drupal.org/project/dreditor', 'dreditor');
+            // Let's just assume that we DID update. ;)
+            GM_setValue('version', newversion);
+          }
+        }
+      }
+    });
+  }
+};
+
+dreditorUpdateCheck();
+
