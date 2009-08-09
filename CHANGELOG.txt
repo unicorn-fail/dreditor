@@ -6,6 +6,8 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#543928 by sun: Fixed commit message separator is always output.
+#543930 by webchick, sun: Fixed commit message separator looks odd.
 #543800 by sun: Added issue count to project issue tables.
 #543178 by sun: Added a delimiter between patch submitters and commenters.
 #543178 by sun: Changed algorithm for user list in commit message.

@@ -821,14 +821,6 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         });
         // Retrieve all comments in this issue.
         var $comments = $('#comments div.comment', context);
-        // Build list of top commenters.
-        var commenters = $comments.find('div.author a')
-          // Skip test bot.
-          .not(':contains("System Message")')
-          // Add original poster.
-          .add('div.node .info-page a')
-          // Count and sort by occurrences.
-          .countvalues();
         // Build list of top patch submitters.
         var submitters = $comments
           // Filter comments by those having patches.
@@ -837,20 +829,25 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
           .add('div.node:has(#attachments a[href*=.patch]) .info-page a')
           // Count and sort by occurrences.
           .countvalues();
-        // Start with all patch submitters.
-        var contributors = submitters;
-        // Add 10% of # of all follow-ups as commenters.
-        var max = parseInt(($comments.length || 1) / 10, 10);
+        // Build list of top commenters.
+        var commenters = $comments.find('div.author a')
+          // Skip test bot.
+          .not(':contains("System Message")')
+          // Add original poster.
+          .add('div.node .info-page a')
+          // Count and sort by occurrences.
+          .countvalues();
+        // Compile a list of top commenters (max. 10% of # of all follow-ups).
+        var contributors = [];
+        var max = parseInt(($comments.length > 10 ? $comments.length : 10) / 10, 10);
         if (max) {
-          // Add a delimiter between patch submitters and commenters.
-          contributors.push('-');
           $.each(commenters, function(index, name) {
             if (max < 1) {
               return false;
             }
             // Skip already listed contributors.
-            for (var i in contributors) {
-              if (contributors[i] == name) {
+            for (var i in submitters) {
+              if (submitters[i] == name) {
                 return;
               }
             }
@@ -860,7 +857,14 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         }
         // Build commit message.
         var message = '#' + window.location.href.match(/node\/(\d+)/)[1] + ' ';
-        message += 'by ' + contributors.join(', ');
+        message += 'by ' + submitters.join(', ');
+        if (contributors.length) {
+          if (submitters.length) {
+            message += ' | ';
+          }
+          // Add a separator between patch submitters and commenters.
+          message += contributors.join(', ');
+        }
         // Replace double quotes with single quotes for cvs command line.
         message += ': ' + $('h1.title').html().replace('"', "'", 'g') + '.';
         // Prepend commit message to issue comment textarea.
