@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Fixed annoying URL encoding bug in Drupal core Upload module.
 #498064 by sun: Added filtering of fixed issues in project issue tables.
 #543928 by sun: Fixed commit message separator is always output.
 #543930 by webchick, sun: Fixed commit message separator looks odd.

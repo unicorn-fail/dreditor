@@ -290,6 +290,10 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
   $('#attachments:not(.dreditor-patchreview-processed), #comments table.comment-upload-attachments:not(.dreditor-patchreview-processed)', context)
     .addClass('dreditor-patchreview-processed')
     .find('a').each(function () {
+      // Fix annoying URL encoding bug in Drupal core Upload module.
+      var baseURL = window.location.protocol + '//' + window.location.hostname + '/files/issues/';
+      this.href = baseURL + encodeURIComponent(this.href.substring(baseURL.length));
+      // Skip this attachment if it is not a patch.
       if (this.href.indexOf('.patch') == -1) {
         return;
       }
@@ -1005,7 +1009,7 @@ GM_addStyle(" \
 #dreditor .form-textarea { width: 100%; height: 12em; font: 13px 'courier new', courier, 'lucida console'; color: #000; } \
 #dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; overflow: scroll; height: 100%; } \
 #dreditor-content, pre { font: 13px 'courier new', courier, 'lucida console'; } \
-#dreditor #code { background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y scroll 50em 0; padding-left: 10px; } \
+#dreditor #code { background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y scroll 50.7em 0; padding-left: 10px; } \
 #dreditor #code pre { background-color: transparent; border: 0; margin: 0; padding: 0; } \
 #dreditor #code pre span { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
 #dreditor #code .file { color: #088; } \
