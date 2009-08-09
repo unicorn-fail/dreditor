@@ -952,7 +952,33 @@ Drupal.behaviors.dreditorIssueCount = function (context) {
     .addClass('dreditor-issuecount-processed')
     .each(function () {
       var $table = $(this);
-      $table.before('<div class="dreditor-issuecount"><label>Displaying ' + $table.find('tbody tr').length + ($table.parent().parent().find('.pager').length ? '+' : '') + ' issues.</div>');
+      $table.before('<div class="dreditor-issuecount">Displaying ' + $table.find('tbody tr').length + ($table.parent().parent().find('.pager').length ? '+' : '') + ' issues.</div>');
+    });
+};
+
+/**
+ * Hide fixed issues without update marker.
+ */
+Drupal.behaviors.dreditorFixedIssues = function (context) {
+  $('table.project-issue:not(.dreditor-fixedissues-processed)', context)
+    .addClass('dreditor-fixedissues-processed')
+    .find('tr.state-2').not(':has(.marker)').addClass('dreditor-issue-hidden').hide().end().end()
+    .each(function () {
+      var $table = $(this);
+      if (!$table.find('.dreditor-issue-hidden').length) {
+        return false;
+      }
+      // Build notice.
+      var $message = $('<span class="dreditor-fixedissues">&nbsp;' + $table.find('.dreditor-issue-hidden').length + ' fixed issues have been hidden.&nbsp;</span>');
+      // Add link to re-display hidden issues.
+      $('<a href="javascript:void(0);">Unhide</a>')
+        .click(function () {
+          $table.find('.dreditor-issue-hidden').removeClass('dreditor-issue-hidden').show();
+          $(this).parent().remove();
+          return false;
+        })
+        .appendTo($message);
+      $('div.dreditor-issuecount', context).append($message);
     });
 };
 
