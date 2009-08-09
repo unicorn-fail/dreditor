@@ -865,8 +865,42 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
           // Add a separator between patch submitters and commenters.
           message += contributors.join(', ');
         }
+        // Build title.
         // Replace double quotes with single quotes for cvs command line.
-        message += ': ' + $('h1.title').html().replace('"', "'", 'g') + '.';
+        var title = $('h1.title').html().replace('"', "'", 'g');
+        // Add "Added|Changed|Fixed " prefix based on issue category.
+        switch ($('#edit-category').val()) {
+          case 'bug':
+            title = 'Fixed ' + title;
+            break;
+
+          case 'feature':
+            title = 'Added ' + title;
+            break;
+
+          case 'task':
+            title = 'Changed ' + title;
+            break;
+
+          default:
+            // For anything else, we just ensure proper capitalization.
+            if (title[0].toLowerCase() == title[0]) {
+              title = title[0].toUpperCase() + title.substring(1);
+            }
+            break;
+        }
+        // Try to fix function names.
+        title = title.replace(/[a-z]+_[a-z_()]+/g, function (match) {
+          if (match[match.length - 1] != ')') {
+            match += '()';
+          }
+          return match;
+        });
+        // Add a period (full-stop).
+        if (title[title.length - 1] != '.') {
+          title += '.';
+        }
+        message += ': ' + title;
         // Prepend commit message to issue comment textarea.
         $('#edit-comment', context).val(message + "\n\n" + $('#edit-comment', context).val());
         return false;
