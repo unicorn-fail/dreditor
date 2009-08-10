@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#543496 by joachim: Fixed regular expression for correcting function names.
 by sun: Added update check for Dreditor.
 by sun: Fixed annoying URL encoding bug in Drupal core Upload module.
 #498064 by sun: Added filtering of fixed issues in project issue tables.

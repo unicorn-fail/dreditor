@@ -893,13 +893,8 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
             }
             break;
         }
-        // Try to fix function names.
-        title = title.replace(/[a-z]+_[a-z_()]+/g, function (match) {
-          if (match[match.length - 1] != ')') {
-            match += '()';
-          }
-          return match;
-        });
+        // Try to fix function names without parenthesis.
+        title = title.replace(/([a-z_]+_[a-z_]+)\b(?!\(\))/g, '$&()');
         // Add a period (full-stop).
         if (title[title.length - 1] != '.') {
           title += '.';
