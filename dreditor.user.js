@@ -96,7 +96,8 @@ Drupal.dreditor = {
     // Add cancel button to tear down Dreditor.
     $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />')
       .click(function () {
-        return Drupal.dreditor.tearDown(context);
+        Drupal.dreditor.tearDown(context);
+        return false;
       })
       .appendTo($actions);
     $actions.appendTo(self.$dreditor);
@@ -121,7 +122,6 @@ Drupal.dreditor = {
       delete self.$dreditor;
       delete self.$wrapper;
     });
-    return false;
   },
 
   /**
@@ -199,6 +199,22 @@ Drupal.dreditor = {
       }
     }
     return params;
+  },
+
+  /**
+   * Jump to a fragment/hash in the document, skipping the browser's history.
+   *
+   * To be used for jump links within Dreditor overlay only.
+   */
+  goto: function (selector) {
+    if (!(typeof selector == 'string' && selector.length)) {
+      return;
+    }
+    // @todo Does not work because of overflow: hidden.
+    //window.scrollTo(0, $(selector).offset().top);
+    // Gecko-only method to scroll DOM elements into view.
+    // @see https://developer.mozilla.org/en/DOM/element.scrollIntoView
+    $(selector).get(0).scrollIntoView();
   }
 };
 
@@ -559,7 +575,7 @@ Drupal.dreditor.patchReview = {
     var $commentField = $('#edit-comment');
     $commentField.val($commentField.val() + html);
     // Jump to the issue comment textarea after pasting.
-    window.location.hash = '#edit-comment';
+    Drupal.dreditor.goto('#edit-comment');
     // Close Dreditor.
     Drupal.dreditor.tearDown();
   }
@@ -691,14 +707,16 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     var line = code[n];
     // Build file menu links.
     line = line.replace(/^(\+\+\+ )([^\s]+)(\s.*)?/, function (full, match1, match2, match3) {
-      $lastFile = $('<li><a href="#' + match2 + '">' + match2 + '</a></li>');
+      var id = match2.replace(/[^A-Za-z_-]/g, '');
+      $lastFile = $('<li><a href="#' + id + '">' + match2 + '</a></li>');
       $menu.append($lastFile);
-      return match1 + '<a class="file" id="' + match2 + '">' + match2 + '</a>' + match3;
+      return match1 + '<a class="file" id="' + id + '">' + match2 + '</a>' + match3;
     });
     // Build hunk menu links for file.
     line = line.replace(/^(@@ .+ @@\s+)([^\s]+\s[^\s\(]*)/, function (full, match1, match2) {
-      $lastFile.append('<li><a href="#' + match2 + '">' + match2 + '</a></li>');
-      return match1 + '<a class="hunk" id="' + match2 + '">' + match2 + '</a>';
+      var id = match2.replace(/[^A-Za-z_-]/g, '');
+      $lastFile.append('<li><a href="#' + id + '">' + match2 + '</a></li>');
+      return match1 + '<a class="hunk" id="' + id + '">' + match2 + '</a>';
     });
 
     // Colorize file diff lines.
@@ -738,6 +756,17 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     }
     return false;
   });
+};
+
+/**
+ * Attach click handler to jump menu.
+ */
+Drupal.dreditor.patchReview.behaviors.jumpMenu = function (context) {
+  $('#menu a:not(.dreditor-jumpmenu-processed)', context).addClass('dreditor-jumpmenu-processed')
+    .click(function () {
+      Drupal.dreditor.goto(this.hash);
+      return false;
+    });
 };
 
 Drupal.dreditor.patchReview.behaviors.attachPastie = function (context) {
