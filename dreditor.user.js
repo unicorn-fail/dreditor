@@ -7,6 +7,7 @@
 // @include        http://drupal.org/node/*
 // @include        http://drupal.org/comment/reply/*
 // @include        http://drupal.org/project/*
+// @include        http://drupal.org/node/add/project-issue/*
 // ==/UserScript==
 
 // Initialize window objects.
@@ -79,32 +80,38 @@ Drupal.dreditor = {
    * limitations of jQuery.param()).
    */
   confInit: function () {
-    var self = this;
-    var conf = self.conf;
-    self.conf = {};
-    jQuery.each(conf.split('&'), function() {
+    this.conf = this.unserialize(this.conf);
+  },
+
+  /**
+   * Unserialize a serialized string.
+   */
+  unserialize: function (str) {
+    var obj = {};
+    jQuery.each(str.split('&'), function() {
       var splitted = this.split('=');
-      if (!splitted[1]) {
+      if (splitted.length != 2) {
         return;
       }
       var key = splitted[0];
-      var val = splitted[1];
+      var val = decodeURIComponent(splitted[1].replace(/\+/g, ' '));
       // Convert numbers.
       if (/^[0-9.]+$/.test(val)) {
         val = parseFloat(val);
       }
       // Convert booleans.
-      if (val == 'true') {
+      else if (val == 'true') {
         val = true;
       }
-      if (val == 'false') {
+      else if (val == 'false') {
         val = false;
       }
       // Ignore empty values.
       if (typeof val == 'number' || typeof val == 'boolean' || val.length > 0) {
-        self.conf[key] = val;
+        obj[key] = val;
       }
     });
+    return obj;
   },
 
   setup: function (context) {
@@ -1058,6 +1065,27 @@ Drupal.behaviors.dreditorFixedIssues = function (context) {
         })
         .appendTo($message);
       $('div.dreditor-issuecount', context).append($message);
+    });
+};
+
+/**
+ * Attach issue count to project issue tables.
+ */
+Drupal.behaviors.dreditorIssueValues = function (context) {
+  // This catches only the issue creation form, since project issue/release data
+  // cannot be altered on node/#/edit.
+  $('#node-form:not(.dreditor-issuevalues-processed):has(#edit-rid)', context)
+    .addClass('dreditor-issuevalues-processed')
+    .each(function () {
+      var $form = $(this);
+      if (Drupal.dreditor.conf.issueValues) {
+        $.each(Drupal.dreditor.unserialize(Drupal.dreditor.conf.issueValues), function (name, value) {
+          $form.find(':input[name=' + name + ']').val(value);
+        });
+      }
+      $form.submit(function () {
+        Drupal.dreditor.conf.issueValues = $.param($('.inline-options:first :input', $form));
+      });
     });
 };
 
