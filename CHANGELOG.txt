@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#546738 by sun: Removed code-freeze footer messages for contrib patches.
 #547786 by sun: Added behavior to prefill issue form with last values.
 #547784 by sun: Added permanent Dreditor configuration handler.
 #539360 by sun: Fixed patch reviewer jump menu hi-jacks browser history.

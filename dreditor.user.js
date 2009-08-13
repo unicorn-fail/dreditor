@@ -613,16 +613,19 @@ Drupal.dreditor.patchReview = {
       for(var j, x, i = array.length; i; j = parseInt(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
       return array;
     }
-    var daysToCodeFreeze = parseInt((new Date(2009, 9 - 1, 1) - new Date()) / 1000 / 60 / 60 / 24, 10);
     var messages = [
       'This review is powered by <a href="@dreditor-url">Dreditor</a>.',
       'I\'m on crack.  <a href="@dreditor-url">Are you, too?</a>'
     ];
-    if (daysToCodeFreeze) {
-      $.merge(messages, [
-        '@days to code freeze.  <a href="@dreditor-url">Better review yourself.</a>',
-        'Beer-o-mania starts in @days!  <a href="@dreditor-url">Don\'t drink and patch.</a>'
-      ]);
+    // Add Drupal core specific messages.
+    if ($('#edit-project-info-project-title').val() == 'Drupal') {
+      var daysToCodeFreeze = parseInt((new Date(2009, 9 - 1, 1) - new Date()) / 1000 / 60 / 60 / 24, 10);
+      if (daysToCodeFreeze) {
+        $.merge(messages, [
+          '@days to code freeze.  <a href="@dreditor-url">Better review yourself.</a>',
+          'Beer-o-mania starts in @days!  <a href="@dreditor-url">Don\'t drink and patch.</a>'
+        ]);
+      }
     }
     var message = shuffle(messages)[0];
     message = message.replace('@dreditor-url', 'http://drupal.org/project/dreditor');
