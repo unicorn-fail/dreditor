@@ -56,6 +56,57 @@ jQuery.fn.debug = jQuery.debug;
 Drupal.dreditor = {
   behaviors: {},
 
+  /**
+   * Global Dreditor configuration object.
+   *
+   * @see confInit()
+   */
+  conf: '',
+
+  /**
+   * Convert serialized global configuration into an object.
+   *
+   * To leverage Greasemonkey's user script variable storage, which cannot be
+   * accessed or altered from within the unsafeWindow context (the original
+   * context of jQuery), we build and use our own configuration storage.
+   * Drupal.dreditor.conf is a serialized string (using jQuery.param(), which
+   * jQuery also uses to serialize form values) that is converted into an object
+   * when the script is executed and converted back into a serialized string
+   * when the page unloads. Nifty! :)
+   *
+   * Note that this only supports simple values (numbers, booleans, strings)
+   * and only an one-dimensional (flat) associative configuration object (due to
+   * limitations of jQuery.param()).
+   */
+  confInit: function () {
+    var self = this;
+    var conf = self.conf;
+    self.conf = {};
+    jQuery.each(conf.split('&'), function() {
+      var splitted = this.split('=');
+      if (!splitted[1]) {
+        return;
+      }
+      var key = splitted[0];
+      var val = splitted[1];
+      // Convert numbers.
+      if (/^[0-9.]+$/.test(val)) {
+        val = parseFloat(val);
+      }
+      // Convert booleans.
+      if (val == 'true') {
+        val = true;
+      }
+      if (val == 'false') {
+        val = false;
+      }
+      // Ignore empty values.
+      if (typeof val == 'number' || typeof val == 'boolean' || val.length > 0) {
+        self.conf[key] = val;
+      }
+    });
+  },
+
   setup: function (context) {
     var self = this;
     // Prevent repeated setup (not supported yet).
@@ -1010,8 +1061,19 @@ Drupal.behaviors.dreditorFixedIssues = function (context) {
     });
 };
 
+/**
+ * Initialize Dreditor/Greasemonkey global configuration handler.
+ *
+ * @see Drupal.dreditor.confInit()
+ */
+Drupal.dreditor.conf = GM_getValue('dreditor.conf', '');
+window.addEventListener('unload', function () {
+  GM_setValue('dreditor.conf', $.param(Drupal.dreditor.conf));
+}, true);
+
 // @todo Behaviors of Dreditor are not invoked with regular behaviors.
 jQuery(document).ready(function () {
+  Drupal.dreditor.confInit();
   Drupal.attachBehaviors(this);
 });
 

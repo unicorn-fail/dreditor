@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#547784 by sun: Added permanent Dreditor configuration handler.
 #539360 by sun: Fixed patch reviewer jump menu hi-jacks browser history.
 #543496 by joachim: Fixed regular expression for correcting function names.
 by sun: Added update check for Dreditor.
