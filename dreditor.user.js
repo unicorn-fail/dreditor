@@ -619,8 +619,8 @@ Drupal.dreditor.patchReview = {
     ];
     // Add Drupal core specific messages.
     if ($('#edit-project-info-project-title').val() == 'Drupal') {
-      var daysToCodeFreeze = parseInt((new Date(2009, 9 - 1, 1) - new Date()) / 1000 / 60 / 60 / 24, 10);
-      if (daysToCodeFreeze) {
+      var daysToCodeFreeze = parseInt((new Date(2009, 9 - 1, 7) - new Date()) / 1000 / 60 / 60 / 24, 10);
+      if (daysToCodeFreeze > 0) {
         $.merge(messages, [
           '@days to code freeze.  <a href="@dreditor-url">Better review yourself.</a>',
           'Beer-o-mania starts in @days!  <a href="@dreditor-url">Don\'t drink and patch.</a>'
