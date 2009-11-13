@@ -15,7 +15,6 @@ $ = window.$ = window.jQuery = unsafeWindow.jQuery;
 Drupal = window.Drupal = unsafeWindow.Drupal;
 // Bail out in (the unlikely) case that JS has been disabled.
 if (Drupal === undefined) {
-  alert('JavaScript is disabled, but required for Dreditor.');
   return false;
 }
 
