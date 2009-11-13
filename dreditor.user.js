@@ -1009,7 +1009,7 @@ Drupal.behaviors.dreditorInlineImage = function (context) {
   if (!$('#edit-format-5').length) {
     return;
   }
-  $('#comment-upload-attachments:not(.dreditor-inlineimage-processed)', context)
+  $('#upload-attachments:not(.dreditor-inlineimage-processed), #comment-upload-attachments:not(.dreditor-inlineimage-processed)', context)
     .addClass('dreditor-inlineimage-processed')
     .find('div.description').each(function () {
       var url = $(this).text();
@@ -1024,7 +1024,7 @@ Drupal.behaviors.dreditorInlineImage = function (context) {
         var desc = $(this).parent().siblings('input').val();
         var image = '<img src="' + url + '" alt="' + desc + '" />';
         // Append image to issue comment textarea (context is AHAH content here).
-        $('#edit-comment').val($('#edit-comment').val() + "\n" + image + "\n");
+        $('#edit-body, #edit-comment').val($('#edit-body, #edit-comment').val() + "\n" + image + "\n");
         // Ensure the "Documentation" input format is enabled.
         $('#edit-format-5').select();
         return false;

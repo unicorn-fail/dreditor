@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#547780 by sun: Fixed 'Embed' button does not show up for new issue posts.
 #550280 by sun: Fixed HTML entities are not escaped.
 #569264 by sun: Removed warning message for unavailable JS.
 #565850 by jeffschuler, sun: Added support for .diff files.
