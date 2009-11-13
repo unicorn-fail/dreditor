@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#565850 by jeffschuler, sun: Added support for .diff files.
 by sun: Fixed broken code-freeze day counter.
 #546738 by sun: Removed code-freeze footer messages for contrib patches.
 #547786 by sun: Added behavior to prefill issue form with last values.

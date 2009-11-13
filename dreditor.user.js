@@ -361,14 +361,15 @@ if ( document.documentElement.compareDocumentPosition ) {
  * Attach patch review editor to issue attachments.
  */
 Drupal.behaviors.dreditorPatchReview = function (context) {
-  $('#attachments:not(.dreditor-patchreview-processed), #comments table.comment-upload-attachments:not(.dreditor-patchreview-processed)', context)
+  // d.o infrastructure -- are you nuts?!
+  $('#attachments:not(.dreditor-patchreview-processed), #comments table.comment-upload-attachments:not(.dreditor-patchreview-processed), div[id^=pift-results]:not(.dreditor-patchreview-processed)', context)
     .addClass('dreditor-patchreview-processed')
     .find('a').each(function () {
       // Fix annoying URL encoding bug in Drupal core Upload module.
       var baseURL = window.location.protocol + '//' + window.location.hostname + '/files/issues/';
       this.href = baseURL + encodeURIComponent(this.href.substring(baseURL.length));
       // Skip this attachment if it is not a patch.
-      if (this.href.indexOf('.patch') == -1) {
+      if (this.href.indexOf('.patch') == -1 && this.href.indexOf('.diff') == -1) {
         return;
       }
       // Generate review link.
@@ -918,9 +919,9 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         // Build list of top patch submitters.
         var submitters = $comments
           // Filter comments by those having patches.
-          .filter(':has(.comment-upload-attachments a[href*=.patch])').find('div.author a')
+          .filter(':has(a.dreditor-patchreview)').find('div.author a')
           // Add original post if it contains a patch.
-          .add('div.node:has(#attachments a[href*=.patch]) .info-page a')
+          .add('div.node:has(a.dreditor-patchreview) .info-page a')
           // Count and sort by occurrences.
           .countvalues();
         // Build list of top commenters.
