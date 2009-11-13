@@ -752,7 +752,8 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
 
   // Convert CRLF, CR into LF.
   code = code.replace(/\r\n|\r/g, "\n");
-  // Escape all HTML.
+  // Escape HTML tags and entities; order of replacements is important.
+  code = code.replace(/&/g, '&amp;');
   code = code.replace(/</g, '&lt;');
   code = code.replace(/>/g, '&gt;');
   // Remove cruft: IDE comments and unversioned files.
