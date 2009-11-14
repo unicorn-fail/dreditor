@@ -19,6 +19,11 @@ if (Drupal === undefined) {
 }
 
 /**
+ * @defgroup jquery_extensions jQuery extensions
+ * @{
+ */
+
+/**
  * Dreditor debugging helper.
  *
  * @usage
@@ -52,6 +57,51 @@ jQuery.extend({
 });
 // @todo Is this the right way?
 jQuery.fn.debug = jQuery.debug;
+
+/**
+ * sort() callback to sort DOM elements by their actual DOM position.
+ *
+ * Copied from jQuery 1.3.2.
+ *
+ * @see Drupal.dreditor.patchReview.sort()
+ */
+var sortOrder;
+
+if ( document.documentElement.compareDocumentPosition ) {
+	sortOrder = function( a, b ) {
+		var ret = a.compareDocumentPosition(b) & 4 ? -1 : a === b ? 0 : 1;
+		if ( ret === 0 ) {
+			hasDuplicate = true;
+		}
+		return ret;
+	};
+} else if ( "sourceIndex" in document.documentElement ) {
+	sortOrder = function( a, b ) {
+		var ret = a.sourceIndex - b.sourceIndex;
+		if ( ret === 0 ) {
+			hasDuplicate = true;
+		}
+		return ret;
+	};
+} else if ( document.createRange ) {
+	sortOrder = function( a, b ) {
+		var aRange = a.ownerDocument.createRange(), bRange = b.ownerDocument.createRange();
+		aRange.selectNode(a);
+		aRange.collapse(true);
+		bRange.selectNode(b);
+		bRange.collapse(true);
+		var ret = aRange.compareBoundaryPoints(Range.START_TO_END, bRange);
+		if ( ret === 0 ) {
+			hasDuplicate = true;
+		}
+		return ret;
+	};
+}
+// end sortOrder
+
+/**
+ * @} End of "defgroup jquery_extensions".
+ */
 
 Drupal.dreditor = {
   behaviors: {},
@@ -276,6 +326,11 @@ Drupal.dreditor = {
 };
 
 /**
+ * @defgroup form_api JavaScript port of Form API
+ * @{
+ */
+
+/**
  * Dreditor JavaScript form API.
  *
  * Due to Greasemonkey limitations, we have to instantiate new form objects in
@@ -321,40 +376,9 @@ Drupal.dreditor.form.form.prototype = {
   }
 };
 
-// Copied from jQuery 1.3.2.
-var sortOrder;
-
-if ( document.documentElement.compareDocumentPosition ) {
-	sortOrder = function( a, b ) {
-		var ret = a.compareDocumentPosition(b) & 4 ? -1 : a === b ? 0 : 1;
-		if ( ret === 0 ) {
-			hasDuplicate = true;
-		}
-		return ret;
-	};
-} else if ( "sourceIndex" in document.documentElement ) {
-	sortOrder = function( a, b ) {
-		var ret = a.sourceIndex - b.sourceIndex;
-		if ( ret === 0 ) {
-			hasDuplicate = true;
-		}
-		return ret;
-	};
-} else if ( document.createRange ) {
-	sortOrder = function( a, b ) {
-		var aRange = a.ownerDocument.createRange(), bRange = b.ownerDocument.createRange();
-		aRange.selectNode(a);
-		aRange.collapse(true);
-		bRange.selectNode(b);
-		bRange.collapse(true);
-		var ret = aRange.compareBoundaryPoints(Range.START_TO_END, bRange);
-		if ( ret === 0 ) {
-			hasDuplicate = true;
-		}
-		return ret;
-	};
-}
-// end sortOrder
+/**
+ * @} End of "defgroup form_api".
+ */
 
 /**
  * Attach patch review editor to issue attachments.
@@ -383,6 +407,11 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
       $link.appendTo(this.parentNode);
     });
 };
+
+/**
+ * @defgroup dreditor_patchreview Dreditor patch reviewer
+ * @{
+ */
 
 /**
  * Dreditor patchReview application.
@@ -876,6 +905,10 @@ Drupal.dreditor.patchReview.behaviors.saveButton = function (context) {
 };
 
 /**
+ * @} End of "defgroup dreditor_patchreview".
+ */
+
+/**
  * Attach commit message generator to issue comment form.
  */
 Drupal.behaviors.dreditorCommitMessage = function (context) {
@@ -1147,13 +1180,15 @@ dreditorUpdateCheck = function () {
   var version = GM_getValue('version', '');
   var lastChecked = GM_getValue('update.last', 0);
   var now = parseInt(new Date() / 1000, 10);
-  var interval = 60 * 60 * 24 * 3; // Check every 3 days.
+  // Check every 3 days.
+  var interval = 60 * 60 * 24 * 3;
   if (lastChecked - now < -interval) {
+    // Whatever happens to this request, remember that we tried.
+    GM_setValue('update.last', now);
     GM_xmlhttpRequest({
       method: 'GET',
-      url: 'http://cvs.drupal.org/viewvc.py/drupal/contributions/modules/dreditor/CHANGELOG.txt?view=co',
+      url: 'http://drupalcode.org/viewvc/drupal/contributions/modules/dreditor/CHANGELOG.txt?view=co',
       onload: function (responseDetails) {
-        GM_setValue('update.last', now);
         if (responseDetails.status == 200) {
           var newversion = responseDetails.responseText.match(/\$Id.+\$/)[0];
           if (newversion == version) {
