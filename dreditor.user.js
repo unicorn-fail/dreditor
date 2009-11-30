@@ -789,6 +789,8 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   var $code = $('<div id="code"></div>');
   var $menu = $('#menu', context);
   var $lastFile = $('<li>Parse error</li>');
+  var $diffstat = $('<div id="diffstat"></div>').appendTo('#dreditor #bar');
+  var diffstat = { files: 0, insertions: 0, deletions: 0 };
 
   code = code.split('\n');
   for (var n in code) {
@@ -798,6 +800,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       var id = match2.replace(/[^A-Za-z_-]/g, '');
       $lastFile = $('<li><a href="#' + id + '">' + match2 + '</a></li>');
       $menu.append($lastFile);
+      diffstat.files++;
       return match1 + '<a class="file" id="' + id + '">' + match2 + '</a>' + match3;
     });
     // Build hunk menu links for file.
@@ -814,10 +817,12 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     // Colorize old code, but skip file diff lines.
     else if (line.match(/^((?!\-\-\-)\-.*)$/)) {
       line = '<pre class="old">' + line + '<span /></pre>';
+      diffstat.deletions++;
     }
     // Colorize new code, but skip file diff lines.
     else if (line.match(/^((?!\+\+\+)\+.*)$/)) {
       line = '<pre class="new">' + line + '<span /></pre>';
+      diffstat.insertions++;
     }
     // Wrap all other lines in PREs for copy/pasting.
     else {
@@ -829,6 +834,9 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   }
   // Append parsed code to body.
   $('#dreditor-content', context).append($code);
+
+  // Append diffstat to sidebar.
+  $diffstat.html(diffstat.files + '&nbsp;files changed, ' + diffstat.insertions + '&nbsp;insertions, ' + diffstat.deletions + '&nbsp;deletions.');
 
   // Attach pastie to any selection.
   $code.mouseup(function (e) {

@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#568978 by sun: Added basic diffstat-alike patch statistics.
 #547784 by sun: Fixed issue count not updated after unhiding issues.
 #547784 by sun: Added a setting for hiding issues.
 by sun: Added @defgroups and updated CVS checkout URL.
