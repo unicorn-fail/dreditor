@@ -1097,10 +1097,11 @@ Drupal.behaviors.dreditorIssueCount = function (context) {
       }
 
       // Output total count (minus hidden).
-      $container.append('<span class="dreditor-issuecount-total">Displaying ' + (count - countHidden) + countSuffix + ' issues.</span>');
+      $container.append('<span class="dreditor-issuecount-total">Displaying <span class="count">' + (count - countHidden) + '</span>' + countSuffix + ' issues.</span>');
       if (!countHidden) {
         return;
       }
+      var $counter = $container.find('span.dreditor-issuecount-total span.count');
 
       // Output 'fixed' count.
       var $issuesFixed = $table.find('tr.state-2.dreditor-issue-hidden');
@@ -1108,6 +1109,7 @@ Drupal.behaviors.dreditorIssueCount = function (context) {
         $('<a href="#" title="Show" class="dreditor-issuecount-hidden">' + $issuesFixed.length + ' fixed issues.' + '</a>')
           .click(function () {
             $issuesFixed.removeClass('dreditor-issue-hidden').show();
+            $counter.text(parseInt($counter.text(), 10) + $issuesFixed.length);
             $(this).remove();
             return false;
           })
@@ -1120,6 +1122,7 @@ Drupal.behaviors.dreditorIssueCount = function (context) {
         $('<a href="#" title="Show" class="dreditor-issuecount-hidden">' + $issuesInfo.length + ' issues need more info.' + '</a>')
           .click(function () {
             $issuesInfo.removeClass('dreditor-issue-hidden').show();
+            $counter.text(parseInt($counter.text(), 10) + $issuesInfo.length);
             $(this).remove();
             return false;
           })
