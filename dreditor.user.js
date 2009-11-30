@@ -608,17 +608,25 @@ Drupal.dreditor.patchReview = {
       }
 
       var lastline = $elements.get(0).previousSibling;
+      var lastfileNewlineAdded;
 
       $elements.each(function () {
         var $element = $(this);
+        lastfileNewlineAdded = false;
         // Add new last file, in case a comment spans over multiple files.
         if (lastfile && lastfile != $element.prevAll('pre.file:has(> a.file)').get(0)) {
           lastfile = $element.prevAll('pre.file:has(> a.file)').get(0);
-          html += lastfile.textContent + '\n';
+          html += '\n' + lastfile.textContent + '\n';
+          lastfileNewlineAdded = true;
         }
         // Add new last hunk, in case a comment spans over multiple hunks.
         if (lasthunk && lasthunk != $element.prevAll('pre.file').get(0)) {
           lasthunk = $element.prevAll('pre.file').get(0);
+          // Only add a newline if there was no new file already.
+          if (!lastfileNewlineAdded) {
+            html += '\n';
+            lastfileNewlineAdded = true;
+          }
           html += lasthunk.textContent + '\n';
         }
         // Add a delimiter, in case a comment spans over multiple selections.
