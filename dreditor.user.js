@@ -1065,40 +1065,66 @@ Drupal.behaviors.dreditorInlineImage = function (context) {
 };
 
 /**
- * Attach issue count to project issue tables.
+ * Attach issue count to project issue tables and hide fixed/needs more info issues without update marker.
  */
 Drupal.behaviors.dreditorIssueCount = function (context) {
   $('table.project-issue:not(.dreditor-issuecount-processed)', context)
     .addClass('dreditor-issuecount-processed')
     .each(function () {
       var $table = $(this);
-      $table.before('<div class="dreditor-issuecount">Displaying ' + $table.find('tbody tr').length + ($table.parent().parent().find('.pager').length ? '+' : '') + ' issues.</div>');
-    });
-};
+      var count = $table.find('tbody tr').length;
+      var countSuffix = ($table.parent().parent().find('.pager').length ? '+' : '');
+      var countHidden = 0;
 
-/**
- * Hide fixed issues without update marker.
- */
-Drupal.behaviors.dreditorFixedIssues = function (context) {
-  $('table.project-issue:not(.dreditor-fixedissues-processed)', context)
-    .addClass('dreditor-fixedissues-processed')
-    .find('tr.state-2').not(':has(.marker)').addClass('dreditor-issue-hidden').hide().end().end()
-    .each(function () {
-      var $table = $(this);
-      if (!$table.find('.dreditor-issue-hidden').length) {
-        return false;
-      }
-      // Build notice.
-      var $message = $('<span class="dreditor-fixedissues">&nbsp;' + $table.find('.dreditor-issue-hidden').length + ' fixed issues have been hidden.&nbsp;</span>');
-      // Add link to re-display hidden issues.
-      $('<a href="javascript:void(0);">Unhide</a>')
+      var $container = $('<div class="dreditor-issuecount"></div>');
+      $table.before($container);
+
+      // Add link to toggle this feature.
+      // @todo Initial draft. Needs refactoring into abstracted configuration.
+      var enabled = Drupal.dreditor.conf['application.issuecount.status'];
+      $('<a href="#" class="dreditor-application-toggle"></a>')
+        .text(enabled ? 'Do not hide issues' : 'Hide issues by default')
         .click(function () {
-          $table.find('.dreditor-issue-hidden').removeClass('dreditor-issue-hidden').show();
-          $(this).parent().remove();
+          Drupal.dreditor.conf['application.issuecount.status'] = (!enabled);
+          // Reload the current page without refresh from server.
+          window.location.href = window.location.href;
           return false;
         })
-        .appendTo($message);
-      $('div.dreditor-issuecount', context).append($message);
+        .prependTo($container);
+
+      if (enabled) {
+        countHidden = $table.find('tr.state-2, tr.state-16').not(':has(.marker)').addClass('dreditor-issue-hidden').hide().length;
+      }
+
+      // Output total count (minus hidden).
+      $container.append('<span class="dreditor-issuecount-total">Displaying ' + (count - countHidden) + countSuffix + ' issues.</span>');
+      if (!countHidden) {
+        return;
+      }
+
+      // Output 'fixed' count.
+      var $issuesFixed = $table.find('tr.state-2.dreditor-issue-hidden');
+      if ($issuesFixed.length) {
+        $('<a href="#" title="Show" class="dreditor-issuecount-hidden">' + $issuesFixed.length + ' fixed issues.' + '</a>')
+          .click(function () {
+            $issuesFixed.removeClass('dreditor-issue-hidden').show();
+            $(this).remove();
+            return false;
+          })
+          .appendTo($container);
+      }
+
+      // Output 'needs more info' count.
+      var $issuesInfo = $table.find('tr.state-16.dreditor-issue-hidden');
+      if ($issuesInfo.length) {
+        $('<a href="#" title="Show" class="dreditor-issuecount-hidden">' + $issuesInfo.length + ' issues need more info.' + '</a>')
+          .click(function () {
+            $issuesInfo.removeClass('dreditor-issue-hidden').show();
+            $(this).remove();
+            return false;
+          })
+          .appendTo($container);
+      }
     });
 };
 
@@ -1140,6 +1166,7 @@ jQuery(document).ready(function () {
 });
 
 // Add custom stylesheet.
+// @todo Can we load CSS files that ship with this user script?
 GM_addStyle(" \
 #dreditor-wrapper { position: fixed; z-index: 1000; width: 100%; top: 0; } \
 #dreditor { position: relative; width: 100%; height: 100%; background-color: #fff; border: 1px solid #ccc; } \
@@ -1166,6 +1193,10 @@ GM_addStyle(" \
 #dreditor #code .has-comment { background-color: rgba(255, 200, 200, 0.5); } \
 #dreditor #code .selected { background-color: rgba(255, 255, 200, 0.5); } \
 #dreditor-overlay { } \
+ \
+#content a.dreditor-application-toggle { display: inline-block; margin: 0 0.5em 0 0; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
+ \
+.dreditor-issuecount a { padding: 0 0.3em; } \
 ");
 
 /**

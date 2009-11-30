@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#547784 by sun: Added a setting for hiding issues.
 by sun: Added @defgroups and updated CVS checkout URL.
 by sun: Removed URL encoding fix for file attachments.
 #547780 by sun: Fixed 'Embed' button does not show up for new issue posts.
