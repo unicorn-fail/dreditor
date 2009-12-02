@@ -1099,7 +1099,7 @@ Drupal.behaviors.dreditorIssueCount = function (context) {
       // @todo Initial draft. Needs refactoring into abstracted configuration.
       var enabled = Drupal.dreditor.conf['application.issuecount.status'];
       $('<a href="#" class="dreditor-application-toggle"></a>')
-        .text(enabled ? 'Do not hide issues' : 'Hide issues by default')
+        .text(enabled ? 'Show all issues' : 'Hide irrelevant issues')
         .click(function () {
           Drupal.dreditor.conf['application.issuecount.status'] = (!enabled);
           // Reload the current page without refresh from server.
@@ -1214,8 +1214,9 @@ GM_addStyle(" \
 #dreditor #code .selected { background-color: rgba(255, 255, 200, 0.5); } \
 #dreditor-overlay { } \
  \
-#content a.dreditor-application-toggle { display: inline-block; margin: 0 0.5em 0 0; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
+#content a.dreditor-application-toggle { display: inline-block; float: right; line-height: 150%; margin: 0 0 0 0.5em; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
  \
+div.dreditor-issuecount { line-height: 200%; } \
 .dreditor-issuecount a { padding: 0 0.3em; } \
 ");
 
