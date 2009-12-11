@@ -976,6 +976,11 @@ Drupal.dreditor.patchReview.behaviors.saveButton = function (context) {
  * Attach commit message generator to issue comment form.
  */
 Drupal.behaviors.dreditorCommitMessage = function (context) {
+  // Attach this behavior only to project_issue nodes. Use a fast selector for
+  // the common case, but also support comment/reply/% pages.
+  if (!($('body.node-type-project-issue', context).length || $('div.project-issue', context).length)) {
+    return;
+  }
   $('#edit-comment-wrapper', context).once('dreditor-commitmessage', function () {
     // Generate commit message button.
     var $link = $('<a class="dreditor-button dreditor-commitmessage" href="#">Create commit message</a>').click(function () {
