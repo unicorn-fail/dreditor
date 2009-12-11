@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#655384 by sun: Fixed extra line displayed at the end of a patch.
 by sun: Added jQuery.once() from D7.
 #547784 by sun: Fixed UX of issue count feature toggle.
 by sun: Fixed spacing between files/hunks in pasted code.

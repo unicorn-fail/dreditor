@@ -875,6 +875,10 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       line = '<pre class="new">' + line + '<span /></pre>';
       diffstat.insertions++;
     }
+    // Skip entirely empty lines (in diff files, this is only the last newline).
+    else if (!line.length) {
+      continue;
+    }
     // Wrap all other lines in PREs for copy/pasting.
     else {
       line = '<pre>' + line + '<span /></pre>';
