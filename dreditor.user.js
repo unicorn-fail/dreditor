@@ -969,6 +969,30 @@ Drupal.dreditor.patchReview.behaviors.saveButton = function (context) {
 };
 
 /**
+ * Add link to toggle display of deleted patch lines.
+ */
+Drupal.dreditor.patchReview.behaviors.toggleDeletions = function (context) {
+  $('#dreditor #bar').once('toggle-deletions', function () {
+    var $link = $('<a href="#" class="dreditor-application-toggle">Hide deletions</a>');
+    $link.toggle(
+      function () {
+        $('#code pre.old', context).addClass('element-invisible');
+        $link.text('Show deletions');
+        this.blur();
+        return false;
+      },
+      function () {
+        $('#code pre.old', context).removeClass('element-invisible');
+        $link.text('Hide deletions');
+        this.blur();
+        return false;
+      }
+    );
+    $(this).append($link);
+  });
+};
+
+/**
  * @} End of "defgroup dreditor_patchreview".
  */
 
@@ -1259,9 +1283,11 @@ GM_addStyle(" \
 #dreditor #code .old { color: #d00; } \
 #dreditor #code .has-comment { background-color: rgba(255, 200, 200, 0.5); } \
 #dreditor #code .selected { background-color: rgba(255, 255, 200, 0.5); } \
+.element-invisible { height: 0; overflow: hidden; position: absolute; } \
 #dreditor-overlay { } \
  \
-#content a.dreditor-application-toggle { display: inline-block; float: right; line-height: 150%; margin: 0 0 0 0.5em; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
+a.dreditor-application-toggle, #content a.dreditor-application-toggle { display: inline-block; padding: 0 0.3em; line-height: 150%; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
+#content a.dreditor-application-toggle { float: right; margin: 0 0 0 0.5em; } \
  \
 div.dreditor-issuecount { line-height: 200%; } \
 .dreditor-issuecount a { padding: 0 0.3em; } \
