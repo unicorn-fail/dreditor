@@ -691,16 +691,15 @@ Drupal.dreditor.patchReview = {
       return array;
     }
     var messages = [
-      'This review is powered by <a href="@dreditor-url">Dreditor</a>.',
-      'I\'m on crack.  <a href="@dreditor-url">Are you, too?</a>'
+      'Powered by <a href="@dreditor-url">Dreditor</a>.'
     ];
     // Add Drupal core specific messages.
+    var daysToCodeFreeze = 0;
     if ($('#edit-project-info-project-title').val() == 'Drupal') {
-      var daysToCodeFreeze = parseInt((new Date(2009, 9 - 1, 7) - new Date()) / 1000 / 60 / 60 / 24, 10);
+      daysToCodeFreeze = parseInt((new Date(2010, 1 - 1, 15) - new Date()) / 1000 / 60 / 60 / 24, 10);
       if (daysToCodeFreeze > 0) {
         $.merge(messages, [
-          '@days to code freeze.  <a href="@dreditor-url">Better review yourself.</a>',
-          'Beer-o-mania starts in @days!  <a href="@dreditor-url">Don\'t drink and patch.</a>'
+          '@days to code freeze.  <a href="@dreditor-url">Better review yourself.</a>'
         ]);
       }
     }

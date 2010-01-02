@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Updated patch review footer messages.
 by sun: Added toggle to hide deleted lines in patches.
 #547776 by sun: Fixed 'Create commit message' button is shown on forum replies.
 #655384 by sun: Fixed extra line displayed at the end of a patch.
