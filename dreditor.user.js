@@ -826,6 +826,10 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     return;
   }
 
+  // Reset pastie; may have been active when user clicked global 'Cancel' button.
+  // @todo This cries for a proper hook system.
+  Drupal.dreditor.patchReview.reset();
+
   // Convert CRLF, CR into LF.
   code = code.replace(/\r\n|\r/g, "\n");
   // Escape HTML tags and entities; order of replacements is important.
