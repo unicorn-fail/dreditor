@@ -1243,6 +1243,25 @@ Drupal.behaviors.dreditorIssueValues = function (context) {
 };
 
 /**
+ * Add a 'Reset' button to project issue exposed views filter form.
+ */
+Drupal.behaviors.dreditorIssuesFormReset = function (context) {
+  if (!window.location.search) {
+    return;
+  }
+  $('div.view-project-issue-project:has(form)', context).once('dreditor-issues-form-reset', function () {
+    var $form = $(this).find('form');
+    var $container = $form.find('input.form-submit').parent();
+    var $button = $container.clone().find('input').val('Reset').click(function () {
+      // Reload the current page without query string and without refresh.
+      window.location.href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+      return false;
+    }).end();
+    $container.after($button);
+  });
+};
+
+/**
  * Initialize Dreditor/Greasemonkey global configuration handler.
  *
  * @see Drupal.dreditor.confInit()
