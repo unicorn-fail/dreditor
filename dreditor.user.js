@@ -694,18 +694,29 @@ Drupal.dreditor.patchReview = {
       'Powered by <a href="@dreditor-url">Dreditor</a>.'
     ];
     // Add Drupal core specific messages.
-    var daysToCodeFreeze = 0;
+    var daysToCodeFreeze = 0, criticalIssueCount = 0;
     if ($('#edit-project-info-project-title').val() == 'Drupal') {
+      // Code freeze specific messages.
       daysToCodeFreeze = parseInt((new Date(2010, 1 - 1, 15) - new Date()) / 1000 / 60 / 60 / 24, 10);
       if (daysToCodeFreeze > 0) {
         $.merge(messages, [
           '@days to code freeze.  <a href="@dreditor-url">Better review yourself.</a>'
         ]);
       }
+      // Critical issue queue specific messages.
+      // @todo Precondition?
+      criticalIssueCount = $('#block-bingo-0 a:contains("Critical issues")').text();
+      if (criticalIssueCount.length) {
+        criticalIssueCount = criticalIssueCount.match(/\s*(\d+)/)[1];
+        $.merge(messages, [
+          '@critical-count critical left.  <a href="@dreditor-url">Go review some!</a>'
+        ]);
+      }
     }
     var message = shuffle(messages)[0];
     message = message.replace('@dreditor-url', 'http://drupal.org/project/dreditor');
     message = message.replace('@days', daysToCodeFreeze + ' days');
+    message = message.replace('@critical-count', criticalIssueCount);
     html += '\n\n<em>' + message + '</em>\n';
 
     // Paste comment into issue comment textarea.
