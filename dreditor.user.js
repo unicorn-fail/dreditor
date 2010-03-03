@@ -875,28 +875,39 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       return match1 + '<a class="hunk" id="' + id + '">' + match2 + '</a>';
     });
 
+    var classes = [], syntax = false;
     // Colorize file diff lines.
     if (line.match(/^((Index|===|RCS|retrieving|diff|\-\-\- |\+\+\+ |@@ ).*)$/i)) {
-      line = '<pre class="file">' + line + '</pre>';
+      classes.push('file');
     }
     // Colorize old code, but skip file diff lines.
     else if (line.match(/^((?!\-\-\-)\-.*)$/)) {
-      line = '<pre class="old">' + line + '<span /></pre>';
+      classes.push('old');
       diffstat.deletions++;
     }
     // Colorize new code, but skip file diff lines.
     else if (line.match(/^((?!\+\+\+)\+.*)$/)) {
-      line = '<pre class="new">' + line + '<span /></pre>';
+      classes.push('new');
       diffstat.insertions++;
+      syntax = true;
     }
     // Skip entirely empty lines (in diff files, this is only the last newline).
     else if (!line.length) {
       continue;
     }
-    // Wrap all other lines in PREs for copy/pasting.
     else {
-      line = '<pre>' + line + '<span /></pre>';
+      // @todo Also colorizing unchanged lines makes added comments almost
+      //   invisible. Although we could use .new.comment as CSS selector, the
+      //   question of a sane color scheme remains.
+      // syntax = true;
     }
+    // Colorize comments.
+    if (syntax && line.match(/^. +\/\/|^.\/\*[\* ]|^. \*/)) {
+      classes.push('comment');
+    }
+    // Wrap all lines in PREs for copy/pasting.
+    classes = (classes.length ? ' class="' + classes.join(' ') + '"' : '');
+    line = '<pre' + classes + '>' + line + '<span /></pre>';
 
     // Append line to parsed code.
     $code.append(line);
@@ -1312,8 +1323,9 @@ GM_addStyle(" \
 #dreditor #code pre { background-color: transparent; border: 0; margin: 0; padding: 0; } \
 #dreditor #code pre span { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
 #dreditor #code .file { color: #088; } \
-#dreditor #code .new { color: #00d; } \
-#dreditor #code .old { color: #d00; } \
+#dreditor #code .old { color: #c00; } \
+#dreditor #code .new { color: #00c; } \
+#dreditor #code .comment { color: #070; } \
 #dreditor #code .has-comment { background-color: rgba(255, 200, 200, 0.5); } \
 #dreditor #code .selected { background-color: rgba(255, 255, 200, 0.5); } \
 .element-invisible { height: 0; overflow: hidden; position: absolute; } \
