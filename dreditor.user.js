@@ -887,6 +887,11 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     }
     // Colorize new code, but skip file diff lines.
     else if (line.match(/^((?!\+\+\+)\+.*)$/)) {
+      // Wrap trailing white-space with a SPAN to expose them during patch
+      // review. Also add a hidden end-of-line character that will only appear
+      // in the pasted code.
+      line = line.replace(/^(.*\S)(\s+)$/, '$1<span class="trailing-whitespace">$2</span><span class="hidden">¶</span>');
+
       classes.push('new');
       diffstat.insertions++;
       syntax = true;
@@ -894,6 +899,10 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     // Skip entirely empty lines (in diff files, this is only the last newline).
     else if (!line.length) {
       continue;
+    }
+    // Detect missing newline at end of file.
+    else if (line.match(/.*No newline at end of file.*/i)) {
+      line = '<span class="newline-eof">' + line + '</span>';
     }
     else {
       // @todo Also colorizing unchanged lines makes added comments almost
@@ -1322,6 +1331,9 @@ GM_addStyle(" \
 #dreditor #code { background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y scroll 50.7em 0; padding-left: 10px; } \
 #dreditor #code pre { background-color: transparent; border: 0; margin: 0; padding: 0; } \
 #dreditor #code pre span { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
+#dreditor #code pre span.trailing-whitespace { display: inline; background-color: #f99; } \
+#dreditor #code pre span.newline-eof { display: inline; color: #fff; background-color: #f66; } \
+#dreditor #code pre span.hidden { display: none; } \
 #dreditor #code .file { color: #088; } \
 #dreditor #code .old { color: #c00; } \
 #dreditor #code .new { color: #00c; } \

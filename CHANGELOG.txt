@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#656456 by scor: Added trailing white-space and missing EOF newline helpers.
 by sun: Added syntax highlighting for added comments.
 by sun: Added critical issue count as patch review comment footer message.
 by sun: Added a "Reset" form button for project issue views filters.
