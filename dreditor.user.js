@@ -887,10 +887,12 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     }
     // Colorize new code, but skip file diff lines.
     else if (line.match(/^((?!\+\+\+)\+.*)$/)) {
+      // Expose tabs.
+      line = line.replace(/(\t+)/, '<span class="error tab">$1</span>');
       // Wrap trailing white-space with a SPAN to expose them during patch
       // review. Also add a hidden end-of-line character that will only appear
       // in the pasted code.
-      line = line.replace(/^(.*\S)(\s+)$/, '$1<span class="trailing-whitespace">$2</span><span class="hidden">¶</span>');
+      line = line.replace(/^(.*\S)(\s+)$/, '$1<span class="error whitespace">$2</span><span class="hidden">¶</span>');
 
       classes.push('new');
       diffstat.insertions++;
@@ -902,7 +904,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     }
     // Detect missing newline at end of file.
     else if (line.match(/.*No newline at end of file.*/i)) {
-      line = '<span class="newline-eof">' + line + '</span>';
+      line = '<span class="error eof">' + line + '</span>';
     }
     else {
       // @todo Also colorizing unchanged lines makes added comments almost
@@ -1331,8 +1333,9 @@ GM_addStyle(" \
 #dreditor #code { background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y scroll 50.7em 0; padding-left: 10px; } \
 #dreditor #code pre { background-color: transparent; border: 0; margin: 0; padding: 0; } \
 #dreditor #code pre span { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
-#dreditor #code pre span.trailing-whitespace { display: inline; background-color: #f99; } \
-#dreditor #code pre span.newline-eof { display: inline; color: #fff; background-color: #f66; } \
+#dreditor #code pre span.error { background-color: #f99; line-height: 100%; width: auto; height: auto; border: 0; } \
+#dreditor #code pre span.error.eof { color: #fff; background-color: #f66; } \
+#dreditor #code pre span.error.tab { background-color: #fdd; } \
 #dreditor #code pre span.hidden { display: none; } \
 #dreditor #code .file { color: #088; } \
 #dreditor #code .old { color: #c00; } \
