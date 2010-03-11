@@ -1311,7 +1311,10 @@ Drupal.behaviors.projectAuto = function (context) {
       Drupal.projectSetTaxonomy(this.value);
     });
   });
-  Drupal.projectSetTaxonomy(tid);
+  // Only reset taxonomy selectors when initially attaching on edit forms.
+  if (tid) {
+    Drupal.projectSetTaxonomy(tid);
+  }
 };
 
 /**
