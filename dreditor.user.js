@@ -1295,29 +1295,6 @@ Drupal.behaviors.dreditorIssuesFormReset = function (context) {
 };
 
 /**
- * Fix a very annoying bug in project.js.
- */
-Drupal.behaviors.projectAuto = function (context) {
-  if (typeof Drupal.projectSetTaxonomy != 'function') {
-    return;
-  }
-  // The initially selected term, if any.
-  var tid;
-  $('div.project-taxonomy-element input', context).once('projectAuto-processed', function () {
-    if (this.checked) {
-      tid = this.value;
-    }
-    $(this).click(function () {
-      Drupal.projectSetTaxonomy(this.value);
-    });
-  });
-  // Only reset taxonomy selectors when initially attaching on edit forms.
-  if (tid) {
-    Drupal.projectSetTaxonomy(tid);
-  }
-};
-
-/**
  * Initialize Dreditor/Greasemonkey global configuration handler.
  *
  * @see Drupal.dreditor.confInit()
