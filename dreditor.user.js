@@ -1033,6 +1033,81 @@ Drupal.dreditor.patchReview.behaviors.toggleDeletions = function (context) {
  */
 
 /**
+ * Streamline issue comment form.
+ *
+ * Altering of the form makes certain browsers (such as Firefox) no longer find
+ * the form fields upon page refresh (i.e. effective result like
+ * autocomplete="off"), so we need to work with CSS tricks.
+ *
+ * Moving form elements around, unwrapping them, and similar actions are not
+ * supported.
+ */
+Drupal.behaviors.dreditorIssueCommentForm = function (context) {
+  $('#comment-form:has(#edit-category)', context).once('dreditor-issue-comment-form', function () {
+    var $form = $('> div', this);
+    // Remove that ugly looking heading.
+    $form.parents('.content').prev('h2').remove();
+
+    // Unwrap basic issue data.
+    $form
+      .find('fieldset:first')
+        .attr('id', 'dreditor-issue-data')
+        .removeClass('collapsible').addClass('fieldset-flat')
+        .find('.fieldset-wrapper')
+          // Hide note about issue title for n00bs.
+          .find('.description:first').hide().end()
+          // Hide basic issue data labels.
+          .find('label').hide().end();
+
+    // Hide label for comment textarea.
+    $form.find('label[for="edit-comment"]').hide();
+
+    // Move issue tags into issue data.
+    // @todo Resets issue tags and comment textarea upon page refresh. :(
+    //   setTimeout() doesn't help.
+    /*
+    $form
+      .find('fieldset:last')
+        .removeClass('collapsible collapsed').addClass('fieldset-flat')
+        .insertAfter('#dreditor-issue-data')
+        .find('.fieldset-wrapper')
+          .find('.form-item').css('marginTop', 0)
+            .find('label').hide().end();
+    */
+    // Note: Issue tags are still reset upon page refresh, but that's caused by
+    // by collapse.js in D6, which inserts div.fieldset-wrapper into the form.
+    $form
+      .find('fieldset:last')
+        // Since tags are reset anyway, we can also move them, at least above
+        // attachments.
+        .insertBefore('.attachments')
+        .removeClass('collapsible collapsed').addClass('fieldset-flat')
+        .find('.form-item').css('margin', 0)
+          .find('label').hide();
+
+    // Unwrap attachments.
+    $form
+      .find('.attachments fieldset')
+        .removeClass('collapsible').addClass('fieldset-flat')
+        .find('.description:first').hide();
+
+    // Add expected comment #number; parse last comment, since deleted/
+    // unpublished comments are counted. Also, there
+    // are no comments to count on fresh issues.
+    var count = $('#comments .comment:last .title', context).text() || 0;
+    if (count) {
+      count = parseInt(count.match(/\d+$/)[0], 10);
+    }
+    count++;
+    $form.prepend($('<h3 class="title">#' + count + '</h3>'));
+
+    // Add classes to make it look licky. Needs to stay last to not break
+    // comment count.
+    $form.addClass('comment rounded-corners');
+  });
+};
+
+/**
  * Attach commit message generator to issue comment form.
  */
 Drupal.behaviors.dreditorCommitMessage = function (context) {
@@ -1043,7 +1118,7 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
   }
   $('#edit-comment-wrapper', context).once('dreditor-commitmessage', function () {
     // Generate commit message button.
-    var $link = $('<a class="dreditor-button dreditor-commitmessage" href="#">Create commit message</a>').click(function () {
+    var $link = $('<a class="dreditor-application-toggle dreditor-commitmessage" href="#">Create commit message</a>').click(function () {
       // A port of PHP's array_count_values(), combined with a keysort.
       $.fn.extend({
         countvalues: function () {
@@ -1153,7 +1228,13 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
       return false;
     });
     // Prepend commit message button to comment form.
-    $link.prependTo(this);
+    // @todo Generalize this setup. Somehow.
+    var $container = $('.dreditor-actions', this);
+    if (!$container.length) {
+      $container = $('<div class="dreditor-actions" style="width: 95%"></div>');
+      $(this).prepend($container);
+    }
+    $link.prependTo($container);
   });
 };
 
@@ -1257,7 +1338,7 @@ Drupal.behaviors.dreditorIssueCount = function (context) {
 };
 
 /**
- * Attach issue count to project issue tables.
+ * Prepopulate issue creation form with last used values.
  */
 Drupal.behaviors.dreditorIssueValues = function (context) {
   // This catches only the issue creation form, since project issue/release data
@@ -1346,11 +1427,16 @@ GM_addStyle(" \
 .element-invisible { height: 0; overflow: hidden; position: absolute; } \
 #dreditor-overlay { } \
  \
+.dreditor-actions { overflow: hidden; } \
 a.dreditor-application-toggle, #content a.dreditor-application-toggle { display: inline-block; padding: 0 0.3em; line-height: 150%; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
 #content a.dreditor-application-toggle { float: right; margin: 0 0 0 0.5em; } \
  \
 div.dreditor-issuecount { line-height: 200%; } \
 .dreditor-issuecount a { padding: 0 0.3em; } \
+ \
+#content .fieldset-flat { display: block; border: 0; width: auto; padding: 0; } \
+.fieldset-flat > legend { display: none; } \
+.rounded-corners { padding: 10px; width: auto; -moz-border-radius: 8px; border-radius: 8px; } \
 ");
 
 /**

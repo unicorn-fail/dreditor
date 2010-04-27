@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#713740 by sun, Bojhan: Fixed UX of issue comment form.
 #569370 by sun: Removed fix for project.js.
 #569370 by sun: Fixed behavior in project.js cannot be executed twice.
 #656456 by sun: Added highlighting of tabs in patches.
