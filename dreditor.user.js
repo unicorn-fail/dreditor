@@ -1048,39 +1048,31 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
     // Remove that ugly looking heading.
     $form.parents('.content').prev('h2').remove();
 
+    // Since we cannot move DOM elements around, we need to use advanced CSS
+    // positioning to achieve a sane order of form elements.
+    $form.css({ position: 'relative', paddingTop: 150 });
+
     // Unwrap basic issue data.
     $form
       .find('fieldset:first')
+        .css({ position: 'absolute', top: 20, width: '98%' })
         .attr('id', 'dreditor-issue-data')
         .removeClass('collapsible').addClass('fieldset-flat')
         .find('.fieldset-wrapper')
           // Hide note about issue title for n00bs.
           .find('.description:first').hide().end()
           // Hide basic issue data labels.
-          .find('label').hide().end();
+          .find('label').hide();
 
     // Hide label for comment textarea.
     $form.find('label[for="edit-comment"]').hide();
 
     // Move issue tags into issue data.
-    // @todo Resets issue tags and comment textarea upon page refresh. :(
-    //   setTimeout() doesn't help.
-    /*
-    $form
-      .find('fieldset:last')
-        .removeClass('collapsible collapsed').addClass('fieldset-flat')
-        .insertAfter('#dreditor-issue-data')
-        .find('.fieldset-wrapper')
-          .find('.form-item').css('marginTop', 0)
-            .find('label').hide().end();
-    */
     // Note: Issue tags are still reset upon page refresh, but that's caused by
     // by collapse.js in D6, which inserts div.fieldset-wrapper into the form.
     $form
       .find('fieldset:last')
-        // Since tags are reset anyway, we can also move them, at least above
-        // attachments.
-        .insertBefore('.attachments')
+        .css({ position: 'absolute', top: 130, width: '98%' })
         .removeClass('collapsible collapsed').addClass('fieldset-flat')
         .find('.form-item').css('margin', 0)
           .find('label').hide();
@@ -1099,7 +1091,9 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
       count = parseInt(count.match(/\d+$/)[0], 10);
     }
     count++;
-    $form.prepend($('<h3 class="title">#' + count + '</h3>'));
+    $('<h3 class="title">#' + count + '</h3>')
+      .css({ position: 'absolute', top: 11 })
+      .prependTo($form);
 
     // Add classes to make it look licky. Needs to stay last to not break
     // comment count.
