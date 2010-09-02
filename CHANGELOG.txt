@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Updated for changed issue comment form markup.
 #713740 by sun: Fixed position of issue tags in comment form (follow-up).
 #713740 by sun, Bojhan: Fixed UX of issue comment form.
 #569370 by sun: Removed fix for project.js.

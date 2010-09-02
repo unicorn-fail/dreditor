@@ -1071,11 +1071,9 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
     // Note: Issue tags are still reset upon page refresh, but that's caused by
     // by collapse.js in D6, which inserts div.fieldset-wrapper into the form.
     $form
-      .find('fieldset:last')
-        .css({ position: 'absolute', top: 130, width: '98%' })
-        .removeClass('collapsible collapsed').addClass('fieldset-flat')
-        .find('.form-item').css('margin', 0)
-          .find('label').hide();
+      .children('.form-item:last')
+        .css({ position: 'absolute', top: 130, width: '98%', margin: 0 })
+        .find('label').hide();
 
     // Unwrap attachments.
     $form
