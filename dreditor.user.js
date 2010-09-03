@@ -1079,19 +1079,22 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
 
     // Since we cannot move DOM elements around, we need to use advanced CSS
     // positioning to achieve a sane order of form elements.
-    $form.css({ position: 'relative', paddingTop: 150 });
+    $form.css({ position: 'relative', paddingTop: '15em' });
 
     // Unwrap basic issue data.
     $form
       .find('fieldset:first')
-        .css({ position: 'absolute', top: 20, width: '98%' })
+        .css({ position: 'absolute', top: '2em', width: '98%' })
         .attr('id', 'dreditor-issue-data')
         .removeClass('collapsible').addClass('fieldset-flat')
         .find('.fieldset-wrapper')
           // Hide note about issue title for n00bs.
           .find('.description:first').hide().end()
           // Hide basic issue data labels.
-          .find('label').hide();
+          .find('label').each(function () {
+            var $label = $(this).hide();
+            $('#' + $label.attr('for'), context).attr('title', $label.text());
+          });
 
     // Hide label for comment textarea.
     $form.find('label[for="edit-comment"]').hide();
@@ -1101,8 +1104,11 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
     // by collapse.js in D6, which inserts div.fieldset-wrapper into the form.
     $form
       .children('.form-item:last')
-        .css({ position: 'absolute', top: 130, width: '98%', margin: 0 })
-        .find('label').hide();
+        .css({ position: 'absolute', top: '12.5em', width: '98%', margin: 0 })
+        .find('label').each(function () {
+          var $label = $(this).hide();
+          $('#' + $label.attr('for'), context).attr('title', $label.text());
+        });
 
     // Unwrap attachments.
     $form
@@ -1462,6 +1468,7 @@ div.dreditor-issuecount { line-height: 200%; } \
  \
 #content .fieldset-flat { display: block; border: 0; width: auto; padding: 0; } \
 .fieldset-flat > legend { display: none; } \
+#dreditor-issue-data .inline-options .form-item { margin-bottom: 0.3em; } \
 .rounded-corners { padding: 10px; width: auto; -moz-border-radius: 8px; border-radius: 8px; } \
 ");
 
