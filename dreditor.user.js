@@ -365,6 +365,35 @@ Drupal.dreditor = {
     // Gecko-only method to scroll DOM elements into view.
     // @see https://developer.mozilla.org/en/DOM/element.scrollIntoView
     $(selector).get(0).scrollIntoView();
+  },
+
+  /**
+   * Redirect to a given path or the current page.
+   *
+   * Avoids hard browser refresh (clearing cache).
+   *
+   * @param path
+   *   (optional) The path to redirect to, including leading slash. Defaults to
+   *   current path.
+   * @param options
+   *   (optional) An object containing:
+   *   - query: A query string to append, including leading question mark
+   *     (window.location.search). Defaults to current query string.
+   *   - fragment: A fragment string to append, including leading pound
+   *     (window.location.hash). Defaults to none.
+   */
+  redirect: function (path, options) {
+    path = path || window.location.pathname;
+    options = $.extend({ fragment: '' }, options || {});
+    var url = window.location.protocol + '//' + window.location.hostname + path;
+    // If query is not null, take it; otherwise, use current.
+    url += (typeof options.query != 'undefined' ? options.query : window.location.search);
+    // Not using current fragment by default.
+    if (options.fragment.length) {
+      url += options.fragment;
+    }
+    window.location.href = url;
+    return false;
   }
 };
 
@@ -1360,7 +1389,7 @@ Drupal.behaviors.dreditorIssuesFormReset = function (context) {
     var $container = $form.find('input.form-submit').parent();
     var $button = $container.clone().find('input').val('Reset').click(function () {
       // Reload the current page without query string and without refresh.
-      window.location.href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+      Drupal.dreditor.redirect(null, { query: '' });
       return false;
     }).end();
     $container.after($button);
