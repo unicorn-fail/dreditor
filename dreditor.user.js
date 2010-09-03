@@ -1371,17 +1371,22 @@ Drupal.behaviors.dreditorIssuesFormReset = function (context) {
  * Initialize Dreditor/Greasemonkey global configuration handler.
  *
  * @see Drupal.dreditor.confInit()
+ *
+ * @todo Dreditor's Drupal behaviors are not always invoked with drupal.org's
+ *   behaviors. Starting with a recent GM update, confInit() had to be moved
+ *   outside of .ready(), since Dreditor's behaviors were suddenly invoked with
+ *   drupal.org's behaviors, i.e., this might depend on browser/GM version.
  */
 Drupal.dreditor.conf = GM_getValue('dreditor.conf', '');
+Drupal.dreditor.confInit();
+jQuery(document).ready(function () {
+  Drupal.attachBehaviors(this);
+});
+
+// GM_setValue() is only allowed in the user script context.
 window.addEventListener('unload', function () {
   GM_setValue('dreditor.conf', $.param(Drupal.dreditor.conf));
 }, true);
-
-// @todo Behaviors of Dreditor are not invoked with regular behaviors.
-jQuery(document).ready(function () {
-  Drupal.dreditor.confInit();
-  Drupal.attachBehaviors(this);
-});
 
 // Add custom stylesheet.
 // @todo Can we load CSS files that ship with this user script?
