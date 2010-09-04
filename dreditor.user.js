@@ -1144,8 +1144,10 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
     return;
   }
   $('#edit-comment-wrapper', context).once('dreditor-commitmessage', function () {
+    var $container = $('.dreditor-actions', this);
     // Generate commit message button.
-    var $link = $('<a class="dreditor-application-toggle dreditor-commitmessage" href="#">Create commit message</a>').click(function () {
+    var $link = $('<a class="dreditor-application-toggle dreditor-commitmessage" href="#">Create commit message</a>');
+    $link.click(function () {
       // A port of PHP's array_count_values(), combined with a keysort.
       $.fn.extend({
         countvalues: function () {
@@ -1250,13 +1252,28 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         title += '.';
       }
       message += ': ' + title;
-      // Prepend commit message to issue comment textarea.
-      $('#edit-comment', context).val(message + "\n\n" + $('#edit-comment', context).val());
+
+      // Inject a text field.
+      var $input = $('#dreditor-commitmessage-input', context);
+      if (!$input.length) {
+        $input = $('<input id="dreditor-commitmessage-input" class="dreditor-input" type="text" />')
+          .css({ position: 'absolute', right: $link.width(), width: 0 })
+          .val(message).debug('input');
+        $link.css({ position: 'relative', zIndex: 1 }).before($input);
+        $input.animate({ width: $container.width() - $link.width() - 10 }, null, null, function () {
+          this.select();
+        });
+        $link.one('click', function () {
+          $input.animate({ width: 0 }, null, null, function () {
+            $input.remove();
+          });
+          return false;
+        });
+      }
       return false;
     });
     // Prepend commit message button to comment form.
     // @todo Generalize this setup. Somehow.
-    var $container = $('.dreditor-actions', this);
     if (!$container.length) {
       $container = $('<div class="dreditor-actions" style="width: 95%"></div>');
       $(this).prepend($container);
@@ -1459,9 +1476,10 @@ GM_addStyle(" \
 .element-invisible { height: 0; overflow: hidden; position: absolute; } \
 #dreditor-overlay { } \
  \
-.dreditor-actions { overflow: hidden; } \
-a.dreditor-application-toggle, #content a.dreditor-application-toggle { display: inline-block; padding: 0 0.3em; line-height: 150%; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
+.dreditor-actions { overflow: hidden; position: relative; } \
+a.dreditor-application-toggle, #content a.dreditor-application-toggle { display: inline-block; padding: 0.05em 0.3em; line-height: 150%; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
 #content a.dreditor-application-toggle { float: right; margin: 0 0 0 0.5em; } \
+.dreditor-input { border: 1px solid #ccc; padding: 0.2em 0.3em; font-size: 100%; line-height: 150%; } \
  \
 div.dreditor-issuecount { line-height: 200%; } \
 .dreditor-issuecount a { padding: 0 0.3em; } \
