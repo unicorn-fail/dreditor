@@ -1256,7 +1256,7 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
       // Inject a text field.
       var $input = $('#dreditor-commitmessage-input', context);
       if (!$input.length) {
-        $input = $('<input id="dreditor-commitmessage-input" class="dreditor-input" type="text" />')
+        $input = $('<input id="dreditor-commitmessage-input" class="dreditor-input" type="text" autocomplete="off" />')
           .css({ position: 'absolute', right: $link.width(), width: 0 })
           .val(message).debug('input');
         $link.css({ position: 'relative', zIndex: 1 }).before($input);
