@@ -1079,7 +1079,7 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
 
     // Since we cannot move DOM elements around, we need to use advanced CSS
     // positioning to achieve a sane order of form elements.
-    $form.css({ position: 'relative', paddingTop: '15em' });
+    $form.css({ position: 'relative', paddingTop: '19em' });
 
     // Unwrap basic issue data.
     $form
@@ -1091,10 +1091,11 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
           // Hide note about issue title for n00bs.
           .find('.description:first').hide().end()
           // Hide basic issue data labels.
-          .find('label').each(function () {
+          // @todo Add a toggle for this.
+          /*.find('label').each(function () {
             var $label = $(this).hide();
             $('#' + $label.attr('for'), context).attr('title', $label.text());
-          });
+          })*/;
 
     // Hide label for comment textarea.
     $form.find('label[for="edit-comment"]').hide();
@@ -1104,7 +1105,7 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
     // by collapse.js in D6, which inserts div.fieldset-wrapper into the form.
     $form
       .children('.form-item:last')
-        .css({ position: 'absolute', top: '12.5em', width: '98%', margin: 0 })
+        .css({ position: 'absolute', top: '16.5em', width: '98%', margin: 0 })
         .find('label').each(function () {
           var $label = $(this).hide();
           $('#' + $label.attr('for'), context).attr('title', $label.text());
