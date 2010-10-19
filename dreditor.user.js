@@ -464,7 +464,7 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
         return;
       }
       // Generate review link.
-      var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">review</a>').click(function () {
+      var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">Review</a>').click(function () {
         // Load file.
         $.get(this.href, function (content, status) {
           if (status == 'success') {
@@ -1084,18 +1084,12 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
     // Unwrap basic issue data.
     $form
       .find('fieldset:first')
-        .css({ position: 'absolute', top: '2em', width: '98%' })
+        .css({ position: 'absolute', top: '2em', width: '100%' })
         .attr('id', 'dreditor-issue-data')
         .removeClass('collapsible').addClass('fieldset-flat')
         .find('.fieldset-wrapper')
           // Hide note about issue title for n00bs.
-          .find('.description:first').hide().end()
-          // Hide basic issue data labels.
-          // @todo Add a toggle for this.
-          /*.find('label').each(function () {
-            var $label = $(this).hide();
-            $('#' + $label.attr('for'), context).attr('title', $label.text());
-          })*/;
+          .find('.description:first').hide().end();
 
     // Hide label for comment textarea.
     $form.find('label[for="edit-comment"]').hide();
@@ -1105,7 +1099,7 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
     // by collapse.js in D6, which inserts div.fieldset-wrapper into the form.
     $form
       .children('.form-item:last')
-        .css({ position: 'absolute', top: '16.5em', width: '98%', margin: 0 })
+        .css({ position: 'absolute', top: '16.5em', width: '100%', margin: 0 })
         .find('label').each(function () {
           var $label = $(this).hide();
           $('#' + $label.attr('for'), context).attr('title', $label.text());
@@ -1120,18 +1114,19 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
     // Add expected comment #number; parse last comment, since deleted/
     // unpublished comments are counted. Also, there
     // are no comments to count on fresh issues.
-    var count = $('#comments .comment:last .title', context).text() || 0;
+    var count = $('#comments .comment:last .comment-title', context).text() || 0;
     if (count) {
       count = parseInt(count.match(/\d+$/)[0], 10);
     }
     count++;
-    $('<h3 class="title">#' + count + '</h3>')
+    $('<h3 class="comment-title">#' + count + '</h3>')
       .css({ position: 'absolute', top: 11 })
       .prependTo($form);
 
     // Add classes to make it look licky. Needs to stay last to not break
     // comment count.
-    $form.addClass('comment rounded-corners');
+    $(this).addClass('comment');
+    $form.addClass('comment-inner');
   });
 };
 
@@ -1181,9 +1176,9 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
       // Build list of top patch submitters.
       var submitters = $comments
         // Filter comments by those having patches.
-        .filter(':has(a.dreditor-patchreview)').find('div.author a')
+        .filter(':has(a.dreditor-patchreview)').find('div.submitted a')
         // Add original post if it contains a patch.
-        .add('div.node:has(a.dreditor-patchreview) .info-page a')
+        .add('div.node:has(a.dreditor-patchreview) div.submitted a')
         // Count and sort by occurrences.
         .countvalues();
       // Build list of top commenters.
@@ -1191,7 +1186,7 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         // Skip test bot.
         .not(':contains("System Message")')
         // Add original poster.
-        .add('div.node .info-page a')
+        .add('div.node div.submitted a')
         // Count and sort by occurrences.
         .countvalues();
       // Compile a list of top commenters (max. 10% of # of all follow-ups).
@@ -1224,7 +1219,7 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
       }
       // Build title.
       // Replace double quotes with single quotes for cvs command line.
-      var title = $('h1.title').html().replace('"', "'", 'g');
+      var title = $('h1#page-subtitle').text().replace('"', "'", 'g');
       // Add "Added|Changed|Fixed " prefix based on issue category.
       switch ($('#edit-category').val()) {
         case 'bug':
@@ -1259,7 +1254,7 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
       if (!$input.length) {
         $input = $('<input id="dreditor-commitmessage-input" class="dreditor-input" type="text" autocomplete="off" />')
           .css({ position: 'absolute', right: $link.width(), width: 0 })
-          .val(message).debug('input');
+          .val(message);
         $link.css({ position: 'relative', zIndex: 1 }).before($input);
         $input.animate({ width: $container.width() - $link.width() - 10 }, null, null, function () {
           this.select();
@@ -1449,10 +1444,10 @@ GM_addStyle(" \
 #dreditor #bar, #dreditor-actions { width: 230px; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
 #dreditor #bar { position: absolute; height: 100%; } \
 #dreditor-actions { background-color: #fff; bottom: 0; padding-top: 5px; padding-bottom: 5px; position: absolute; } \
-.dreditor-button, #content a.dreditor-button { background: transparent url(/sites/all/themes/bluebeach/header-back.png) repeat-x 0 -30px; border: 1px solid #06c; color: #fff; cursor: pointer; font: 11px sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 1px 9px; text-transform: uppercase; text-decoration: none; -moz-border-radius: 9px; -webkit-border-radius: 9px; border-radius: 9px; } \
-.dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 0; } \
-#dreditor .dreditor-button { margin: 0 0.5em 0 0; } \
-.dreditor-patchreview-processed .dreditor-button { margin-left: 1em; } \
+.dreditor-button, #content a.dreditor-button { background: transparent url(/sites/all/themes/bluecheese/images/sprites-horizontal.png) repeat-x 0 -1150px; border: 1px solid #28d; color: #fff; cursor: pointer; font: 11px sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px; } \
+.dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 -1100px; } \
+.dreditor-button { margin: 0 0.5em 0 0; } \
+table .dreditor-button { margin-left: 1em; } \
 #dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; } \
 #dreditor #menu li { list-style: none; margin: 0; overflow: hidden; padding: 0 0.5em 0 0; white-space: nowrap; } \
 #dreditor #menu li li { padding: 0 0 0 1em; } \
@@ -1478,7 +1473,7 @@ GM_addStyle(" \
 #dreditor-overlay { } \
  \
 .dreditor-actions { overflow: hidden; position: relative; } \
-a.dreditor-application-toggle, #content a.dreditor-application-toggle { display: inline-block; padding: 0.05em 0.3em; line-height: 150%; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
+a.dreditor-application-toggle { display: inline-block; padding: 0.05em 0.3em; line-height: 150%; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
 #content a.dreditor-application-toggle { float: right; margin: 0 0 0 0.5em; } \
 .dreditor-input { border: 1px solid #ccc; padding: 0.2em 0.3em; font-size: 100%; line-height: 150%; } \
  \
@@ -1487,8 +1482,8 @@ div.dreditor-issuecount { line-height: 200%; } \
  \
 #content .fieldset-flat { display: block; border: 0; width: auto; padding: 0; } \
 .fieldset-flat > legend { display: none; } \
+#dreditor-issue-data #edit-title-wrapper { margin-top: 0; } \
 #dreditor-issue-data .inline-options .form-item { margin-bottom: 0.3em; } \
-.rounded-corners { padding: 10px; width: auto; -moz-border-radius: 8px; border-radius: 8px; } \
 ");
 
 /**
