@@ -1397,9 +1397,63 @@ Drupal.behaviors.dreditorIssueValues = function (context) {
 };
 
 /**
+ * Cleans up views exposed filter form values before the filter form is submitted.
+ *
+ * The purpose is that only non-default views filters are contained in the
+ * resulting GET query parameters. Better and cleaner for sharing links to a
+ * certain filtered issue queue result.
+ *
+ * Input elements (except multiple selects) always serialize into an empty
+ * string, so the entire element needs to be disabled.
+ */
+Drupal.behaviors.dreditorIssuesFilterFormValuesClean = function (context) {
+  $('.view-project-issue-project .view-filters form, .view-project-issue-search-project .view-filters form', context).once('dreditor-issues-form-values-clean', function () {
+    $(this).submit(function (event) {
+      var $form = $(this);
+      $.each(event.target.elements, function (index, element) {
+        var $element = $(element);
+        var value = $element.val();
+        switch (element.name) {
+        	case 'text':
+        	case 'assigned':
+        	case 'submitted':
+        	case 'participant':
+        	case 'issue_tags':
+            if (value == '') {
+              element.disabled = true;
+            }
+        		break;
+
+        	case 'status':
+            if (value == 'Open') {
+              element.disabled = true;
+            }
+        		break;
+
+        	case 'priorities':
+        	case 'categories':
+        	case 'version':
+        	case 'component':
+            if (value == 'All') {
+              element.disabled = true;
+            }
+        		break;
+
+        	case 'issue_tags_op':
+            if (value == 'or') {
+              element.disabled = true;
+            }
+        		break;
+        }
+      });
+    });
+  });
+};
+
+/**
  * Add a 'Reset' button to project issue exposed views filter form.
  */
-Drupal.behaviors.dreditorIssuesFormReset = function (context) {
+Drupal.behaviors.dreditorIssuesFilterFormReset = function (context) {
   if (!window.location.search) {
     return;
   }

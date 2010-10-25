@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Added clean-up for views filter form values for better issue queue URLs.
 by sun: Updated for drupal.org redesign.
 #713740 by sun: Reverted hiding of issue comment form labels.
 by sun: Fixed crappy browser autocomplete for commit message field.
