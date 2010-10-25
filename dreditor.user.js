@@ -1407,7 +1407,7 @@ Drupal.behaviors.dreditorIssueValues = function (context) {
  * string, so the entire element needs to be disabled.
  */
 Drupal.behaviors.dreditorIssuesFilterFormValuesClean = function (context) {
-  $('.view-project-issue-project .view-filters form, .view-project-issue-search-project .view-filters form', context).once('dreditor-issues-form-values-clean', function () {
+  $('.view-filters form', context).once('dreditor-issues-form-values-clean', function () {
     $(this).submit(function (event) {
       var $form = $(this);
       $.each(event.target.elements, function (index, element) {
@@ -1457,8 +1457,8 @@ Drupal.behaviors.dreditorIssuesFilterFormReset = function (context) {
   if (!window.location.search) {
     return;
   }
-  $('div.view-project-issue-project:has(form)', context).once('dreditor-issues-form-reset', function () {
-    var $form = $(this).find('form');
+  $('.view-filters form', context).once('dreditor-issues-form-reset', function () {
+    var $form = $(this);
     var $container = $form.find('input.form-submit').parent();
     var $button = $container.clone().find('input').val('Reset').click(function () {
       // Reload the current page without query string and without refresh.
