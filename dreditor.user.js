@@ -457,7 +457,7 @@ Drupal.dreditor.form.form.prototype = {
  */
 Drupal.behaviors.dreditorPatchReview = function (context) {
   // d.o infrastructure -- are you nuts?!
-  $('#attachments, #comments table.comment-upload-attachments, div[id^=pift-results]', context).once('dreditor-patchreview', function () {
+  $('#attachments, table.comment-upload-attachments, div[id^=pift-results]', context).once('dreditor-patchreview', function () {
     $(this).find('a').each(function () {
       // Skip this attachment if it is not a patch.
       if (this.href.indexOf('.patch') == -1 && this.href.indexOf('.diff') == -1) {
