@@ -6,6 +6,7 @@ Dreditor x.x-x.x, xxxx-xx-xx
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#966474 by ericduran, sun: Fixed 80 chars delimiter.
 #947144 by ericduran, das-peter: Added patch review in comment preview.
 by sun: Fixed selectors of views filter form tweaks.
 by sun: Added clean-up for views filter form values for better issue queue URLs.

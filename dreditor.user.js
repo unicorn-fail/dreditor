@@ -952,8 +952,12 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     // Append line to parsed code.
     $code.append(line);
   }
-  // Append parsed code to body.
-  $('#dreditor-content', context).append($code);
+  // Append to body...
+  $('#dreditor-content', context)
+    // a container to visualize the 80 chars delimiter.
+    .append('<div id="code-delimiter"></div>')
+    // the parsed code.
+    .append($code);
 
   // Append diffstat to sidebar.
   $diffstat.html(diffstat.files + '&nbsp;files changed, ' + diffstat.insertions + '&nbsp;insertions, ' + diffstat.deletions + '&nbsp;deletions.');
@@ -1498,7 +1502,7 @@ GM_addStyle(" \
 #dreditor #bar, #dreditor-actions { width: 230px; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
 #dreditor #bar { position: absolute; height: 100%; } \
 #dreditor-actions { background-color: #fff; bottom: 0; padding-top: 5px; padding-bottom: 5px; position: absolute; } \
-.dreditor-button, #content a.dreditor-button { background: transparent url(/sites/all/themes/bluecheese/images/sprites-horizontal.png) repeat-x 0 -1150px; border: 1px solid #28d; color: #fff; cursor: pointer; font: 11px sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px; } \
+.dreditor-button, #content a.dreditor-button { background: transparent url(/sites/all/themes/bluecheese/images/sprites-horizontal.png) repeat-x 0 -1150px; border: 1px solid #28d; color: #fff; cursor: pointer; font-size: 11px; font-family: sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px; } \
 .dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 -1100px; } \
 .dreditor-button { margin: 0 0.5em 0 0; } \
 table .dreditor-button { margin-left: 1em; } \
@@ -1510,7 +1514,8 @@ table .dreditor-button { margin-left: 1em; } \
 #dreditor .form-textarea { width: 100%; height: 12em; font: 13px 'courier new', courier, 'lucida console'; color: #000; } \
 #dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; overflow: scroll; height: 100%; } \
 #dreditor-content, pre { font: 13px 'courier new', courier, 'lucida console'; } \
-#dreditor #code { background: transparent url(/sites/all/themes/bluebeach/shade.png) repeat-y scroll 50.7em 0; padding-left: 10px; } \
+#dreditor #code-delimiter { position: fixed; height: 100%; width: 0.5em; margin-left: 50.7em; background-color: #f9f9fa; } \
+#dreditor #code { position: relative; padding-left: 10px; } \
 #dreditor #code pre { background-color: transparent; border: 0; margin: 0; padding: 0; } \
 #dreditor #code pre span { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
 #dreditor #code pre span.error { background-color: #f99; line-height: 100%; width: auto; height: auto; border: 0; } \
