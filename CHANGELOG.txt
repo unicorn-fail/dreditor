@@ -1,11 +1,8 @@
 // $Id$
 
-Dreditor x.x-x.x, xxxx-xx-xx
-----------------------------
-
-
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Added patch review support for .txt files (e.g., interdiffs).
 #966474 by ericduran, sun: Fixed 80 chars delimiter.
 #947144 by ericduran, das-peter: Added patch review in comment preview.
 by sun: Fixed selectors of views filter form tweaks.

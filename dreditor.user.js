@@ -458,24 +458,22 @@ Drupal.dreditor.form.form.prototype = {
 Drupal.behaviors.dreditorPatchReview = function (context) {
   // d.o infrastructure -- are you nuts?!
   $('#attachments, table.comment-upload-attachments, div[id^=pift-results]', context).once('dreditor-patchreview', function () {
-    $(this).find('a').each(function () {
-      // Skip this attachment if it is not a patch.
-      if (this.href.indexOf('.patch') == -1 && this.href.indexOf('.diff') == -1) {
-        return;
-      }
-      // Generate review link.
-      var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">Review</a>').click(function () {
-        // Load file.
-        $.get(this.href, function (content, status) {
-          if (status == 'success') {
-            // Invoke Dreditor.
-            Drupal.dreditor.setup(context, 'patchReview', content);
-          }
+    $('a', this).each(function () {
+      if (this.href.match(/\.(patch|diff|txt)/)) {
+        // Generate review link.
+        var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">Review</a>').click(function () {
+          // Load file.
+          $.get(this.href, function (content, status) {
+            if (status == 'success') {
+              // Invoke Dreditor.
+              Drupal.dreditor.setup(context, 'patchReview', content);
+            }
+          });
+          return false;
         });
-        return false;
-      });
-      // Append review link to parent table cell.
-      $link.appendTo(this.parentNode);
+        // Append review link to parent table cell.
+        $link.appendTo(this.parentNode);
+      }
     });
   });
 };
