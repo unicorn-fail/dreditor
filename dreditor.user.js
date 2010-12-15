@@ -1335,16 +1335,29 @@ Drupal.behaviors.dreditorSyntaxAutocomplete = function (context) {
  *   A form input element (e.g., textarea) to bind to.
  */
 Drupal.dreditor.syntaxAutocomplete = function (element) {
-  // Should be '[' (open bracket) on EN-US keyboards, 'ß' (SHARP-S) on DE.
-  this.keyCode = 219;
+  this.keyCode = 9;
   this.$element = $(element);
 
   this.$suggestion = $('<span></span>');
-  this.$tooltip = $('<div class="dreditor-tooltip">CTRL + [: </div>')
+  this.$tooltip = $('<div class="dreditor-tooltip">TAB: </div>')
     .insertAfter(this.$element)
     .append(this.$suggestion);
 
+  this.$element.bind('keypress.syntaxAutocomplete', { syntax: this }, this.keypressHandler);
   this.$element.bind('keyup.syntaxAutocomplete', { syntax: this }, this.keyupHandler);
+};
+
+/**
+ * Responds to any keypress event in the bound element to prevent the browser's default keyboard shortcut.
+ */
+Drupal.dreditor.syntaxAutocomplete.prototype.keypressHandler = function (event) {
+  var self = event.data.syntax;
+  // event.which is 0 in the keypress event, so directly compare with keyCode.
+  if (event.keyCode == self.keyCode) {
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
+  }
 };
 
 /**
@@ -1382,7 +1395,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keyupHandler = function (event) {
   }
   // If the special autocompletion key combination was pressed and there is a
   // suggestion, perform the text replacement.
-  if (event.ctrlKey && event.which == self.keyCode && self.suggestion) {
+  if (event.which == self.keyCode && self.suggestion) {
     var prefix = this.value.substring(0, pos - self.needle.length);
     var suffix = this.value.substring(pos);
     this.value = prefix + self.suggestion.replace('^', '') + suffix;
@@ -1394,6 +1407,9 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keyupHandler = function (event) {
     // Remove the tooltip and suggestion directly after executing the
     // autocompletion.
     self.delSuggestion();
+
+    // Do not trigger the browser's default keyboard shortcut.
+    return false;
   }
 };
 
