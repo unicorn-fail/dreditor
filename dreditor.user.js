@@ -1363,10 +1363,17 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keyupHandler = function (event) {
   // Retrieve the needle: The word before the cursor.
   var needle = this.value.substring(0, pos).match(/[^\s]+$/);
   // If there is a needle, check whether to show a suggestion.
+  // @todo Revamp the entire following conditional code to call
+  //   delSuggestion() only once.
   if (needle) {
     self.needle = needle[0];
+    // If the needle is found in the haystack of suggestions, show a suggestion.
     if (self.suggestions[self.needle]) {
       self.setSuggestion(self.suggestions[self.needle]);
+    }
+    // Otherwise, ensure a possibly existing last suggestion is removed.
+    else {
+      self.delSuggestion();
     }
   }
   // Otherwise, ensure there is no suggestion.
@@ -1383,6 +1390,10 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keyupHandler = function (event) {
     // Move the cursor to the autocomplete position marker.
     var newpos = pos - self.needle.length + self.suggestion.indexOf('^');
     this.setSelectionRange(newpos, newpos);
+
+    // Remove the tooltip and suggestion directly after executing the
+    // autocompletion.
+    self.delSuggestion();
   }
 };
 
