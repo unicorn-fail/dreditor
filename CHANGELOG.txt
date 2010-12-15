@@ -2,6 +2,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#739476 by sun: Added markup syntax autocompletion for textareas.
 by sun: Added patch review support for .txt files (e.g., interdiffs).
 #966474 by ericduran, sun: Fixed 80 chars delimiter.
 #947144 by ericduran, das-peter: Added patch review in comment preview.

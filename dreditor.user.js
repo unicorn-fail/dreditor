@@ -1315,6 +1315,122 @@ Drupal.behaviors.dreditorInlineImage = function (context) {
 };
 
 /**
+ * Attaches syntax/markup autocompletion to all textareas.
+ */
+Drupal.behaviors.dreditorSyntaxAutocomplete = function (context) {
+  $('textarea', context).once('dreditor-syntaxautocomplete', function () {
+    new Drupal.dreditor.syntaxAutocomplete(this);
+  });
+};
+
+/**
+ * @defgroup dreditor_syntaxautocomplete Dreditor syntax autocompletion
+ * @{
+ */
+
+/**
+ * Initializes a new syntax autocompletion object.
+ *
+ * @param element
+ *   A form input element (e.g., textarea) to bind to.
+ */
+Drupal.dreditor.syntaxAutocomplete = function (element) {
+  // Should be '[' (open bracket) on EN-US keyboards, 'ß' (SHARP-S) on DE.
+  this.keyCode = 219;
+  this.$element = $(element);
+
+  this.$suggestion = $('<span></span>');
+  this.$tooltip = $('<div class="dreditor-tooltip">CTRL + [: </div>')
+    .insertAfter(this.$element)
+    .append(this.$suggestion);
+
+  this.$element.bind('keyup.syntaxAutocomplete', { syntax: this }, this.keyupHandler);
+};
+
+/**
+ * Responds to any keyUp event in the bound element.
+ */
+Drupal.dreditor.syntaxAutocomplete.prototype.keyupHandler = function (event) {
+  // Don't interfere with text selections.
+  if (this.selectionStart != this.selectionEnd) {
+    return;
+  }
+  // Always skip this, if a special key (except CTRL) was pressed.
+  if (event.shiftKey || event.altKey) {
+    return;
+  }
+  var self = event.data.syntax, pos = this.selectionEnd;
+  // Retrieve the needle: The word before the cursor.
+  var needle = this.value.substring(0, pos).match(/[^\s]+$/);
+  // If there is a needle, check whether to show a suggestion.
+  if (needle) {
+    self.needle = needle[0];
+    if (self.suggestions[self.needle]) {
+      self.setSuggestion(self.suggestions[self.needle]);
+    }
+  }
+  // Otherwise, ensure there is no suggestion.
+  else {
+    self.delSuggestion();
+  }
+  // If the special autocompletion key combination was pressed and there is a
+  // suggestion, perform the text replacement.
+  if (event.ctrlKey && event.which == self.keyCode && self.suggestion) {
+    var prefix = this.value.substring(0, pos - self.needle.length);
+    var suffix = this.value.substring(pos);
+    this.value = prefix + self.suggestion.replace('^', '') + suffix;
+
+    // Move the cursor to the autocomplete position marker.
+    var newpos = pos - self.needle.length + self.suggestion.indexOf('^');
+    this.setSelectionRange(newpos, newpos);
+  }
+};
+
+/**
+ * Sets the suggestion and shows the autocompletion tooltip.
+ */
+Drupal.dreditor.syntaxAutocomplete.prototype.setSuggestion = function (suggestion) {
+  var self = this;
+  if (suggestion != self.suggestion) {
+    self.suggestion = suggestion;
+    self.$suggestion.text(self.suggestion.replace('^', ''));
+    self.$tooltip.css({ display: 'inline-block' });
+  }
+};
+
+/**
+ * Deletes the suggestion and hides the autocompletion tooltip.
+ */
+Drupal.dreditor.syntaxAutocomplete.prototype.delSuggestion = function () {
+  var self = this;
+	delete self.suggestion;
+  self.$tooltip.hide();
+};
+
+/**
+ *
+ */
+Drupal.dreditor.syntaxAutocomplete.prototype.suggestions = {
+  '<?': "<?php\n^\n?>\n",
+  '<a': '<a href="^"></a>',
+  '<block': '<blockquote>^</blockquote>',
+  '<code': '<code>^</code>',
+  '<dl': "<dl>\n^\n</dl>\n",
+  '<dt': '<dt>^</dt>',
+  '<dd': '<dd>^</dd>',
+  '<em': '<em>^</em>',
+  '<li': '<li>^</li>',
+  '<ol': "<ol>\n^\n</ol>\n",
+  '<pre': "<pre>\n^\n</pre>\n",
+  '<strong': '<strong>^</strong>',
+  '<ul': "<ul>\n^\n</ul>\n"
+};
+
+/**
+ * @} End of "defgroup dreditor_syntaxautocomplete".
+ */
+
+/**
  * Attach issue count to project issue tables and hide fixed/needs more info issues without update marker.
  */
 Drupal.behaviors.dreditorIssueCount = function (context) {
@@ -1541,6 +1657,8 @@ div.dreditor-issuecount { line-height: 200%; } \
 .fieldset-flat > legend { display: none; } \
 #dreditor-issue-data #edit-title-wrapper { margin-top: 0; } \
 #dreditor-issue-data .inline-options .form-item { margin-bottom: 0.3em; } \
+ \
+.dreditor-tooltip { display: none; position: fixed; bottom: 0; background-color: #ffffbf; border: 1px solid #000; padding: 0 3px; font-family: sans-serif; font-size: 11px; line-height: 150%; } \
 ");
 
 /**
