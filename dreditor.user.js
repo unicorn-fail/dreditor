@@ -1348,12 +1348,28 @@ Drupal.dreditor.syntaxAutocomplete = function (element) {
 };
 
 /**
- * Responds to any keypress event in the bound element to prevent the browser's default keyboard shortcut.
+ * Responds to keypress events in the bound element to prevent default key event handlers.
  */
 Drupal.dreditor.syntaxAutocomplete.prototype.keypressHandler = function (event) {
-  var self = event.data.syntax;
+  var self = event.data.syntax, pos = this.selectionEnd;
+
+  // If the autocompletion key was pressed and there is a suggestion, perform
+  // the text replacement.
   // event.which is 0 in the keypress event, so directly compare with keyCode.
-  if (event.keyCode == self.keyCode) {
+  if (event.keyCode == self.keyCode && self.suggestion) {
+    var prefix = this.value.substring(0, pos - self.needle.length);
+    var suffix = this.value.substring(pos);
+    this.value = prefix + self.suggestion.replace('^', '') + suffix;
+
+    // Move the cursor to the autocomplete position marker.
+    var newpos = pos - self.needle.length + self.suggestion.indexOf('^');
+    this.setSelectionRange(newpos, newpos);
+
+    // Remove the tooltip and suggestion directly after executing the
+    // autocompletion.
+    self.delSuggestion();
+
+    // Do not trigger the browser's default keyboard shortcut.
     event.preventDefault();
     event.stopPropagation();
     return false;
@@ -1361,15 +1377,15 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keypressHandler = function (event) 
 };
 
 /**
- * Responds to any keyUp event in the bound element.
+ * Responds to keyup events in the bound element.
  */
 Drupal.dreditor.syntaxAutocomplete.prototype.keyupHandler = function (event) {
   // Don't interfere with text selections.
   if (this.selectionStart != this.selectionEnd) {
     return;
   }
-  // Always skip this, if a special key (except CTRL) was pressed.
-  if (event.shiftKey || event.altKey) {
+  // Skip special keystrokes.
+  if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) {
     return;
   }
   var self = event.data.syntax, pos = this.selectionEnd;
@@ -1392,24 +1408,6 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keyupHandler = function (event) {
   // Otherwise, ensure there is no suggestion.
   else {
     self.delSuggestion();
-  }
-  // If the special autocompletion key combination was pressed and there is a
-  // suggestion, perform the text replacement.
-  if (event.which == self.keyCode && self.suggestion) {
-    var prefix = this.value.substring(0, pos - self.needle.length);
-    var suffix = this.value.substring(pos);
-    this.value = prefix + self.suggestion.replace('^', '') + suffix;
-
-    // Move the cursor to the autocomplete position marker.
-    var newpos = pos - self.needle.length + self.suggestion.indexOf('^');
-    this.setSelectionRange(newpos, newpos);
-
-    // Remove the tooltip and suggestion directly after executing the
-    // autocompletion.
-    self.delSuggestion();
-
-    // Do not trigger the browser's default keyboard shortcut.
-    return false;
   }
 };
 

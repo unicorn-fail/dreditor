@@ -2,6 +2,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#739476 by sun: Fixed autocompletion breaks keyboard navigation.
 #739476 by sun: Fixed autocompletion keyCode is not unique on different systems.
 #739476 by sun: Fixed syntax autocompletion is not always canceled.
 #739476 by sun: Added markup syntax autocompletion for textareas.
