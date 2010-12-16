@@ -1397,8 +1397,9 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keyupHandler = function (event) {
   if (needle) {
     self.needle = needle[0];
     // If the needle is found in the haystack of suggestions, show a suggestion.
-    if (self.suggestions[self.needle]) {
-      self.setSuggestion(self.suggestions[self.needle]);
+    var suggestion;
+    if (suggestion = self.checkSuggestion(self.needle)) {
+      self.setSuggestion(suggestion);
     }
     // Otherwise, ensure a possibly existing last suggestion is removed.
     else {
@@ -1409,6 +1410,26 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keyupHandler = function (event) {
   else {
     self.delSuggestion();
   }
+};
+
+/**
+ * Determines whether there is a suggestion for a given needle.
+ */
+Drupal.dreditor.syntaxAutocomplete.prototype.checkSuggestion = function (needle) {
+  var self = this, suggestion = false;
+  $.each(self.suggestions, function () {
+    if ($.isFunction(this)) {
+      if (suggestion = this(needle)) {
+        return false;
+      }
+    }
+    else if (this[needle]) {
+      if (suggestion = this[needle]) {
+        return false;
+      }
+    }
+  });
+  return suggestion;
 };
 
 /**
@@ -1432,23 +1453,52 @@ Drupal.dreditor.syntaxAutocomplete.prototype.delSuggestion = function () {
   self.$tooltip.hide();
 };
 
+Drupal.dreditor.syntaxAutocomplete.prototype.suggestions = {};
+
 /**
- *
+ * Look-up map for simple HTML/markup suggestions.
  */
-Drupal.dreditor.syntaxAutocomplete.prototype.suggestions = {
+Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.html = {
   '<?': "<?php\n^\n?>\n",
   '<a': '<a href="^"></a>',
-  '<block': '<blockquote>^</blockquote>',
+  '<block': "<blockquote>^</blockquote>\n\n",
+  '<br': "<br />\n^",
+  '<cite': '<cite>^</cite>',
   '<code': '<code>^</code>',
-  '<dl': "<dl>\n^\n</dl>\n",
+  '<del': '<del>^</del>',
+  '<dl': "<dl>\n<dt>^</dt>\n<dd></dd>\n</dl>\n",
   '<dt': '<dt>^</dt>',
   '<dd': '<dd>^</dd>',
   '<em': '<em>^</em>',
-  '<li': '<li>^</li>',
+  '<h1': "<h1>^</h1>\n",
+  '<h2': "<h2>^</h2>\n",
+  '<h3': "<h3>^</h3>\n",
+  '<h4': "<h4>^</h4>\n",
+  '<h5': "<h5>^</h5>\n",
+  '<h6': "<h6>^</h6>\n",
+  '<li': "<li>^</li>\n",
   '<ol': "<ol>\n^\n</ol>\n",
+  '<p': "<p>^</p>\n",
   '<pre': "<pre>\n^\n</pre>\n",
+  '<q': '<q>^</q>',
   '<strong': '<strong>^</strong>',
+  '<table': "<table>\n<tr>\n<th>^</th>\n</tr>\n<tr>\n<td></td>\n</tr>\n</table>\n",
+  '<tr': "<tr>\n^\n</tr>",
+  '<th': "<th>^</th>",
+  '<td': "<td>^</td>",
+  '<u': '<u>^</u>',
   '<ul': "<ul>\n^\n</ul>\n"
+};
+
+/**
+ * Suggest a [#issue] conversion for Project Issue input filter.
+ */
+Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.issue = function (needle) {
+  var matches;
+  if (matches = needle.match('^http://drupal.org/node/([0-9]+)')) {
+    return '[#' + matches[1] + ']^';
+  }
+  return false;
 };
 
 /**
