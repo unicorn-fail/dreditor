@@ -4,10 +4,8 @@
 // @description    Awesomeness for drupal.org.
 // @author         Daniel F. Kudwien (sun)
 // @version        0.1
-// @include        http://drupal.org/node/*
-// @include        http://drupal.org/comment/reply/*
-// @include        http://drupal.org/project/*
-// @include        http://drupal.org/node/add/project-issue/*
+// @include        http://drupal.org/*
+// @include        https://drupal.org/*
 // ==/UserScript==
 
 // Initialize window objects.

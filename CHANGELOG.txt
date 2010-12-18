@@ -2,6 +2,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#995598 by sun: Added HTTPS protocol to user script inclusion list.
 #910636 by sun: Changed GreaseMonkey-specific code into HTML5.
 #739476 by sun: Added autocompletion for drupal.org issue URLs.
 #739476 by sun: Fixed autocompletion breaks keyboard navigation.
