@@ -149,63 +149,6 @@ if (typeof $.fn.once == 'undefined') {
 Drupal.dreditor = {
   behaviors: {},
 
-  /**
-   * Global Dreditor configuration object.
-   *
-   * @see confInit()
-   */
-  conf: '',
-
-  /**
-   * Convert serialized global configuration into an object.
-   *
-   * To leverage Greasemonkey's user script variable storage, which cannot be
-   * accessed or altered from within the unsafeWindow context (the original
-   * context of jQuery), we build and use our own configuration storage.
-   * Drupal.dreditor.conf is a serialized string (using jQuery.param(), which
-   * jQuery also uses to serialize form values) that is converted into an object
-   * when the script is executed and converted back into a serialized string
-   * when the page unloads. Nifty! :)
-   *
-   * Note that this only supports simple values (numbers, booleans, strings)
-   * and only an one-dimensional (flat) associative configuration object (due to
-   * limitations of jQuery.param()).
-   */
-  confInit: function () {
-    this.conf = this.unserialize(this.conf);
-  },
-
-  /**
-   * Unserialize a serialized string.
-   */
-  unserialize: function (str) {
-    var obj = {};
-    jQuery.each(str.split('&'), function() {
-      var splitted = this.split('=');
-      if (splitted.length != 2) {
-        return;
-      }
-      var key = splitted[0];
-      var val = decodeURIComponent(splitted[1].replace(/\+/g, ' '));
-      // Convert numbers.
-      if (/^[0-9.]+$/.test(val)) {
-        val = parseFloat(val);
-      }
-      // Convert booleans.
-      else if (val == 'true') {
-        val = true;
-      }
-      else if (val == 'false') {
-        val = false;
-      }
-      // Ignore empty values.
-      if (typeof val == 'number' || typeof val == 'boolean' || val.length > 0) {
-        obj[key] = val;
-      }
-    });
-    return obj;
-  },
-
   setup: function (context) {
     var self = this;
     // Prevent repeated setup (not supported yet).
@@ -395,6 +338,160 @@ Drupal.dreditor = {
     window.location.href = url;
     return false;
   }
+};
+
+/**
+ * Drupal HTML5 storage handler.
+ *
+ * @see http://drupal.org/node/65578
+ */
+Drupal.storage = {};
+
+/**
+ * Checks support for a client-side data storage bin.
+ *
+ * @param bin
+ *   The space to store in, one of 'session', 'local', 'global'.
+ */
+Drupal.storage.isSupported = function (bin) {
+  try {
+    return bin + 'Storage' in window && window[bin + 'Storage'] !== null;
+  }
+  catch (e) {
+    return false;
+  }
+};
+
+Drupal.storage.support = {
+  session: Drupal.storage.isSupported('session'),
+  local: Drupal.storage.isSupported('local'),
+  global: Drupal.storage.isSupported('global')
+};
+
+/**
+ * Loads data from client-side storage.
+ *
+ * Keep in mind that HTML5 storage *always* stores values as strings.
+ *
+ * @param key
+ *   The key name to load stored data from. Automatically prefixed with
+ *   "Drupal.".
+ * @param bin
+ *   (optional) The storage space to retrieve from. Defaults to 'session'.
+ *
+ * @see Drupal.storage.save()
+ */
+Drupal.storage.load = function (key, bin) {
+  if (typeof bin == 'undefined') {
+    bin = 'local';
+  }
+  if (!Drupal.storage.support[bin]) {
+    return false;
+  }
+  key = 'Dreditor.' + key;
+  return Drupal.storage.parse(window[bin + 'Storage'].getItem(key));
+};
+
+/**
+ * Stores data on the client-side.
+ *
+ * @param key
+ *   The key name to store data under. Automatically prefixed with "Drupal.".
+ *   Should be further namespaced by module; e.g., for
+ *   "Drupal.moduleName.settingName" you pass "moduleName.settingName".
+ * @param data
+ *   The data to store.
+ * @param bin
+ *   (optional) The space to store in, one of 'session', 'local', 'global'.
+ *   Defaults to 'session'.
+ */
+Drupal.storage.save = function (key, data, bin) {
+  if (typeof bin == 'undefined') {
+    bin = 'local';
+  }
+  if (!Drupal.storage.support[bin]) {
+    return false;
+  }
+  key = 'Dreditor.' + key;
+  window[bin + 'Storage'].setItem(key, data);
+  return true;
+};
+
+/**
+ * Delete data from client-side storage.
+ *
+ * Called 'remove', since 'delete' is a reserved keyword.
+ *
+ * @param key
+ *   The key name to delete. Automatically prefixed with "Drupal.".
+ * @param bin
+ *   (optional) The storage space name. Defaults to 'session'.
+ *
+ * @see Drupal.storage.save()
+ */
+Drupal.storage.remove = function (key, bin) {
+  if (typeof bin == 'undefined') {
+    bin = 'local';
+  }
+  if (!Drupal.storage.support[bin]) {
+    return false;
+  }
+  key = 'Dreditor.' + key;
+  return window[bin + 'Storage'].removeItem(key);
+};
+
+/**
+ * Parses a stored value into its original data type.
+ *
+ * HTML5 storage always stores values as strings. This is a "best effort" to
+ * restore data type sanity.
+ */
+Drupal.storage.parse = function (val) {
+  // Convert numbers.
+  if (/^[0-9.]+$/.test(val)) {
+    val = parseFloat(val);
+  }
+  // Convert booleans.
+  else if (val == 'true') {
+    val = true;
+  }
+  else if (val == 'false') {
+    val = false;
+  }
+  return val;
+};
+
+/**
+ * Serializes a value suitable for client-side (string) storage.
+ */
+Drupal.storage.serialize = function (val) {
+  return $.param(val);
+};
+
+/**
+ * Unserializes a $.param() string.
+ *
+ * Note that this only supports simple values (numbers, booleans, strings)
+ * and only an one-dimensional (flat) associative configuration object (due to
+ * limitations of jQuery.param()).
+ */
+Drupal.storage.unserialize = function (val) {
+  var obj = {};
+  jQuery.each(str.split('&'), function() {
+    var splitted = this.split('=');
+    if (splitted.length != 2) {
+      return;
+    }
+    var key = splitted[0];
+    var val = decodeURIComponent(splitted[1].replace(/\+/g, ' '));
+    val = Drupal.storage.parse(val);
+
+    // Ignore empty values.
+    if (typeof val == 'number' || typeof val == 'boolean' || val.length > 0) {
+      obj[key] = val;
+    }
+  });
+  return obj;
 };
 
 /**
@@ -1519,12 +1616,11 @@ Drupal.behaviors.dreditorIssueCount = function (context) {
     $table.before($container);
 
     // Add link to toggle this feature.
-    // @todo Initial draft. Needs refactoring into abstracted configuration.
-    var enabled = Drupal.dreditor.conf['application.issuecount.status'];
+    var enabled = Drupal.storage.load('issuecount.status');
     $('<a href="#" class="dreditor-application-toggle"></a>')
       .text(enabled ? 'Show all issues' : 'Hide irrelevant issues')
       .click(function () {
-        Drupal.dreditor.conf['application.issuecount.status'] = (!enabled);
+        Drupal.storage.save('issuecount.status', !enabled);
         // Reload the current page without refresh from server.
         window.location.href = window.location.href;
         return false;
@@ -1578,13 +1674,14 @@ Drupal.behaviors.dreditorIssueValues = function (context) {
   // cannot be altered on node/#/edit.
   $('#node-form:has(#edit-rid)', context).once('dreditor-issuevalues', function () {
     var $form = $(this);
-    if (Drupal.dreditor.conf.issueValues) {
-      $.each(Drupal.dreditor.unserialize(Drupal.dreditor.conf.issueValues), function (name, value) {
+    var values = Drupal.storage.load('issuevalues');
+    if (values) {
+      $.each(Drupal.storage.unserialize(values), function (name, value) {
         $form.find(':input[name=' + name + ']').val(value);
       });
     }
     $form.submit(function () {
-      Drupal.dreditor.conf.issueValues = $.param($('.inline-options:first :input', $form));
+      Drupal.storage.save('issuevalues', Drupal.storage.serialize($('.inline-options:first :input', $form)));
     });
   });
 };
@@ -1663,29 +1760,18 @@ Drupal.behaviors.dreditorIssuesFilterFormReset = function (context) {
 };
 
 /**
- * Initialize Dreditor/Greasemonkey global configuration handler.
- *
- * @see Drupal.dreditor.confInit()
- *
- * @todo Dreditor's Drupal behaviors are not always invoked with drupal.org's
- *   behaviors. Starting with a recent GM update, confInit() had to be moved
- *   outside of .ready(), since Dreditor's behaviors were suddenly invoked with
- *   drupal.org's behaviors, i.e., this might depend on browser/GM version.
+ * Initialize Dreditor.
  */
-Drupal.dreditor.conf = GM_getValue('dreditor.conf', '');
-Drupal.dreditor.confInit();
 jQuery(document).ready(function () {
   Drupal.attachBehaviors(this);
 });
 
-// GM_setValue() is only allowed in the user script context.
-window.addEventListener('unload', function () {
-  GM_setValue('dreditor.conf', $.param(Drupal.dreditor.conf));
-}, true);
-
 // Add custom stylesheet.
-// @todo Can we load CSS files that ship with this user script?
-GM_addStyle(" \
+var styles = document.createElement("style");
+styles.setAttribute('type', 'text/css');
+document.getElementsByTagName('head')[0].appendChild(styles);
+
+styles.innerHTML = " \
 #dreditor-wrapper { position: fixed; z-index: 1000; width: 100%; top: 0; } \
 #dreditor { position: relative; width: 100%; height: 100%; background-color: #fff; border: 1px solid #ccc; } \
 #dreditor #bar, #dreditor-actions { width: 230px; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
@@ -1734,7 +1820,7 @@ div.dreditor-issuecount { line-height: 200%; } \
 #dreditor-issue-data .inline-options .form-item { margin-bottom: 0.3em; } \
  \
 .dreditor-tooltip { display: none; position: fixed; bottom: 0; background-color: #ffffbf; border: 1px solid #000; padding: 0 3px; font-family: sans-serif; font-size: 11px; line-height: 150%; } \
-");
+";
 
 /**
  * Check for new Dreditor versions.
@@ -1774,5 +1860,6 @@ dreditorUpdateCheck = function () {
   }
 };
 
-dreditorUpdateCheck();
+// @todo Rethink the update status functionality.
+// dreditorUpdateCheck();
 
