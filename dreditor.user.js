@@ -1485,7 +1485,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keyupHandler = function (event) {
   }
   var self = event.data.syntax, pos = this.selectionEnd;
   // Retrieve the needle: The word before the cursor.
-  var needle = this.value.substring(0, pos).match(/[^\s]+$/);
+  var needle = this.value.substring(0, pos).match(/[^\s>(]+$/);
   // If there is a needle, check whether to show a suggestion.
   // @todo Revamp the entire following conditional code to call
   //   delSuggestion() only once.
@@ -1514,7 +1514,8 @@ Drupal.dreditor.syntaxAutocomplete.prototype.checkSuggestion = function (needle)
   var self = this, suggestion = false;
   $.each(self.suggestions, function () {
     if ($.isFunction(this)) {
-      if (suggestion = this(needle)) {
+      // Use .call() to provide self in this.
+      if (suggestion = this.call(self, needle)) {
         return false;
       }
     }
@@ -1592,6 +1593,38 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.issue = function (needl
   var matches;
   if (matches = needle.match('^http://drupal.org/node/([0-9]+)')) {
     return '[#' + matches[1] + ']^';
+  }
+  return false;
+};
+
+/**
+ * Suggest a username.
+ */
+Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.user = function (needle) {
+  var matches, self = this;
+  if (matches = needle.match('^@([a-zA-Z0-9]+)')) {
+    // Performance: Upon first match, setup a username list once.
+    if (typeof self.suggestionUserList == 'undefined') {
+      self.suggestionUserList = {};
+      var seen = {};
+      $('.comment .submitted a').each(function () {
+        if (!seen[this.text]) {
+          seen[this.text] = 1;
+          // Use the shortest possible needle.
+          var i, n, name = this.text.toLowerCase();
+          for (i = 1; i < name.length; i++) {
+            n = name.substring(0, i);
+            if (!self.suggestionUserList[n]) {
+              self.suggestionUserList[n] = '@' + this.text + '^';
+              break;
+            }
+          }
+        }
+      });
+    }
+    if (self.suggestionUserList[matches[1]]) {
+      return self.suggestionUserList[matches[1]];
+    }
   }
   return false;
 };
