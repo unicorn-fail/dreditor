@@ -1355,7 +1355,22 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         $link.css({ position: 'relative', zIndex: 1 }).before($input);
         $input.animate({ width: $container.width() - $link.width() - 10 }, null, null, function () {
           this.select();
+
+          // Make the commit message text input dynamically attach to the bottom
+          // of the viewport upon scrolling.
+          var $window = $(window);
+          var inputOffset = $input.offset().top;
+          var inputOriginalStyle = $input.attr('style');
+          $window.scroll(function () {
+            if (inputOffset > $window.scrollTop() + $window.height()) {
+              $input.css({ position: 'fixed', bottom: 0 });
+            }
+            else {
+              $input.attr('style', inputOriginalStyle);
+            }
+          });
         });
+
         $link.one('click', function () {
           $input.animate({ width: 0 }, null, null, function () {
             $input.remove();
