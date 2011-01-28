@@ -1305,7 +1305,7 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         });
       }
       // Build commit message.
-      var message = '#' + window.location.href.match(/node\/(\d+)/)[1] + ' ';
+      var message = '#' + window.location.href.match(/(?:node|comment\/reply)\/(\d+)/)[1] + ' ';
       message += 'by ' + submitters.join(', ');
       if (contributors.length) {
         if (submitters.length) {
@@ -1316,7 +1316,7 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
       }
       // Build title.
       // Replace double quotes with single quotes for cvs command line.
-      var title = $('h1#page-subtitle').text().replace('"', "'", 'g');
+      var title = $('#edit-title').val().replace('"', "'", 'g');
       // Add "Added|Changed|Fixed " prefix based on issue category.
       switch ($('#edit-category').val()) {
         case 'bug':

@@ -2,6 +2,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#1011084 by sun: Fixed commit message doesn't work on comment reply page.
 #543916 by webchick, sun: Attach commit message input to bottom of viewport.
 #948068 by Jacine: Updated .element-invisible CSS to match D7.
 #739476 by sun: Added username autocompletion.
