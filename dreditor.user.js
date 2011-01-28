@@ -844,6 +844,8 @@ Drupal.dreditor.patchReview = {
     // Paste comment into issue comment textarea.
     var $commentField = $('#edit-comment');
     $commentField.val($commentField.val() + html);
+    // Change the status to 'needs work'.
+    $('#edit-sid').val(13);
     // Jump to the issue comment textarea after pasting.
     Drupal.dreditor.goto('#edit-comment');
     // Close Dreditor.
