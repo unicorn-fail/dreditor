@@ -1834,7 +1834,7 @@ table .dreditor-button { margin-left: 1em; } \
 #dreditor #code .comment { color: #070; } \
 #dreditor #code .has-comment { background-color: rgba(255, 200, 200, 0.5); } \
 #dreditor #code .selected { background-color: rgba(255, 255, 200, 0.5); } \
-.element-invisible { height: 0; overflow: hidden; position: absolute; } \
+.element-invisible { clip: rect(1px, 1px, 1px, 1px); position: absolute !important; } \
 #dreditor-overlay { } \
  \
 .dreditor-actions { overflow: hidden; position: relative; } \
