@@ -11,9 +11,10 @@
 // Initialize window objects.
 $ = window.$ = window.jQuery = unsafeWindow.jQuery;
 Drupal = window.Drupal = unsafeWindow.Drupal;
+
 // Bail out in (the unlikely) case that JS has been disabled.
-if (Drupal === undefined) {
-  return false;
+if (typeof Drupal == 'undefined') {
+  return;
 }
 
 /**
@@ -30,8 +31,15 @@ if (Drupal === undefined) {
  */
 jQuery.extend({
   debug: function () {
-    // Setup debug storage in global window. We want to look into it.
-    window.debug = unsafeWindow.debug = window.debug || [];
+    // Initialize window.debug storage, to make debug data accessible later
+    // (e.g., via browser console). Although we are going to possibly store
+    // named keys, this needs to be an Array, so we can determine its length.
+    window.debug = window.debug || [];
+    // Keep unsafeWindow.debug and window.debug in sync in user script
+    // environments.
+    if (typeof unsafeWindow != 'undefined') {
+      unsafeWindow.debug = window.debug;
+    }
 
     args = jQuery.makeArray(arguments);
     // Determine data source; this is an object for $variable.debug().
@@ -305,7 +313,13 @@ Drupal.dreditor = {
     //window.scrollTo(0, $(selector).offset().top);
     // Gecko-only method to scroll DOM elements into view.
     // @see https://developer.mozilla.org/en/DOM/element.scrollIntoView
-    $(selector).get(0).scrollIntoView();
+    var $target = $(selector);
+    if ($target.length) {
+      $target.get(0).scrollIntoView();
+    }
+    else if (typeof console.warn == 'function') {
+      console.warn(selector + ' does not exist.');
+    }
   },
 
   /**
@@ -493,38 +507,26 @@ Drupal.storage.unserialize = function (val) {
 };
 
 /**
- * @defgroup form_api JavaScript port of Form API
+ * @defgroup form_api JavaScript port of Drupal Form API
  * @{
  */
 
-/**
- * Dreditor JavaScript form API.
- *
- * Due to Greasemonkey limitations, we have to instantiate new form objects in
- * a wrapper object to pass Drupal.dreditor.form as context to the prototype.
- */
 Drupal.dreditor.form = {
   forms: [],
 
-  create: function (id) {
-    // We must pass this as wrapping object.
-    return new this.form(this, id);
+  create: function (form_id) {
+    return new this.form(form_id);
   }
 };
 
-Drupal.dreditor.form.form = function (o, id) {
+Drupal.dreditor.form.form = function (form_id) {
   var self = this;
 
   // Turn this object into a jQuery object, being a form. :)
-  $.extend(true, self, $('<form id="' + id + '"></form>'));
+  $.extend(true, self, $('<form id="' + form_id + '"></form>'));
 
   // Override the default submit handler.
   self.submit(function (e) {
-    // Invoke the submit handler of the clicked button.
-    var op = e.originalEvent.explicitOriginalTarget.value;
-    if (self.submitHandlers[op]) {
-      self.submitHandlers[op](this, self);
-    }
     // Unless proven wrong, we remove the form after submission.
     self.remove();
     // We never really submit.
@@ -536,9 +538,14 @@ Drupal.dreditor.form.form.prototype = {
   submitHandlers: {},
 
   addButton: function (op, onSubmit) {
-    this.submitHandlers[op] = onSubmit;
-    this.append('<input name="op" class="dreditor-button" type="submit" value="' + op + '" />');
-    // Return the jQurey form object to allow for chaining.
+    var self = this;
+    self.submitHandlers[op] = onSubmit;
+    var $button = $('<input name="op" class="dreditor-button" type="submit" value="' + op + '" />');
+    $button.bind('click.form', function () {
+      self.submitHandlers[op].call(self, $button);
+    });
+    this.append($button);
+    // Return the jQuery form object to allow for chaining.
     return this;
   }
 };
@@ -669,10 +676,10 @@ Drupal.dreditor.patchReview = {
       // Add comment textarea.
       self.$form.append('<textarea name="comment" class="form-textarea resizable" rows="10"></textarea>');
       // Add comment save button.
-      self.$form.addButton((self.data.id !== undefined ? 'Update' : 'Save'), function (form, $form) {
+      self.$form.addButton((self.data.id !== undefined ? 'Update' : 'Save'), function ($button) {
         // @todo For any reason, FF 3.5 breaks when trying to access
         //   form.comment.value. Works in FF 3.0.x. WTF?
-        var value = $form.find('textarea').val();
+        var value = this.find('textarea').val();
         // Store new comment, if non-empty.
         if ($.trim(value).length) {
           self.comment.save({
@@ -685,13 +692,13 @@ Drupal.dreditor.patchReview = {
         self.reset();
       });
       // Add comment cancel button.
-      self.$form.addButton('Cancel', function (form, $form) {
+      self.$form.addButton('Cancel', function ($button) {
         // Reset pastie.
         self.reset();
       });
       // Add comment delete button for existing comments.
       if (self.data.id !== undefined) {
-        self.$form.addButton('Delete', function (form, $form) {
+        self.$form.addButton('Delete', function ($button) {
           self.comment.delete(self.data.id);
           // Reset pastie.
           self.reset();

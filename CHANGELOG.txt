@@ -1,6 +1,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#577412 by sun: Fixed propietary FF/GM code for Chrome support.
 #754190 by ericduran: Auto-switch status to 'need work' when pasting a review.
 #1011084 by sun: Fixed commit message doesn't work on comment reply page.
 #543916 by webchick, sun: Attach commit message input to bottom of viewport.
