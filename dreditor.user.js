@@ -8,11 +8,75 @@
 // @include        https://drupal.org/*
 // ==/UserScript==
 
-// Initialize window objects.
-$ = window.$ = window.jQuery = unsafeWindow.jQuery;
-Drupal = window.Drupal = unsafeWindow.Drupal;
+/**
+ * Content Scope Runner.
+ *
+ * While Firefox/GreaseMonkey supports advanced DOM manipulations, Chrome does
+ * not. For maximum browser compatibility, this user script injects itself into
+ * the page it is executed on.
+ *
+ * Support and available features for user scripts highly varies across browser
+ * vendors. Some browsers (e.g., Firefox) require to install a browser extension
+ * (GreaseMonkey) in order to install and execute user scripts. Some others
+ * have built-in support for user scripts, but do not support all features of
+ * GreaseMonkey (variable storage, cross-domain XHR, etc). In the special case
+ * of Chrome, user scripts are executed before the DOM has been fully loaded and
+ * initialized; they can only access and manipulate the plain DOM document as
+ * is, but none of the scripts on the actual page are loaded yet.
+ *
+ * Bear in mind, with Content Scope Runner, unsafeWindow and all other
+ * GreaseMonkey specific features are not available.
+ *
+ * The global __PAGE_SCOPE_RUN__ variable is prepended to the user script to
+ * control execution. Make sure this variable does not clash with actual page
+ * variables.
+ *
+ * @see http://userscripts.org/scripts/show/68059
+ * @see http://wiki.greasespot.net/Content_Scope_Runner
+ *
+ * @todo FIXME upstream:
+ *   - Bogus SCRIPT type attribute.
+ *   - data attribute throws MIME type warning in Chrome; textContent approach
+ *     of earlier versions is correct.
+ *   - Append to HEAD.
+ *   - Removal/clean-up is completely invalid.
+ *   - setTimeout() approach seems useless?
+ *   - Code comments.
+ */
+// If not already running in the page, inject this script into the page.
+if (typeof __PAGE_SCOPE_RUN__ == 'undefined') {
+  // Define a closure/function in the global scope in order to reference the
+  // function caller (the function that executes the user script itself).
+  (function page_scope_runner() {
+    // Retrieve the source of this user script.
+    var self_src = '(' + page_scope_runner.caller.toString() + ')();';
 
-// Bail out in (the unlikely) case that JS has been disabled.
+    // Add the source to a new SCRIPT DOM element; prepend it with the
+    // __PAGE_SCOPE_RUN__ marker.
+    // Intentionally no scope-wrapping here.
+    var script = document.createElement('script');
+    script.setAttribute('type', 'text/javascript');
+    script.textContent = "var __PAGE_SCOPE_RUN__ = true;\n" + self_src;
+
+    // Inject the SCRIPT element into the page.
+    // Use setTimeout to force execution "outside" of
+    // the user script scope completely.
+    var head = document.getElementsByTagName('head')[0];
+    head.appendChild(script);
+  })();
+
+  // End execution. This code path is only reached in a GreaseMonkey/user
+  // script environment.
+  return;
+}
+
+// @todo Implement closure to provide jQuery in $.
+
+// If we are in a GreaseMonkey environment and JavaScript is disabled, user
+// scripts are executed nevertheless and can still act on the DOM, but none of
+// the scripts on the actual page are executed. Cancel processing in this case.
+// Drupal is also undefined when drupal.org is down.
+// @todo Verify whether this still applies.
 if (typeof Drupal == 'undefined') {
   return;
 }
@@ -35,11 +99,6 @@ jQuery.extend({
     // (e.g., via browser console). Although we are going to possibly store
     // named keys, this needs to be an Array, so we can determine its length.
     window.debug = window.debug || [];
-    // Keep unsafeWindow.debug and window.debug in sync in user script
-    // environments.
-    if (typeof unsafeWindow != 'undefined') {
-      unsafeWindow.debug = window.debug;
-    }
 
     args = jQuery.makeArray(arguments);
     // Determine data source; this is an object for $variable.debug().
