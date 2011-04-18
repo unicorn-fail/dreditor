@@ -1,6 +1,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Fixed project issue counter.
 #577412 by sun, seutje, ericduran, hass: Added Chrome support.
 #577412 by sun: Fixed propietary FF/GM code for Chrome support.
 #754190 by ericduran: Auto-switch status to 'need work' when pasting a review.

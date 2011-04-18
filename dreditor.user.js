@@ -1722,7 +1722,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.user = function (needle
 Drupal.behaviors.dreditorIssueCount = function (context) {
   $('table.project-issue', context).once('dreditor-issuecount', function () {
     var $table = $(this);
-    var count = $table.find('tbody tr').length;
+    var countTotal = $table.find('tbody tr').length;
     var countSuffix = ($table.parent().parent().find('.pager').length ? '+' : '');
     var countHidden = 0;
 
@@ -1745,8 +1745,10 @@ Drupal.behaviors.dreditorIssueCount = function (context) {
       countHidden = $table.find('tr.state-2, tr.state-16').not(':has(.marker)').addClass('dreditor-issue-hidden').hide().length;
     }
 
-    // Output total count (minus hidden).
-    $container.append('<span class="dreditor-issuecount-total">Displaying <span class="count">' + (count - countHidden) + '</span>' + countSuffix + ' issues.</span>');
+    // Output optimized count (minus hidden).
+    // Separate calculation required, or otherwise some browsers output NaN.
+    var count = countTotal - countHidden;
+    $container.append('<span class="dreditor-issuecount-total">Displaying <span class="count">' + count + '</span>' + countSuffix + ' issues.</span>');
     if (!countHidden) {
       return;
     }
