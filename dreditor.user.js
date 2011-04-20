@@ -1373,7 +1373,7 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         });
       }
       // Build commit message.
-      var message = '#' + window.location.href.match(/(?:node|comment\/reply)\/(\d+)/)[1] + ' ';
+      var message = 'Issue #' + window.location.href.match(/(?:node|comment\/reply)\/(\d+)/)[1] + ' ';
       message += 'by ' + submitters.join(', ');
       if (contributors.length) {
         if (submitters.length) {
