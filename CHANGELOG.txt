@@ -1,6 +1,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Fixed issue author not contained in username suggestions.
 #1061758 by alanburke: Added "Issue" prefix to commit message.
 by sun: Fixed project issue counter.
 #577412 by sun, seutje, ericduran, hass: Added Chrome support.

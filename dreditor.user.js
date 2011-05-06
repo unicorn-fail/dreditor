@@ -1690,7 +1690,8 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.user = function (needle
     if (typeof self.suggestionUserList == 'undefined') {
       self.suggestionUserList = {};
       var seen = {};
-      $('.comment .submitted a').each(function () {
+      // Add issue author to comment authors and build the suggestion list.
+      $('.comment .submitted a').add('div.node div.submitted a').each(function () {
         if (!seen[this.text]) {
           seen[this.text] = 1;
           // Use the shortest possible needle.
