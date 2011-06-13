@@ -1244,7 +1244,7 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
 
     // Since we cannot move DOM elements around, we need to use advanced CSS
     // positioning to achieve a sane order of form elements.
-    $form.css({ position: 'relative', paddingTop: '19em' });
+    $form.css({ position: 'relative', paddingTop: '20em' });
 
     // Unwrap basic issue data.
     $form
