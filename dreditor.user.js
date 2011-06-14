@@ -216,6 +216,10 @@ Drupal.dreditor = {
 
   setup: function (context) {
     var self = this;
+
+    // Reset scroll position.
+    delete self.scrollTop;
+
     // Prevent repeated setup (not supported yet).
     if (self.$dreditor) {
       self.show();
@@ -287,8 +291,12 @@ Drupal.dreditor = {
    */
   hide: function () {
     var self = this;
+    // Backup current vertical scroll position of Dreditor content.
+    self.scrollTop = self.$dreditor.find('#dreditor-content').scrollTop();
+
     var button = self.$dreditor.find('#dreditor-hide').get(0);
     button.value = 'Show';
+
     self.$wrapper.animate({ height: 34 }, function () {
       self.$dreditor.find('> div:not(#dreditor-actions)').hide();
       $('body').css({ overflow: 'auto' });
@@ -303,10 +311,16 @@ Drupal.dreditor = {
     var self = this;
     var button = self.$dreditor.find('#dreditor-hide').get(0);
     self.$dreditor.find('> div:not(#dreditor-actions)').show();
+
     $('body').css({ overflow: 'hidden' });
     self.$wrapper.animate({ height: '100%' }, function () {
       button.value = 'Hide';
     });
+
+    // Restore previous vertical scroll position of Dreditor content.
+    if (self.scrollTop) {
+      self.$dreditor.find('#dreditor-content').scrollTop(self.scrollTop);
+    }
     return false;
   },
 
