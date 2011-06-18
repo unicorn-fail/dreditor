@@ -1,6 +1,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#1094426 by sun: Added autocomplete for issue comments.
 by sun: Fixed vertical scroll position not restored upon Hide/Show.
 #1180658 by ericduran, naught101: Fixed commit message covered by help text.
 by sun: Fixed issue author not contained in username suggestions.

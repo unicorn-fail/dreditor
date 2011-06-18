@@ -1728,6 +1728,32 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.user = function (needle
 };
 
 /**
+ * Suggest a comment on issue.
+ */
+Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.comment = function (needle) {
+  var matches, self = this;
+  if (matches = needle.match('^#([0-9]+)')) {
+    // Performance: Upon first match, setup a username list once.
+    if (typeof self.suggestionCommentList == 'undefined') {
+      self.suggestionCommentList = {
+        0: 'content'
+      };
+      // Add issue author to comment authors and build the suggestion list.
+      var n, id;
+      $('.comment-title a').each(function () {
+        n = this.text.substring(1);
+        id = this.hash.substring(1);
+        self.suggestionCommentList[n] = id;
+      });
+    }
+    if (self.suggestionCommentList[matches[1]]) {
+      return '<a href="#' + self.suggestionCommentList[matches[1]] + '">#' + matches[1] + '</a> ^';
+    }
+  }
+  return false;
+};
+
+/**
  * @} End of "defgroup dreditor_syntaxautocomplete".
  */
 
