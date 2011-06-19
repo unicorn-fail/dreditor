@@ -893,18 +893,28 @@ Drupal.dreditor.patchReview = {
       return array;
     }
     var messages = [
-      'Powered by <a href="@dreditor-url">Dreditor</a>.'
+      //'Powered by <a href="@dreditor-url">Dreditor</a>.'
     ];
     // Add Drupal core specific messages.
-    var daysToCodeFreeze = 0, criticalIssueCount = 0;
-    if ($('#edit-project-info-project-title').val() == 'Drupal') {
+    var daysToCodeFreeze = 0, daysToPointRelease = 0, criticalIssueCount = 0;
+    if ($('#edit-project-info-project-title').val() == 'Drupal core') {
       // Code freeze specific messages.
       daysToCodeFreeze = parseInt((new Date(2010, 1 - 1, 15) - new Date()) / 1000 / 60 / 60 / 24, 10);
       if (daysToCodeFreeze > 0) {
         $.merge(messages, [
-          '@days to code freeze.  <a href="@dreditor-url">Better review yourself.</a>'
+          '@days days to code freeze.  <a href="@dreditor-url">Better review yourself.</a>'
         ]);
       }
+      // Point release freeze (last Wed of month) specific messages.
+      // @thanks http://stackoverflow.com/questions/2914095/detect-last-week-of-each-month-with-javascript
+      var lastWed = new Date();
+      var dayOfWeek = 3; // 0 is Sunday.
+      lastWed.setMonth(lastWed.getMonth() + 1);
+      lastWed.setDate(0);
+      lastWed.setDate(lastWed.getDate() - (lastWed.getDay() != 0 ? lastWed.getDay() - dayOfWeek : 7 - dayOfWeek));
+      daysToPointRelease = lastWed.getDate() - new Date().getDate();
+      messages.push('@point-release-days days to next Drupal core point release.');
+
       // Critical issue queue specific messages.
       // @todo Precondition?
       criticalIssueCount = $('#block-bingo-0 a:contains("Critical issues")').text();
@@ -915,11 +925,14 @@ Drupal.dreditor.patchReview = {
         ]);
       }
     }
-    var message = shuffle(messages)[0];
-    message = message.replace('@dreditor-url', 'http://drupal.org/project/dreditor');
-    message = message.replace('@days', daysToCodeFreeze + ' days');
-    message = message.replace('@critical-count', criticalIssueCount);
-    html += '\n\n<em>' + message + '</em>\n';
+    if (messages.length) {
+      var message = shuffle(messages)[0];
+      message = message.replace('@dreditor-url', 'http://drupal.org/project/dreditor');
+      message = message.replace('@days', daysToCodeFreeze);
+      message = message.replace('@point-release-days', daysToPointRelease);
+      message = message.replace('@critical-count', criticalIssueCount);
+      html += '\n\n<em>' + message + '</em>\n';
+    }
 
     // Paste comment into issue comment textarea.
     var $commentField = $('#edit-comment');
