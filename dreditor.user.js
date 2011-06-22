@@ -1130,7 +1130,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       // syntax = true;
     }
     // Colorize comments.
-    if (syntax && line.match(/^. +\/\/|^.\/\*[\* ]|^. \*/)) {
+    if (syntax && line.match(/^.\s*\/\/|^.\s*\/\*[\* ]|^.\s+\*/)) {
       classes.push('comment');
     }
     // Wrap all lines in PREs for copy/pasting.
