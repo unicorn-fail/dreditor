@@ -560,7 +560,7 @@ Drupal.storage.serialize = function (val) {
  * and only an one-dimensional (flat) associative configuration object (due to
  * limitations of jQuery.param()).
  */
-Drupal.storage.unserialize = function (val) {
+Drupal.storage.unserialize = function (str) {
   var obj = {};
   jQuery.each(str.split('&'), function() {
     var splitted = this.split('=');

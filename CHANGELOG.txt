@@ -1,6 +1,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#910636 by sun: Fixed undefined variable val.
 by sun: Fixed some comments not colorized as comments.
 #1002748 by sun: Added Drupal core point release footer message.
 #1094426 by sun: Added autocomplete for issue comments.
