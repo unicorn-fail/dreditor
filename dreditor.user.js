@@ -1689,7 +1689,8 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.html = {
   '<h4': "<h4>^</h4>\n",
   '<h5': "<h5>^</h5>\n",
   '<h6': "<h6>^</h6>\n",
-  '<li': "<li>^</li>\n",
+  '<img': '<img src="^" />',
+  '<li': "<li>^</li>",
   '<ol': "<ol>\n^\n</ol>\n",
   '<p': "<p>^</p>\n",
   '<pre': "<pre>\n^\n</pre>\n",
@@ -1719,7 +1720,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.issue = function (needl
  */
 Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.user = function (needle) {
   var matches, self = this;
-  if (matches = needle.match('^@([a-zA-Z0-9]+)')) {
+  if (matches = needle.match('^@([a-zA-Z0-9]+)$')) {
     // Performance: Upon first match, setup a username list once.
     if (typeof self.suggestionUserList == 'undefined') {
       self.suggestionUserList = {};
@@ -1752,7 +1753,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.user = function (needle
  */
 Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.comment = function (needle) {
   var matches, self = this;
-  if (matches = needle.match('^#([0-9]+)')) {
+  if (matches = needle.match('^#([0-9]+)$')) {
     // Performance: Upon first match, setup a username list once.
     if (typeof self.suggestionCommentList == 'undefined') {
       self.suggestionCommentList = {
