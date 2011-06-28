@@ -1562,6 +1562,10 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keypressHandler = function (event) 
   // the text replacement.
   // event.which is 0 in the keypress event, so directly compare with keyCode.
   if (event.keyCode == self.keyCode && self.suggestion) {
+    // Backup the current scroll position within the textarea. Any manipulation
+    // of this.value automatically resets this.scrollTop to zero.
+    var scrollTop = this.scrollTop;
+
     var prefix = this.value.substring(0, pos - self.needle.length);
     var suffix = this.value.substring(pos);
     this.value = prefix + self.suggestion.replace('^', '') + suffix;
@@ -1569,6 +1573,9 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keypressHandler = function (event) 
     // Move the cursor to the autocomplete position marker.
     var newpos = pos - self.needle.length + self.suggestion.indexOf('^');
     this.setSelectionRange(newpos, newpos);
+
+    // Restore original scroll position.
+    this.scrollTop = scrollTop;
 
     // Remove the tooltip and suggestion directly after executing the
     // autocompletion.
