@@ -1265,6 +1265,12 @@ Drupal.dreditor.patchReview.behaviors.toggleDeletions = function (context) {
  */
 Drupal.behaviors.dreditorIssueCommentForm = function (context) {
   $('#comment-form:has(#edit-category)', context).once('dreditor-issue-comment-form', function () {
+    // On comment/reply path pages, drupal.org does not apply the required
+    // .node-type-project-issue to BODY, which the Bluecheese theme targets for
+    // styling comments. Ensure that it is set.
+    // @todo Fix upstream.
+    $('body').addClass('node-type-project-issue');
+
     var $form = $('> div', this);
     // Remove that ugly looking heading.
     $form.parents('.content').prev('h2').remove();
@@ -1290,8 +1296,8 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
     // Note: Issue tags are still reset upon page refresh, but that's caused by
     // by collapse.js in D6, which inserts div.fieldset-wrapper into the form.
     $form
-      .children('.form-item:last')
-        .css({ position: 'absolute', top: '16.5em', width: '100%', margin: 0 })
+      .children('.form-item[id*=tags]')
+        .css({ position: 'absolute', top: '15.5em', width: '100%', margin: 0 })
         .find('label').each(function () {
           var $label = $(this).hide();
           $('#' + $label.attr('for'), context).attr('title', $label.text());
