@@ -1,6 +1,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#1203930 by sun: Fixed Autocompletion not working in Chrome.
 #1202502 by sun: Fixed Comment previews broken.
 #1104268 by sun: Removed extra linebreak for autocompleted HTML list items.
 #739476 by sun: Fixed textarea scroll position reset to zero upon autocomplete.

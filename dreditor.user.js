@@ -1554,7 +1554,13 @@ Drupal.dreditor.syntaxAutocomplete = function (element) {
     .insertAfter(this.$element)
     .append(this.$suggestion);
 
-  this.$element.bind('keypress.syntaxAutocomplete', { syntax: this }, this.keypressHandler);
+  // Intercept the autocompletion key upon pressing the key. Webkit does not
+  // support the keypress event for special keys (such as arrows and TAB) that
+  // are reserved for internal browser behavior. Only the keydown event is
+  // triggered for all keys.
+  // @see http://bugs.jquery.com/ticket/7300
+  this.$element.bind('keydown.syntaxAutocomplete', { syntax: this }, this.keypressHandler);
+  // After user input has been entered, check for suggestions.
   this.$element.bind('keyup.syntaxAutocomplete', { syntax: this }, this.keyupHandler);
 };
 
