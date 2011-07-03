@@ -264,6 +264,9 @@ Drupal.dreditor = {
       .appendTo($actions);
     $actions.appendTo(self.$dreditor);
 
+    // Allow to hide Dreditor using the ESC key.
+    $(document).bind('keyup', { dreditor: self }, self.escapeKeyHandler);
+
     // Setup application.
     var args = arguments;
     // Cut out the application name (2nd argument).
@@ -278,6 +281,10 @@ Drupal.dreditor = {
 
   tearDown: function (context) {
     var self = this;
+
+    // Remove the ESC keyup event handler that was bound in self.setup().
+    $(document).unbind('keyup', self.escapeKeyHandler);
+
     self.$wrapper.animate({ height: 0 }, function () {
       $('body', context).css({ overflow: 'auto' });
       $(this).remove();
@@ -287,17 +294,23 @@ Drupal.dreditor = {
   },
 
   /**
+   * Dreditor visibility state.
+   */
+  visible: false,
+
+  /**
    * Hide Dreditor.
    */
   hide: function () {
     var self = this;
+    self.visible = false;
     // Backup current vertical scroll position of Dreditor content.
     self.scrollTop = self.$dreditor.find('#dreditor-content').scrollTop();
 
     var button = self.$dreditor.find('#dreditor-hide').get(0);
     button.value = 'Show';
 
-    self.$wrapper.animate({ height: 34 }, function () {
+    self.$wrapper.stop().animate({ height: 34 }, function () {
       self.$dreditor.find('> div:not(#dreditor-actions)').hide();
       $('body').css({ overflow: 'auto' });
     });
@@ -309,11 +322,13 @@ Drupal.dreditor = {
    */
   show: function () {
     var self = this;
+    self.visible = true;
+
     var button = self.$dreditor.find('#dreditor-hide').get(0);
     self.$dreditor.find('> div:not(#dreditor-actions)').show();
 
     $('body').css({ overflow: 'hidden' });
-    self.$wrapper.animate({ height: '100%' }, function () {
+    self.$wrapper.stop().animate({ height: '100%' }, function () {
       button.value = 'Hide';
     });
 
@@ -322,6 +337,16 @@ Drupal.dreditor = {
       self.$dreditor.find('#dreditor-content').scrollTop(self.scrollTop);
     }
     return false;
+  },
+
+  /**
+   * Key event handler to hide or show Dreditor.
+   */
+  escapeKeyHandler: function (event) {
+    var self = event.data.dreditor;
+    if (event.which == 27) {
+      self.visible ? self.hide() : self.show();
+    }
   },
 
   attachBehaviors: function (args) {
