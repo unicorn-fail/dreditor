@@ -797,7 +797,7 @@ Drupal.dreditor.patchReview = {
       // Add comment delete button for existing comments.
       if (self.data.id !== undefined) {
         self.$form.addButton('Delete', function ($button) {
-          self.comment.delete(self.data.id);
+          self.comment.remove(self.data.id);
           // Reset pastie.
           self.reset();
         });
@@ -1010,7 +1010,12 @@ Drupal.dreditor.patchReview.comment = {
     return data || {};
   },
 
-  delete: function (id) {
+  /**
+   * Deletes a comment by ID.
+   *
+   * Called 'remove', since 'delete' is a reserved keyword.
+   */
+  remove: function (id) {
     var data = this.load(id);
     if (data && data.id !== undefined) {
       $(data.elements)
