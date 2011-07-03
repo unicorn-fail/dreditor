@@ -1699,7 +1699,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.setSuggestion = function (suggestio
  */
 Drupal.dreditor.syntaxAutocomplete.prototype.delSuggestion = function () {
   var self = this;
-	delete self.suggestion;
+  delete self.suggestion;
   self.$tooltip.hide();
 };
 
@@ -1919,36 +1919,36 @@ Drupal.behaviors.dreditorIssuesFilterFormValuesClean = function (context) {
         var $element = $(element);
         var value = $element.val();
         switch (element.name) {
-        	case 'text':
-        	case 'assigned':
-        	case 'submitted':
-        	case 'participant':
-        	case 'issue_tags':
+          case 'text':
+          case 'assigned':
+          case 'submitted':
+          case 'participant':
+          case 'issue_tags':
             if (value == '') {
               element.disabled = true;
             }
-        		break;
+            break;
 
-        	case 'status':
+          case 'status':
             if (value == 'Open') {
               element.disabled = true;
             }
-        		break;
+            break;
 
-        	case 'priorities':
-        	case 'categories':
-        	case 'version':
-        	case 'component':
+          case 'priorities':
+          case 'categories':
+          case 'version':
+          case 'component':
             if (value == 'All') {
               element.disabled = true;
             }
-        		break;
+            break;
 
-        	case 'issue_tags_op':
+          case 'issue_tags_op':
             if (value == 'or') {
               element.disabled = true;
             }
-        		break;
+            break;
         }
       });
     });
