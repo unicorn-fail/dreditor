@@ -1,6 +1,8 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#1190364 by drunken monkey: Fixed duplicate 'Fix' and 'Add' in commit message
+  template.
 #1212586 by sun: Updated for Issue tags hidden in a fieldset (again).
 #705060 by andypost, sun: Fixed Opera error due to reserved keyword 'delete'.
 #1030816 by clemens.tolboom, sun: Added Escape keystroke to hide patch reviewer.

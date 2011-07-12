@@ -1455,18 +1455,16 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
       // Build title.
       // Replace double quotes with single quotes for cvs command line.
       var title = $('#edit-title').val().replace('"', "'", 'g');
-      // Add "Added|Changed|Fixed " prefix based on issue category.
+      // Add "Added|Fixed " prefix based on issue category.
       switch ($('#edit-category').val()) {
         case 'bug':
+          title = title.replace(/^fix\S*\s*/i, '');
           title = 'Fixed ' + title;
           break;
 
         case 'feature':
+          title = title.replace(/^add\S*\s*/i, '');
           title = 'Added ' + title;
-          break;
-
-        case 'task':
-          title = 'Changed ' + title;
           break;
 
         default:
