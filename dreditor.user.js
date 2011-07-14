@@ -1284,6 +1284,71 @@ Drupal.dreditor.patchReview.behaviors.toggleDeletions = function (context) {
  */
 
 /**
+ * Issue summary AJAX editor.
+ */
+Drupal.behaviors.dreditorIssueSummary = function (context) {
+  // Limit to project_issue node view page.
+  $('#project-summary-container').once('dreditor-issue-summary', function () {
+    // Clone "Edit" link after "Issue summary" title.
+    var $edit_wrapper = $('<small class="admin-link"> [ <span></span> ] </small>');
+    var $edit_link = $('#tabs a:contains("Edit")').clone();
+    $edit_wrapper.find('span').append($edit_link);
+    $edit_wrapper.appendTo($(this).parent().find('h2:first'));
+
+    var $widget = $('<div id="dreditor-issue-summary-widget"></div>').hide().insertAfter(this);
+
+    $edit_link.click(function () {
+      // First of all, remove this link.
+      $edit_wrapper.remove();
+      // Retrieve the node edit form.
+      $.get(this.href, function (data) {
+        var $data = $(data);
+        // Do power users really need this advise? Investigate this.
+        // $widget.append($data.find('div.help'));
+        $widget.append($data.find('#node-form'));
+
+        // For users with just one input format, wrap filter tips in a fieldset.
+        // @todo Abstract this into a behavior. Also applies to comment form.
+        $widget.find('fieldset > ul.tips')
+          .wrap('<fieldset class="collapsible collapsed"></fieldset>')
+          .before('<legend>Input format</legend>');
+        // Clean up.
+        // Remove messages; contains needless info.
+        $widget.find('div.messages.status.site').remove();
+        // That info about issue fields in .standard .standard thingy, too.
+        $widget.find('div.node-form > div.standard > div.standard').remove();
+        // Hide node admin fieldsets; removing these would result in nodes being
+        // unpublished and author being changed to Anonymous on submit.
+        $widget.find('div.admin').hide();
+        // Flatten issue summary, input format, and revision info fielsets.
+        // Blatantly remove all other fieldsets. :)
+        $widget.find('fieldset')
+          .not(':has(#edit-body)')
+          .not(':has(.tips)')
+          .not(':has(#edit-log)')
+          .removeClass('collapsible').hide();
+        // Visually remove top-level fieldset of summary.
+        $widget.find('fieldset:has(#edit-body)').removeClass('collapsible').addClass('fieldset-flat');
+        // Collapse and prepopulate revision log message.
+        // Enforced log message doesn't really make sense for power users. It's
+        // not like we're crafting an encyclopedia with issues.
+        $widget.find('fieldset:has(#edit-log)').addClass('collapsed')
+          .find('#edit-log').val('Revamped issue summary.');
+        // Remove "Preview changes" and "Delete" buttons.
+        $widget.find('#edit-preview-changes').remove();
+        $widget.find('#edit-delete').remove();
+        // Sorry, no support for "Preview" yet.
+        $widget.find('#edit-preview').remove();
+        // Lastly, attach behaviors and slide in.
+        Drupal.attachBehaviors($widget.get(0));
+        $widget.slideDown();
+      }, 'html');
+      return false;
+    });
+  });
+};
+
+/**
  * Streamline issue comment form.
  *
  * Altering of the form makes certain browsers (such as Firefox) no longer find
@@ -2029,7 +2094,9 @@ table .dreditor-button { margin-left: 1em; } \
 #dreditor #code .has-comment { background-color: rgba(255, 200, 200, 0.5); } \
 #dreditor #code .selected { background-color: rgba(255, 255, 200, 0.5); } \
 .element-invisible { clip: rect(1px, 1px, 1px, 1px); position: absolute !important; } \
+.admin-link { font-size: 11px; font-weight: normal; text-transform: lowercase; } \
 #dreditor-overlay { } \
+#dreditor-issue-summary-widget { position: fixed; bottom: 0; left: 2%; width: 94%; z-index: 10; max-height: 60%; overflow: auto; padding: 0 1em 1em; background-color: #fff; -moz-box-shadow: 0 0 20px #bbb; box-shadow: 0 0 20px #bbb; -moz-border-radius: 8px 8px 0 0; border-radius: 8px 8px 0 0; } \
  \
 .dreditor-actions { overflow: hidden; position: relative; } \
 a.dreditor-application-toggle { display: inline-block; padding: 0.05em 0.3em; line-height: 150%; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \

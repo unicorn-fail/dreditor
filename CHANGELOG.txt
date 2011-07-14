@@ -1,6 +1,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#1218208 by sun: Added Ajaxified issue summaries.
 #1190364 by drunken monkey: Fixed duplicate 'Fix' and 'Add' in commit message
   template.
 #1212586 by sun: Updated for Issue tags hidden in a fieldset (again).
