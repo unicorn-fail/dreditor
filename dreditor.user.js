@@ -1333,7 +1333,7 @@ Drupal.behaviors.dreditorIssueSummary = function (context) {
         // Enforced log message doesn't really make sense for power users. It's
         // not like we're crafting an encyclopedia with issues.
         $widget.find('fieldset:has(#edit-log)').addClass('collapsed')
-          .find('#edit-log').val('Revamped issue summary.');
+          .find('#edit-log').val('Updated issue summary.');
         // Remove "Preview changes" and "Delete" buttons.
         $widget.find('#edit-preview-changes').remove();
         $widget.find('#edit-delete').remove();
