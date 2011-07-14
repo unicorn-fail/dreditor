@@ -1314,7 +1314,7 @@ Drupal.behaviors.dreditorIssueSummary = function (context) {
           .before('<legend>Input format</legend>');
         // Clean up.
         // Remove messages; contains needless info.
-        $widget.find('div.messages.status.site').remove();
+        $widget.find('div.messages.status').remove();
         // That info about issue fields in .standard .standard thingy, too.
         $widget.find('div.node-form > div.standard > div.standard').remove();
         // Hide node admin fieldsets; removing these would result in nodes being
