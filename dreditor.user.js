@@ -2049,13 +2049,6 @@ Drupal.behaviors.dreditorIssuesFilterFormReset = function (context) {
   });
 };
 
-/**
- * Initialize Dreditor.
- */
-jQuery(document).ready(function () {
-  Drupal.attachBehaviors(this);
-});
-
 // Add custom stylesheet.
 var styles = document.createElement("style");
 styles.setAttribute('type', 'text/css');

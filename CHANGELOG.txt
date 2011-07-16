@@ -1,6 +1,10 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Removed obsolete duplicate Drupal.attachBehaviors().
+  This was required before Dreditor injected itself into the page, since
+  Drupal's attachBehaviors() had no knowledge/access of the behaviors in the
+  user script, due to browser security realm restrictions.
 #1218208 by sun: Fixed issue creation guidelines still appeared for Drupal core.
 #1218208 by sun: Fixed default issue summary revision log message.
 #1218208 by sun: Added Ajaxified issue summaries.
