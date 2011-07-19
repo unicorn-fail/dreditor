@@ -481,15 +481,15 @@ Drupal.storage.support = {
 /**
  * Loads data from client-side storage.
  *
- * Keep in mind that HTML5 storage *always* stores values as strings.
- *
  * @param key
  *   The key name to load stored data from. Automatically prefixed with
- *   "Drupal.".
+ *   "Dreditor.".
  * @param bin
- *   (optional) The storage space to retrieve from. Defaults to 'session'.
+ *   (optional) A string denoting the storage space to read from. Defaults to
+ *   'local'. See Drupal.storage.save() for details.
  *
  * @see Drupal.storage.save()
+ * @see Drupal.storage.unserialize()
  */
 Drupal.storage.load = function (key, bin) {
   if (typeof bin == 'undefined') {
@@ -506,14 +506,25 @@ Drupal.storage.load = function (key, bin) {
  * Stores data on the client-side.
  *
  * @param key
- *   The key name to store data under. Automatically prefixed with "Drupal.".
+ *   The key name to store data under. Automatically prefixed with "Dreditor.".
  *   Should be further namespaced by module; e.g., for
- *   "Drupal.moduleName.settingName" you pass "moduleName.settingName".
+ *   "Dreditor.moduleName.settingName" you pass "moduleName.settingName".
  * @param data
- *   The data to store.
+ *   The data to store. Note that window storage only supports strings, so data
+ *   should be a scalar value (integer, float, string, or Boolean). For
+ *   non-scalar values, use Drupal.storage.serialize() before saving and
+ *   Drupal.storage.unserialize() after loading data.
  * @param bin
- *   (optional) The space to store in, one of 'session', 'local', 'global'.
- *   Defaults to 'session'.
+ *   (optional) A string denoting the storage space to store data in:
+ *   - session: Reads from window.sessionStorage. Persists for currently opened
+ *     browser window/tab only.
+ *   - local: Reads from window.localStorage. Stored values are only available
+ *     within the scope of the current host name only.
+ *   - global: Reads from window.globalStorage.
+ *   Defaults to 'local'.
+ *
+ * @see Drupal.storage.load()
+ * @see Drupal.storage.serialize()
  */
 Drupal.storage.save = function (key, data, bin) {
   if (typeof bin == 'undefined') {
@@ -1508,7 +1519,12 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         });
       }
       // Build commit message.
-      var message = '- #' + window.location.href.match(/(?:node|comment\/reply)\/(\d+)/)[1] + ' ';
+      // @todo Add configuration option for prefix. For now, manually override:
+      //   Drupal.storage.save('commitmessage.prefix', '-');
+      var prefix = Drupal.storage.load('commitmessage.prefix');
+      prefix = (prefix ? prefix : 'Issue');
+
+      var message = prefix + ' #' + window.location.href.match(/(?:node|comment\/reply)\/(\d+)/)[1] + ' ';
       message += 'by ' + submitters.join(', ');
       if (contributors.length) {
         if (submitters.length) {
