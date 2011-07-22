@@ -2112,7 +2112,8 @@ table .dreditor-button { margin-left: 1em; } \
 .element-invisible { clip: rect(1px, 1px, 1px, 1px); position: absolute !important; } \
 .admin-link { font-size: 11px; font-weight: normal; text-transform: lowercase; } \
 #dreditor-overlay { } \
-#dreditor-issue-summary-widget { position: fixed; bottom: 0; left: 2%; width: 94%; z-index: 10; max-height: 60%; overflow: auto; padding: 0 1em 1em; background-color: #fff; -moz-box-shadow: 0 0 20px #bbb; box-shadow: 0 0 20px #bbb; -moz-border-radius: 8px 8px 0 0; border-radius: 8px 8px 0 0; } \
+#column-left { z-index: 2; /* Required, or issue summary widget would be below site header. */ } \
+#dreditor-issue-summary-widget { position: fixed; bottom: 0; left: 2%; width: 94%; z-index: 10; overflow: auto; padding: 0 1em 1em; background-color: #fff; -moz-box-shadow: 0 0 20px #bbb; box-shadow: 0 0 20px #bbb; -moz-border-radius: 8px 8px 0 0; border-radius: 8px 8px 0 0; } \
  \
 .dreditor-actions { overflow: hidden; position: relative; } \
 a.dreditor-application-toggle { display: inline-block; padding: 0.05em 0.3em; line-height: 150%; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \

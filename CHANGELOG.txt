@@ -1,6 +1,8 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+by sun: Fixed logo and search in site header overlap issue summary widget.
+by Bojhan, sun: Fixed unnecessary max-height for issue summary widget.
 #1061758 by sun: Fixed commit message should use "Issue" prefix by default.
 #1218208 by sun: Fixed issue creation guidelines still appeared for Drupal core.
 #1218208 by sun: Fixed default issue summary revision log message.
