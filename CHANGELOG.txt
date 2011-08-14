@@ -1,6 +1,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#1248800 by sun: Fixed HTTPS issue URLs are not converted.
 by sun: Fixed logo and search in site header overlap issue summary widget.
 by Bojhan, sun: Fixed unnecessary max-height for issue summary widget.
 #1061758 by sun: Fixed commit message should use "Issue" prefix by default.
