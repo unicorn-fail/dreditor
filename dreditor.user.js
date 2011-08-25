@@ -2126,6 +2126,7 @@ div.dreditor-issuecount { line-height: 200%; } \
 #content .fieldset-flat { display: block; border: 0; width: auto; padding: 0; } \
 .fieldset-flat > legend { display: none; } \
 #dreditor-issue-data #edit-title-wrapper { margin-top: 0; } \
+#dreditor-issue-data .inline-options { width: 900px; } \
 #dreditor-issue-data .inline-options .form-item { margin-bottom: 0.3em; } \
  \
 .dreditor-tooltip { display: none; position: fixed; bottom: 0; background-color: #ffffbf; border: 1px solid #000; padding: 0 3px; font-family: sans-serif; font-size: 11px; line-height: 150%; } \

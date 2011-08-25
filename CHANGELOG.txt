@@ -1,6 +1,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#1259798 by sun: Fixed comment form layout on page with sidebar.
 #1248800 by sun: Fixed HTTPS issue URLs are not converted.
 by sun: Fixed logo and search in site header overlap issue summary widget.
 by Bojhan, sun: Fixed unnecessary max-height for issue summary widget.
