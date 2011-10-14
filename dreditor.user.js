@@ -1917,13 +1917,18 @@ Drupal.behaviors.dreditorProjectsCollapse = function (context) {
   if (!enabled) {
     return;
   }
+  var $tables = $('table.projects', context);
+  if (!$tables.length) {
+    return;
+  }
+
   // First table does not have a heading.
   var $heading = $('h2#sandboxes').clone();
   $heading.html($heading.html().replace('Sandbox p', 'P'))
     .removeAttr('id')
     .insertBefore('table.projects:first');
 
-  $('table.projects', context).once('dreditor-projectscollapse', function () {
+  $tables.once('dreditor-projectscollapse', function () {
     var $table = $(this);
     $heading = $table.prevAll('h2').eq(0);
     $heading.css({ cursor: 'pointer' })
