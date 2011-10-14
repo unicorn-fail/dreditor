@@ -1,6 +1,7 @@
 
 Dreditor 6.x-1.x, xxxx-xx-xx
 ----------------------------
+#1305486 by IceCreamYou, sun: Added toggle to collapse projects on /project/user.
 #1289542 by sun: Updated inline image button behavior for changed text formats.
 #1259798 by sun: Fixed comment form layout on page with sidebar.
 #1248800 by sun: Fixed HTTPS issue URLs are not converted.
