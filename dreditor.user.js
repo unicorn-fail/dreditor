@@ -943,6 +943,9 @@ Drupal.dreditor.patchReview = {
       }
       // Point release freeze (last Wed of month) specific messages.
       // @thanks http://stackoverflow.com/questions/2914095/detect-last-week-of-each-month-with-javascript
+      // Temporarily disabled due to bogus negative intervals.
+      // @see http://drupal.org/node/1391946
+      /*
       var lastWed = new Date();
       var dayOfWeek = 3; // 0 is Sunday.
       lastWed.setMonth(lastWed.getMonth() + 1);
@@ -950,6 +953,7 @@ Drupal.dreditor.patchReview = {
       lastWed.setDate(lastWed.getDate() - (lastWed.getDay() != 0 ? lastWed.getDay() - dayOfWeek : 7 - dayOfWeek));
       daysToPointRelease = lastWed.getDate() - new Date().getDate();
       messages.push('@point-release-days days to next Drupal core point release.');
+      */
 
       // Critical issue queue specific messages.
       // @todo Precondition?
