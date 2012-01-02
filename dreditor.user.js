@@ -670,7 +670,7 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
   // d.o infrastructure -- are you nuts?!
   $('#attachments, table.comment-upload-attachments, div[id^=pift-results]', context).once('dreditor-patchreview', function () {
     $('a', this).each(function () {
-      if (this.href.match(/\.(patch|diff|txt)/)) {
+      if (this.href.match(/\.(patch|diff|txt)$/)) {
         // Generate review link.
         var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">Review</a>').click(function () {
           // Load file.
