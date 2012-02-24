@@ -59,27 +59,23 @@ if (typeof __PAGE_SCOPE_RUN__ == 'undefined') {
     script.textContent = "var __PAGE_SCOPE_RUN__ = true;\n" + self_src;
 
     // Inject the SCRIPT element into the page.
-    // Use setTimeout to force execution "outside" of
-    // the user script scope completely.
     var head = document.getElementsByTagName('head')[0];
     head.appendChild(script);
   })();
 
   // End execution. This code path is only reached in a GreaseMonkey/user
-  // script environment.
-  return;
+  // script environment. User script environment implementations differ; not all
+  // browsers (e.g., Opera) understand a return statement here, and it would
+  // also prevent inclusion of this script in unit tests. Therefore, the entire
+  // script needs to be wrapped in a condition.
 }
+// Drupal is undefined when drupal.org is down.
+else if (typeof Drupal == 'undefined') {
+}
+// Execute the script as part of the content page.
+else {
 
 // @todo Implement closure to provide jQuery in $.
-
-// If we are in a GreaseMonkey environment and JavaScript is disabled, user
-// scripts are executed nevertheless and can still act on the DOM, but none of
-// the scripts on the actual page are executed. Cancel processing in this case.
-// Drupal is also undefined when drupal.org is down.
-// @todo Verify whether this still applies.
-if (typeof Drupal == 'undefined') {
-  return;
-}
 
 /**
  * @defgroup jquery_extensions jQuery extensions
@@ -2171,44 +2167,7 @@ div.dreditor-issuecount { line-height: 200%; } \
 .dreditor-tooltip { display: none; position: fixed; bottom: 0; background-color: #ffffbf; border: 1px solid #000; padding: 0 3px; font-family: sans-serif; font-size: 11px; line-height: 150%; } \
 ";
 
-/**
- * Check for new Dreditor versions.
- *
- * GM functions can be invoked from GM environment only.
- */
-dreditorUpdateCheck = function () {
-  if (typeof GM_xmlhttpRequest != 'function') {
-    return;
-  }
-  var version = GM_getValue('version', '');
-  var lastChecked = GM_getValue('update.last', 0);
-  var now = parseInt(new Date() / 1000, 10);
-  // Check every 3 days.
-  var interval = 60 * 60 * 24 * 3;
-  if (lastChecked - now < -interval) {
-    // Whatever happens to this request, remember that we tried.
-    GM_setValue('update.last', now);
-    GM_xmlhttpRequest({
-      method: 'GET',
-      url: 'http://drupalcode.org/viewvc/drupal/contributions/modules/dreditor/CHANGELOG.txt?view=co',
-      onload: function (responseDetails) {
-        if (responseDetails.status == 200) {
-          var newversion = responseDetails.responseText.match(/\$Id.+\$/)[0];
-          if (newversion == version) {
-            return;
-          }
-          var doUpdate = window.confirm('A new version of Dreditor is available. Shall we visit the project page to update?');
-          if (doUpdate) {
-            window.open('http://drupal.org/project/dreditor', 'dreditor');
-            // Let's just assume that we DID update. ;)
-            GM_setValue('version', newversion);
-          }
-        }
-      }
-    });
-  }
-};
 
-// @todo Rethink the update status functionality.
-// dreditorUpdateCheck();
+// End of Content Scope Runner.
+}
 
