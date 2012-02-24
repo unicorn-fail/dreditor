@@ -1898,6 +1898,62 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.comment = function (nee
  */
 
 /**
+ * Checks for Dreditor updates every once in a while.
+ *
+ * @todo Allow to disable this when running off a git clone?
+ */
+Drupal.behaviors.dreditorUpdateCheck = function () {
+  var lastUpdate, now, lastChange, doUpdate;
+  lastUpdate = Drupal.storage.load('lastUpdate');
+  now = new Date();
+
+  // Don't bug to update on very first, initial check.
+  if (lastUpdate == null) {
+    lastUpdate = now;
+    Drupal.storage.save('lastUpdate', lastUpdate.getTime());
+  }
+  else {
+    lastUpdate = new Date(lastUpdate);
+  }
+
+  // Check whether it is time to check for updates.
+  // @todo ----------------------------v
+  var interval = 1000 * 60 * 60 * 24 * 1; // 14 days
+//  $.debug(lastUpdate, 'lastUpdate');
+//  $.debug(lastUpdate.getTime(), 'lastUpdateTime');
+//  $.debug(interval, 'interval');
+//  $.debug(lastUpdate.getTime() + interval, 'lastUpdate + interval');
+//  $.debug(now.getTime(), 'now');
+//  $.debug(lastUpdate.getTime() + interval > now.getTime(), 'lastUpdate + interval > now');
+  if (lastUpdate.getTime() + interval > now.getTime()) {
+    return;
+  }
+
+  $.ajax({
+    url: '//drupal.org/node/525726/commits',
+    success: function (data) {
+      lastChange = $('.commit-global:first h3 a:last', data);
+      if (lastChange.length) {
+        lastChange = new Date(lastChange.text());
+        if (lastChange > lastUpdate) {
+          doUpdate = window.confirm('Dreditor got improved! Visit the project page to update?');
+          if (doUpdate) {
+            window.open('//drupal.org/project/dreditor', 'dreditor');
+            // Update the stored timestamp if the user confirmed.
+            Drupal.storage.save('lastUpdate', lastChange.getTime());
+          }
+        }
+      }
+      // Prevent checking for updates all over again, if last commit could not
+      // be found.
+      else {
+        Drupal.storage.save('lastUpdate', now.getTime());
+      }
+    }
+  });
+};
+
+/**
  * Attach collapsing behavior to user project tables.
  */
 Drupal.behaviors.dreditorProjectsCollapse = function (context) {
