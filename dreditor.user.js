@@ -613,34 +613,38 @@ Drupal.storage.unserialize = function (str) {
 
 /**
  * Checks for Dreditor updates every once in a while.
- *
- * @todo Allow to disable this when running off a git clone?
  */
 Drupal.dreditor.updateCheck = function () {
-  var lastUpdate = Drupal.storage.load('lastUpdate');
   var now = new Date();
+  // Time of the last update check performed.
+  var lastUpdateCheck = Drupal.storage.load('lastUpdateCheck');
+  // Time of the last change parsed out of commit log.
+  var lastUpdate = Drupal.storage.load('lastUpdate');
 
-  // Don't bug to update on very first, initial check.
-  if (lastUpdate == null) {
+  // Do not check for updates if the user just installed Dreditor.
+  if (lastUpdateCheck == null) {
+    Drupal.storage.save('lastUpdateCheck', now.getTime());
+    // As we just installed/updated, the last change is also now.
     Drupal.storage.save('lastUpdate', now.getTime());
     return;
   }
   else {
+    lastUpdateCheck = new Date(lastUpdateCheck);
     lastUpdate = new Date(lastUpdate);
   }
 
   // Check whether it is time to check for updates.
-  // @todo ----------------------------v
-  var interval = 1000 * 60 * 60 * 24 * 1; // 14 days
-//  $.debug(lastUpdate, 'lastUpdate');
-//  $.debug(lastUpdate.getTime(), 'lastUpdateTime');
-//  $.debug(interval, 'interval');
-//  $.debug(lastUpdate.getTime() + interval, 'lastUpdate + interval');
-//  $.debug(now.getTime(), 'now');
-//  $.debug(lastUpdate.getTime() + interval > now.getTime(), 'lastUpdate + interval > now');
-  if (lastUpdate.getTime() + interval > now.getTime()) {
+  var interval = 1000 * 60 * 60 * 24 * 14; // 14 days
+  // Convert to time; JS confuses timezone offset in ISO dates with seconds.
+  if (lastUpdateCheck.getTime() + interval > now.getTime()) {
     return;
   }
+
+  // Save that a update check was performed.
+  // Was previously only saved when the user confirmed or when the commit log
+  // could not be parsed. But if the user does not confirm (cancels), the update
+  // would run on every page load again.
+  Drupal.storage.save('lastUpdateCheck', now.getTime());
 
   var lastChange, doUpdate;
   $.ajax({
@@ -649,7 +653,7 @@ Drupal.dreditor.updateCheck = function () {
       lastChange = $('.commit-global:first h3 a:last', data);
       if (lastChange.length) {
         lastChange = new Date(lastChange.text());
-        if (lastChange.getTime() > lastUpdate) {
+        if (lastChange > lastUpdate) {
           doUpdate = window.confirm('Dreditor got improved! Visit the project page to update?');
           if (doUpdate) {
             window.open('//drupal.org/project/dreditor', 'dreditor');
@@ -657,11 +661,6 @@ Drupal.dreditor.updateCheck = function () {
             Drupal.storage.save('lastUpdate', lastChange.getTime());
           }
         }
-      }
-      // Prevent checking for updates all over again, if last commit could not
-      // be found.
-      else {
-        Drupal.storage.save('lastUpdate', now.getTime());
       }
     }
   });
