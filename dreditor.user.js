@@ -1956,6 +1956,10 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.comment = function (nee
  * Attach collapsing behavior to user project tables.
  */
 Drupal.behaviors.dreditorProjectsCollapse = function (context) {
+  var $tables = $('table.projects', context);
+  if (!$tables.length) {
+    return;
+  }
   var enabled = Drupal.storage.load('projectscollapse.status');
 
   // Add link to toggle this feature.
@@ -1970,10 +1974,6 @@ Drupal.behaviors.dreditorProjectsCollapse = function (context) {
     .insertBefore('table.projects:first');
 
   if (!enabled) {
-    return;
-  }
-  var $tables = $('table.projects', context);
-  if (!$tables.length) {
     return;
   }
 
