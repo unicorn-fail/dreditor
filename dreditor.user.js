@@ -6,6 +6,8 @@
 // @version        0.1
 // @include        http://drupal.org/*
 // @include        https://drupal.org/*
+// @include        http://*.drupal.org/*
+// @include        https://*.drupal.org/*
 // ==/UserScript==
 
 /**
@@ -2173,7 +2175,7 @@ styles.innerHTML = " \
 #dreditor #bar, #dreditor-actions { width: 230px; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
 #dreditor #bar { position: absolute; height: 100%; } \
 #dreditor-actions { background-color: #fff; bottom: 0; padding-top: 5px; padding-bottom: 5px; position: absolute; } \
-.dreditor-button, #content a.dreditor-button { background: transparent url(/sites/all/themes/bluecheese/images/sprites-horizontal.png) repeat-x 0 -1150px; border: 1px solid #28d; color: #fff; cursor: pointer; font-size: 11px; font-family: sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px; } \
+.dreditor-button, .dreditor-button:link, .dreditor-button:visited, #content a.dreditor-button { background-color: #2e96d5; border: 1px solid #28d; color: #fff; cursor: pointer; font-size: 11px; font-family: sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px; } \
 .dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 -1100px; } \
 .dreditor-button { margin: 0 0.5em 0 0; } \
 table .dreditor-button { margin-left: 1em; } \
@@ -2195,7 +2197,7 @@ table .dreditor-button { margin-left: 1em; } \
 #dreditor #code pre span.hidden { display: none; } \
 #dreditor #code .file { color: #088; } \
 #dreditor #code .old { color: #c00; } \
-#dreditor #code .new { color: #00c; } \
+#dreditor #code .new { color: #00c; float: none; font-size: 100%; font-weight: normal; } \
 #dreditor #code .comment { color: #070; } \
 #dreditor #code .has-comment { background-color: rgba(255, 200, 200, 0.5); } \
 #dreditor #code .selected { background-color: rgba(255, 255, 200, 0.5); } \
@@ -2216,7 +2218,6 @@ div.dreditor-issuecount { line-height: 200%; } \
 #content .fieldset-flat { display: block; border: 0; width: auto; padding: 0; } \
 .fieldset-flat > legend { display: none; } \
 #dreditor-issue-data #edit-title-wrapper { margin-top: 0; } \
-#dreditor-issue-data .inline-options { width: 900px; } \
 #dreditor-issue-data .inline-options .form-item { margin-bottom: 0.3em; } \
  \
 .dreditor-tooltip { display: none; position: fixed; bottom: 0; background-color: #ffffbf; border: 1px solid #000; padding: 0 3px; font-family: sans-serif; font-size: 11px; line-height: 150%; } \
