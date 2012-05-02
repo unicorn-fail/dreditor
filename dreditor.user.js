@@ -1507,8 +1507,12 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
   if (!($('body.node-type-project-issue', context).length || $('div.project-issue', context).length)) {
     return;
   }
+  var self = this;
   $('#edit-comment-wrapper', context).once('dreditor-commitmessage', function () {
-    var $container = $('.dreditor-actions', this);
+    // Prepend commit message button to comment form.
+    // @todo Generalize this setup. Somehow.
+    var $container = $('<div class="dreditor-actions" style="width: 95%;"></div>')
+      .prependTo(this);
     // Generate commit message button.
     var $link = $('<a class="dreditor-application-toggle dreditor-commitmessage" href="#">Create commit message</a>');
     $link.click(function () {
@@ -1542,13 +1546,25 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
       // Retrieve all comments in this issue.
       var $comments = $('#comments div.comment', context);
       // Build list of top patch submitters.
-      var submitters = $comments
+      var $submitters = $comments
         // Filter comments by those having patches.
         .filter(':has(a.dreditor-patchreview)').find('div.submitted a')
         // Add original post if it contains a patch.
-        .add('div.node:has(a.dreditor-patchreview) div.submitted a')
-        // Count and sort by occurrences.
-        .countvalues();
+        .add('div.node:has(a.dreditor-patchreview) div.submitted a');
+      // Count and sort by occurrences.
+      var submitters = $submitters.countvalues();
+
+      // Build list of unique users for commit attribution, keyed by uid.
+      var users = {}, user, uid;
+      for (user in $submitters.get()) {
+        uid = $submitters[user].href.match(/\d+/)[0];
+        users[uid] = {
+          id: uid,
+          name: $submitters[user].textContent,
+          href: $submitters[user].href
+        };
+      }
+
       // Build list of top commenters.
       var commenters = $comments.find('div.author a')
         // Skip test bot.
@@ -1591,7 +1607,7 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         message += contributors.join(', ');
       }
       // Build title.
-      // Replace double quotes with single quotes for cvs command line.
+      // Replace double quotes with single quotes for command line.
       var title = $('#edit-title').val().replace('"', "'", 'g');
       // Add "Added|Fixed " prefix based on issue category.
       switch ($('#edit-category').val()) {
@@ -1623,10 +1639,46 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
       // Inject a text field.
       var $input = $('#dreditor-commitmessage-input', context);
       if (!$input.length) {
+        // Setup first input widget for plain commit message.
+        // @todo Revise animation for box-sizing:border-box.
         $input = $('<input id="dreditor-commitmessage-input" class="dreditor-input" type="text" autocomplete="off" />')
-          .css({ position: 'absolute', right: $link.width(), width: 0 })
-          .val(message);
+          .css({ position: 'absolute', right: $link.outerWidth(), width: 0 })
+          .val(message)
+          .insertAfter($link);
         $link.css({ position: 'relative', zIndex: 1 }).before($input);
+
+        // Setup second input widget for full git commit command line.
+        self.createShellCommand = function (message, user) {
+          var command = 'git commit -a -m "' + message + '"';
+          if (user && user.attribution) {
+            command += ' --author="' + user.attribution + '"';
+          }
+          return command;
+        };
+        var $commandContainer = $('<div id="dreditor-commitmessage-command" style="clear: both; padding: 1em 0;" />')
+          .appendTo($container);
+        var $commandInput = $('<input class="dreditor-input" type="text" autocomplete="off" />')
+          .val(self.createShellCommand(message));
+        // Add user list as commit attribution choices.
+        for (var user in users) {
+          var $userLink = $('<a href="#' + users[user].href + '/git-attribution" class="choice">' + users[user].name + '</a>')
+            .data('user', users[user]);
+          $userLink.click(function () {
+            var link = this;
+            // @todo Cache response per user.
+            $.getJSON(this.hash.substring(1), function (response) {
+              users[user].attribution = response.author;
+              $commandInput
+                // Take over current commit message (might have been customized).
+                .val(self.createShellCommand($input.val(), users[user]))
+                .get(0).select();
+              $(link).addClass('selected').siblings().removeClass('selected');
+            });
+            return false;
+          });
+          $commandContainer.append($userLink);
+        }
+
         $input.animate({ width: $container.width() - $link.width() - 10 }, null, null, function () {
           this.select();
 
@@ -1643,10 +1695,15 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
               $input.attr('style', inputOriginalStyle);
             }
           });
+
+          // Inject the shell command widget.
+          $commandContainer.hide().append($commandInput).slideDown('fast');
         });
 
         $link.one('click', function () {
+          $commandContainer.slideUp('fast');
           $input.animate({ width: 0 }, null, null, function () {
+            $commandContainer.remove();
             $input.remove();
           });
           return false;
@@ -1654,12 +1711,6 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
       }
       return false;
     });
-    // Prepend commit message button to comment form.
-    // @todo Generalize this setup. Somehow.
-    if (!$container.length) {
-      $container = $('<div class="dreditor-actions" style="width: 95%"></div>');
-      $(this).prepend($container);
-    }
     $link.prependTo($container);
   });
 };
@@ -2210,7 +2261,9 @@ table .dreditor-button { margin-left: 1em; } \
 .dreditor-actions { overflow: hidden; position: relative; } \
 a.dreditor-application-toggle { display: inline-block; padding: 0.05em 0.3em; line-height: 150%; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
 #content a.dreditor-application-toggle { float: right; margin: 0 0 0 0.5em; } \
-.dreditor-input { border: 1px solid #ccc; padding: 0.2em 0.3em; font-size: 100%; line-height: 150%; } \
+.dreditor-input { border: 1px solid #ccc; padding: 0.2em 0.3em; font-size: 100%; line-height: 150%; -moz-box-sizing: border-box; box-sizing: border-box; width: 100%; } \
+.choice { display: inline-block; margin: 0 0.33em 0.4em 0; padding: 0.2em 0.7em; border: 1px solid #ccc; background-color: #fafcfe; -moz-border-radius: 5px; border-radius: 5px; } \
+.choice.selected { background-color: #2e96d5; border: 1px solid #28d; color: #fff; } \
  \
 div.dreditor-issuecount { line-height: 200%; } \
 .dreditor-issuecount a { padding: 0 0.3em; } \
