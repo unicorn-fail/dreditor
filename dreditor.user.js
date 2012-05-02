@@ -1649,7 +1649,9 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
 
         // Setup second input widget for full git commit command line.
         self.createShellCommand = function (message, user) {
-          var command = 'git commit -a -m "' + message + '"';
+          // -a is evil; people should use apply/am to apply patches, and many
+          // use 'git add -p' to selectively stage and commit changes.
+          var command = 'git commit -m "' + message + '"';
           if (user && user.attribution) {
             command += ' --author="' + user.attribution + '"';
           }
