@@ -1511,7 +1511,7 @@ Drupal.behaviors.dreditorFormBackup = function (context) {
   $(context).find('#comment-form:has(#edit-category)').once('dreditor-form-backup', function () {
     var $form = $(this);
 
-    var $restore = $('<a href="javascript:void()" class="dreditor-application-toggle">Restore previous values</a>').click(function () {
+    var $restore = $('<a href="javascript:void()" class="dreditor-application-toggle">Restore previously entered data</a>').click(function () {
       if (window.confirm('Reset this form to your last submitted values?')) {
         var values = Drupal.storage.unserialize(Drupal.storage.load('form.backup'));
         $form.find('[name]').not('[type=hidden]').each(function () {
