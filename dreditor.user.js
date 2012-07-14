@@ -2057,7 +2057,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.comment = function (nee
       });
     }
     if (self.suggestionCommentList[matches[1]]) {
-      return '<a href="#' + self.suggestionCommentList[matches[1]] + '">#' + matches[1] + '</a> ^';
+      return '<a href="#' + self.suggestionCommentList[matches[1]] + '">#' + matches[1] + '</a>^';
     }
   }
   return false;
