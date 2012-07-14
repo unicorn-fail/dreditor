@@ -1977,6 +1977,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.html = {
   '<h4': "<h4>^</h4>\n",
   '<h5': "<h5>^</h5>\n",
   '<h6': "<h6>^</h6>\n",
+  '<hr': "<hr />\n\n^",
   '<img': '<img src="^" />',
   '<li': "<li>^</li>",
   '<ol': "<ol>\n^\n</ol>\n",
