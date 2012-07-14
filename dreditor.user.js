@@ -98,7 +98,7 @@ jQuery.extend({
     // named keys, this needs to be an Array, so we can determine its length.
     window.debug = window.debug || [];
 
-    args = jQuery.makeArray(arguments);
+    var args = jQuery.makeArray(arguments);
     // Determine data source; this is an object for $variable.debug().
     // Also determine the identifier to store data with.
     if (typeof this == 'object') {
