@@ -1363,7 +1363,7 @@ Drupal.behaviors.dreditorIssueSummary = function (context) {
     $edit_wrapper.find('span').append($edit_link);
     $edit_wrapper.appendTo($(this).parent().find('h2:first'));
 
-    var $widget = $('<div id="dreditor-issue-summary-widget"></div>').hide().insertAfter(this);
+    var $widget = $('<div id="dreditor-widget"></div>').hide().insertAfter(this);
 
     $edit_link.click(function () {
       // First of all, remove this link.
@@ -1518,6 +1518,34 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
     // comment count.
     $(this).addClass('comment');
     $form.addClass('comment-inner');
+  });
+};
+
+/**
+ * Allow to make comment widget sticky.
+ *
+ * On an issue with many follow-ups, one needs to jump back and forth between
+ * the comment form and individual earlier comments you want to reply to.
+ *
+ * To prevent that, allow to make the comment form sticky (like the ajaxified
+ * issue summary widget), so the user is able to read, scroll, and comment at
+ * the same time.
+ */
+Drupal.behaviors.dreditorIssueCommentFormSticky = function (context) {
+  $(context).find('.dreditor-issue-comment-form-processed').once('dreditor-issue-comment-form-sticky', function () {
+    var $wrapper = $(this).find('#edit-comment-wrapper > .resizable-textarea');
+    var $toggle = $('<a href="javascript:void(0);" class="dreditor-application-toggle">Make sticky</a>');
+    $toggle.click(function () {
+      if ($wrapper.attr('id')) {
+        $wrapper.removeAttr('id');
+        $toggle.removeClass('active').text('Make sticky');
+      }
+      else {
+        $wrapper.attr('id', 'dreditor-widget');
+        $toggle.addClass('active').text('Unstick');
+      }
+    });
+    $wrapper.find('> span').prepend($toggle);
   });
 };
 
@@ -2318,10 +2346,11 @@ table .dreditor-button { margin-left: 1em; } \
 .admin-link { font-size: 11px; font-weight: normal; text-transform: lowercase; } \
 #dreditor-overlay { } \
 #column-left { z-index: 2; /* Required, or issue summary widget would be below site header. */ } \
-#dreditor-issue-summary-widget { position: fixed; bottom: 0; left: 2%; width: 94%; z-index: 10; overflow: auto; padding: 0 1em 1em; background-color: #fff; -moz-box-shadow: 0 0 20px #bbb; box-shadow: 0 0 20px #bbb; -moz-border-radius: 8px 8px 0 0; border-radius: 8px 8px 0 0; } \
+#dreditor-widget { position: fixed; bottom: 0; left: 2%; width: 94%; z-index: 10; overflow: auto; padding: 0 1em 1em; background-color: #fff; -moz-box-shadow: 0 0 20px #bbb; box-shadow: 0 0 20px #bbb; -moz-border-radius: 8px 8px 0 0; border-radius: 8px 8px 0 0; } \
  \
 .dreditor-actions { overflow: hidden; position: relative; } \
 a.dreditor-application-toggle { display: inline-block; padding: 0.05em 0.3em; line-height: 150%; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
+a.dreditor-application-toggle.active { border-color: #48e; background-color: #4af; color: #fff; } \
 #content a.dreditor-application-toggle { float: right; margin: 0 0 0 0.5em; } \
 .dreditor-input { border: 1px solid #ccc; padding: 0.2em 0.3em; font-size: 100%; line-height: 150%; -moz-box-sizing: border-box; box-sizing: border-box; width: 100%; } \
 .choice { display: inline-block; margin: 0 0.33em 0.4em 0; padding: 0.2em 0.7em; border: 1px solid #ccc; background-color: #fafcfe; -moz-border-radius: 5px; border-radius: 5px; } \
