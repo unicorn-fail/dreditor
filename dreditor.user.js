@@ -1388,25 +1388,48 @@ Drupal.behaviors.dreditorIssueSummary = function (context) {
         // Hide node admin fieldsets; removing these would result in nodes being
         // unpublished and author being changed to Anonymous on submit.
         $widget.find('div.admin').hide();
+
         // Flatten issue summary, input format, and revision info fielsets.
         // Blatantly remove all other fieldsets. :)
         $widget.find('fieldset')
-          .not(':has(#edit-body)')
-          .not(':has(.tips)')
-          .not(':has(#edit-log)')
+          .not(':has(#edit-body, .tips, #edit-log)')
           .removeClass('collapsible').hide();
-        // Visually remove top-level fieldset of summary.
-        $widget.find('fieldset:has(#edit-body)').removeClass('collapsible').addClass('fieldset-flat');
-        // Collapse and prepopulate revision log message.
-        // Enforced log message doesn't really make sense for power users. It's
-        // not like we're crafting an encyclopedia with issues.
-        $widget.find('fieldset:has(#edit-log)').addClass('collapsed')
-          .find('#edit-log').val('Updated issue summary.');
+        // Visually remove top-level fieldsets, except text format.
+        $widget.find('fieldset:has(#edit-body, #edit-log)')
+          .removeClass('collapsible').addClass('fieldset-flat');
+        // Remove needless spacing between summary and revision elements.
+        $widget.find('.fieldset-flat:eq(0)').css('marginBottom', 0);
+
+        // Hide revision checkbox (only visible for admins, can't be disabled)
+        // and revision log message description.
+        $widget.find('#edit-revision-wrapper, #edit-log-wrapper .description').hide();
+        // Convert revision log message textarea into textfield and prepopulate it.
+        var $textarea = $widget.find('#edit-log');
+        var $textfield = $('<input type="text" size="60" style="width: 95%;" />');
+        $.each($textarea[0].attributes, function (index, attr) {
+          $textfield.attr(attr.name, attr.value);
+        });
+        // Enforced log message doesn't really make sense for power users.
+        // We're not crafting an encyclopedia with issues.
+        $textfield.val('Updated issue summary.');
+        $textarea.replaceWith($textfield);
+
         // Remove "Preview changes" and "Delete" buttons.
         $widget.find('#edit-preview-changes').remove();
         $widget.find('#edit-delete').remove();
         // Sorry, no support for "Preview" yet.
         $widget.find('#edit-preview').remove();
+
+        // Add a Cancel button. Move it far away from the submit button. ;)
+        $widget.find('#edit-submit').before(
+          $('<a href="javascript:void(0);" class="dreditor-button right">Cancel</a>').click(function () {
+            $widget.slideUp('fast', function () {
+              $widget.remove();
+            });
+            return false;
+          })
+        );
+
         // Lastly, attach behaviors and slide in.
         Drupal.attachBehaviors($widget.get(0));
         $widget.slideDown();
