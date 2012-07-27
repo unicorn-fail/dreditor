@@ -1996,7 +1996,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.html = {
   '<code': '<code>^</code>',
   '<del': '<del>^</del>',
   '<dl': "<dl>\n<dt>^</dt>\n<dd></dd>\n</dl>\n",
-  '<dt': '<dt>^</dt>',
+  '<dt': "<dt>^</dt>\n<dd></dd>",
   '<dd': '<dd>^</dd>',
   '<em': '<em>^</em>',
   '<h1': "<h1>^</h1>\n",
