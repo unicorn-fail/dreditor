@@ -690,6 +690,10 @@ Drupal.dreditor.form.form.prototype = {
  * Attach patch review editor to issue attachments.
  */
 Drupal.behaviors.dreditorPatchReview = function (context) {
+  // Prevent users from starting to review patches when not logged in.
+  if (!$(context).find('#comment-form').length) {
+    return;
+  }
   // d.o infrastructure -- are you nuts?!
   $('#attachments, table.comment-upload-attachments, div[id^=pift-results]', context).once('dreditor-patchreview', function () {
     $('a', this).each(function () {
