@@ -2114,6 +2114,27 @@ Drupal.behaviors.dreditorProjectsCollapse = function (context) {
 };
 
 /**
+ * Attach mark as read to project issue tables.
+ */
+Drupal.behaviors.dreditorIssueMarkAsRead = function (context) {
+  $('table.project-issue', context).once('dreditor-issuemarkasread', function () {
+    $(this).find('.marker').addClass('clickable').bind('click.dreditor-markasread', function () {
+      var $marker = $(this);
+      var $link = $marker.prev('a');
+      $.ajax({
+        // The actual HTML page output is irrelevant, so denote that by using
+        // the appropriate HTTP method.
+        type: 'HEAD',
+        url: $link.attr('href'),
+        complete: function () {
+          $marker.remove();
+        }
+      });
+    });
+  });
+};
+
+/**
  * Attach issue count to project issue tables and hide fixed/needs more info issues without update marker.
  */
 Drupal.behaviors.dreditorIssueCount = function (context) {
@@ -2332,6 +2353,7 @@ a.dreditor-application-toggle.active { border-color: #48e; background-color: #4a
  \
 div.dreditor-issuecount { line-height: 200%; } \
 .dreditor-issuecount a { padding: 0 0.3em; } \
+.marker.clickable { cursor: pointer; } \
  \
 #content .fieldset-flat { display: block; border: 0; width: auto; padding: 0; } \
 .fieldset-flat > legend { display: none; } \
