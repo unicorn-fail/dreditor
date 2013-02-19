@@ -711,6 +711,25 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
         });
         // Append review link to parent table cell.
         $link.appendTo(this.parentNode);
+
+        // Generate simplytest.me link.
+        // Exclude .txt file attachments.
+        if (this.href.substr(-4) == '.txt') {
+          return;
+        }
+        // Retrieve project from breadcrumb.
+        // For the Drupal project, the breadcrumb does not contain a link to the
+        // project page.
+        // @todo Provide central Dreditor metadata helper for this.
+        var project = $('.breadcrumb a:eq(0)').attr('href');
+        project = (project == '/project/issues/drupal' ? 'drupal' : project.substr(9));
+        // Retrieve version from comment form.
+        // We need the version string (not PI's internal version ID [rid]), so
+        // retrieve the label of the selected option.
+        var version = $('#edit-project-info-rid option:selected').text().replace('-dev', '');
+        var href = 'http://simplytest.me/project/' + project + '/' + version + '?patch[]=' + this.href;
+        $('<a class="dreditor-button dreditor-patchtest" href="' + href + '" target="_blank">simplytest.me</a>')
+          .appendTo(this.parentNode);
       }
     });
   });
@@ -2315,7 +2334,7 @@ styles.innerHTML = " \
 .dreditor-button, .dreditor-button:link, .dreditor-button:visited, #content a.dreditor-button { background-color: #2e96d5; border: 1px solid #28d; color: #fff; cursor: pointer; font-size: 11px; font-family: sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px; } \
 .dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 -1100px; } \
 .dreditor-button { margin: 0 0.5em 0 0; } \
-table .dreditor-button { margin-left: 1em; } \
+td:first-child a:first-child { margin-right: 1em; white-space: nowrap; } \
 #dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; } \
 #dreditor #menu li { list-style: none; margin: 0; overflow: hidden; padding: 0 0.5em 0 0; white-space: nowrap; } \
 #dreditor #menu li li { padding: 0 0 0 1em; } \
