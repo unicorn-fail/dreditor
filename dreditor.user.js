@@ -2334,7 +2334,7 @@ styles.innerHTML = " \
 .dreditor-button, .dreditor-button:link, .dreditor-button:visited, #content a.dreditor-button { background-color: #2e96d5; border: 1px solid #28d; color: #fff; cursor: pointer; font-size: 11px; font-family: sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px; } \
 .dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 -1100px; } \
 .dreditor-button { margin: 0 0.5em 0 0; } \
-td:first-child a:first-child { margin-right: 1em; white-space: nowrap; } \
+.dreditor-patchreview-processed td:first-child a:first-child { margin-right: 1em; white-space: nowrap; } \
 #dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; } \
 #dreditor #menu li { list-style: none; margin: 0; overflow: hidden; padding: 0 0.5em 0 0; white-space: nowrap; } \
 #dreditor #menu li li { padding: 0 0 0 1em; } \
