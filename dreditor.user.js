@@ -2344,9 +2344,9 @@ styles.innerHTML = " \
 #dreditor #menu li li { padding: 0 0 0 1em; } \
 #dreditor #menu > li > a { display: block; padding: 0 0 0 0.2em; background-color: #f0f0f0; } \
 #dreditor a { text-decoration: none; } \
-#dreditor .form-textarea { width: 100%; height: 12em; font: 13px 'courier new', courier, 'lucida console'; color: #000; } \
+#dreditor .form-textarea { width: 100%; height: 12em; font: 13px 'courier new', courier, 'lucida console', monospace; color: #000; } \
 #dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; overflow: scroll; height: 100%; } \
-#dreditor-content, pre { font: 13px 'courier new', courier, 'lucida console'; } \
+#dreditor-content, pre { font: 13px 'courier new', courier, 'lucida console', monospace; } \
 #dreditor #code-delimiter { position: fixed; height: 100%; width: 0.5em; margin-left: 50.7em; background-color: #f9f9fa; } \
 #dreditor #code { position: relative; padding-left: 10px; } \
 #dreditor #code pre { background-color: transparent; border: 0; margin: 0; padding: 0; } \
