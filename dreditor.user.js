@@ -722,14 +722,18 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
         // project page.
         // @todo Provide central Dreditor metadata helper for this.
         var project = $('.breadcrumb a:eq(0)').attr('href');
-        project = (project == '/project/issues/drupal' ? 'drupal' : project.substr(9));
-        // Retrieve version from comment form.
-        // We need the version string (not PI's internal version ID [rid]), so
-        // retrieve the label of the selected option.
-        var version = $('#edit-project-info-rid option:selected').text().replace('-dev', '');
-        var href = 'http://simplytest.me/project/' + project + '/' + version + '?patch[]=' + this.href;
-        $('<a class="dreditor-button dreditor-patchtest" href="' + href + '" target="_blank">simplytest.me</a>')
-          .appendTo(this.parentNode);
+        // @todo The comment preview page does not contain a breadcrumb and also
+        //   does not expose the project name anywhere else.
+        if (project) {
+          project = (project == '/project/issues/drupal' ? 'drupal' : project.substr(9));
+          // Retrieve version from comment form.
+          // We need the version string (not PI's internal version ID [rid]), so
+          // retrieve the label of the selected option.
+          var version = $('#edit-project-info-rid option:selected').text().replace('-dev', '');
+          var href = 'http://simplytest.me/project/' + project + '/' + version + '?patch[]=' + this.href;
+          $('<a class="dreditor-button dreditor-patchtest" href="' + href + '" target="_blank">simplytest.me</a>')
+            .appendTo(this.parentNode);
+        }
       }
     });
   });
