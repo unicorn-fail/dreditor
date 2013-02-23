@@ -226,7 +226,9 @@ Drupal.dreditor = {
     // Add cancel button to tear down Dreditor.
     $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />')
       .click(function () {
-        Drupal.dreditor.tearDown(context);
+        if (Drupal.dreditor.patchReview.comment.comments.length == 0 || confirm('Do you really want to cancel Dreditor and discard your changes?')) {
+          Drupal.dreditor.tearDown(context);
+        }
         return false;
       })
       .appendTo($actions);
