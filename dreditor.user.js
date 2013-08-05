@@ -205,6 +205,7 @@ Drupal.dreditor = {
     // Add sidebar.
     var $bar = $('<div id="bar"></div>').prependTo(self.$dreditor);
     // Add ul#menu to sidebar by default for convenience.
+    $('<h3>Diff outline</h3>').appendTo($bar);
     $('<ul id="menu"></ul>').appendTo($bar);
 
     // Add content region.
@@ -826,6 +827,24 @@ Drupal.dreditor.patchReview = {
     return elements;
   },
 
+  remove: function (elements) {
+    if (!elements.length) {
+      return elements;
+    }
+    var self = this;
+    $(elements).removeClass('selected');
+    $.each(elements, function () {
+      var element = this;
+      var newlist = new Array();
+      $.each(self.data.elements, function () {
+        if (this != element) {
+          newlist.push(this);
+        }
+      });
+      self.data.elements = newlist;
+    });
+  },
+
   edit: function () {
     var self = this;
     // Mark current selection/commented code as selected.
@@ -835,6 +854,7 @@ Drupal.dreditor.patchReview = {
     if (!self.$form) {
       self.$form = Drupal.dreditor.form.create('pastie');
       // Add comment textarea.
+      self.$form.append('<h3>Comment selected code:</h3>');
       self.$form.append('<textarea name="comment" class="form-textarea resizable" rows="10"></textarea>');
       // Add comment save button.
       self.$form.addButton((self.data.id !== undefined ? 'Update' : 'Save'), function ($button) {
@@ -849,6 +869,9 @@ Drupal.dreditor.patchReview = {
             comment: value
           });
         }
+        $.each(self.data.elements, function () {
+          $(this).attr('title', value);
+        });
         // Reset pastie.
         self.reset();
       });
@@ -875,41 +898,6 @@ Drupal.dreditor.patchReview = {
   },
 
   /**
-   * Return currently selected code lines as jQuery object.
-   */
-  getSelection: function () {
-    var elements = [];
-
-    var range = window.getSelection().getRangeAt(0);
-    if (!range.toString()) {
-      return elements;
-    }
-
-    // Grep selected lines.
-    var next = range.startContainer;
-    var last = range.endContainer;
-    // If start/end containers are a text node, retrieve the parent node.
-    while (next && next.nodeName != 'PRE') {
-      next = next.parentNode;
-    }
-    while (last && last.nodeName != 'PRE') {
-      last = last.parentNode;
-    }
-    // If full lines where selected, retrieve the line right before the end of
-    // selection.
-    if (range.endOffset == 0) {
-      last = last.previousSibling;
-    }
-
-    while (next && next != last) {
-      elements.push(next);
-      next = next.nextSibling;
-    }
-    elements.push(last);
-    return elements;
-  },
-
-  /**
    * Wrapper around jQuery's sortOrder() to sort review comments.
    */
   sort: function (a, b) {
@@ -930,12 +918,12 @@ Drupal.dreditor.patchReview = {
       var $elements = $(this.elements);
       html += '<code>\n';
       // Add file information.
-      var lastfile = $elements.eq(0).prevAll('pre.file:has(> a.file)').get(0);
+      var lastfile = $elements.eq(0).prevAll('tr.file:has(a.file)').get(0);
       if (lastfile) {
         html += lastfile.textContent + '\n';
       }
       // Add hunk information.
-      var lasthunk = $elements.eq(0).prevAll('pre.file').get(0);
+      var lasthunk = $elements.eq(0).prevAll('tr.file').get(0);
       if (lasthunk) {
         html += lasthunk.textContent + '\n';
       }
@@ -947,14 +935,14 @@ Drupal.dreditor.patchReview = {
         var $element = $(this);
         lastfileNewlineAdded = false;
         // Add new last file, in case a comment spans over multiple files.
-        if (lastfile && lastfile != $element.prevAll('pre.file:has(> a.file)').get(0)) {
-          lastfile = $element.prevAll('pre.file:has(> a.file)').get(0);
+        if (lastfile && lastfile != $element.prevAll('tr.file:has(a.file)').get(0)) {
+          lastfile = $element.prevAll('tr.file:has(> a.file)').get(0);
           html += '\n' + lastfile.textContent + '\n';
           lastfileNewlineAdded = true;
         }
         // Add new last hunk, in case a comment spans over multiple hunks.
-        if (lasthunk && lasthunk != $element.prevAll('pre.file').get(0)) {
-          lasthunk = $element.prevAll('pre.file').get(0);
+        if (lasthunk && lasthunk != $element.prevAll('tr.file').get(0)) {
+          lasthunk = $element.prevAll('tr.file').get(0);
           // Only add a newline if there was no new file already.
           if (!lastfileNewlineAdded) {
             html += '\n';
@@ -966,7 +954,7 @@ Drupal.dreditor.patchReview = {
         else if (lastline && lastline != $element.get(0).previousSibling) {
           html += '...\n';
         }
-        html += $element.text() + '\n';
+        html += $element.find('.pre').text() + '\n';
 
         // Use this line as previous line for next line.
         lastline = $element.get(0);
@@ -1029,6 +1017,8 @@ Drupal.dreditor.patchReview = {
     // Paste comment into issue comment textarea.
     var $commentField = $('#edit-comment');
     $commentField.val($commentField.val() + html);
+    // Flush posted comments.
+    this.comment.comments = [];
     // Change the status to 'needs work'.
     // @todo Prevent unintended/inappropriate status changes.
     //$('#edit-sid').val(13);
@@ -1089,6 +1079,7 @@ Drupal.dreditor.patchReview.comment = {
       $(data.elements)
         .removeClass('has-comment')
         .removeClass('comment-id-' + id)
+        .removeAttr('title')
         // @todo For whatever reason, the click event is not unbound here.
         .unbind('click.patchReview.editComment');
       delete this.comments[id];
@@ -1166,22 +1157,31 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   code = code.replace(/^\# .+\n|^\? .+\n/mg, '');
 
   // Setup code container.
-  var $code = $('<div id="code"></div>');
+  var $code = $('<table id="code"></table>');
   var $menu = $('#menu', context);
   var $lastFile = $('<li>Parse error</li>');
+
+  $('<h3>Diff statistics</h3>').appendTo('#dreditor #bar');
   var $diffstat = $('<div id="diffstat"></div>').appendTo('#dreditor #bar');
   var diffstat = { files: 0, insertions: 0, deletions: 0 };
 
+
   code = code.split('\n');
+  var ln1 = '';
+  var ln2 = '';
   for (var n in code) {
+    var ln1o = true;
+    var ln2o = true;
+    var prettify_line = true;
     var line = code[n];
+
     // Build file menu links.
     line = line.replace(/^(\+\+\+ )([^\s]+)(\s.*)?/, function (full, match1, match2, match3) {
       var id = match2.replace(/[^A-Za-z_-]/g, '');
       $lastFile = $('<li><a href="#' + id + '">' + match2 + '</a></li>');
       $menu.append($lastFile);
       diffstat.files++;
-      return match1 + '<a class="file" id="' + id + '">' + match2 + '</a>' + match3;
+      return match1 + '<a class="file" id="' + id + '">' + match2 + '</a>' + (match3 ? match3 : '');
     });
     // Build hunk menu links for file.
     line = line.replace(/^(@@ .+ @@\s+)([^\s]+\s[^\s\(]*)/, function (full, match1, match2) {
@@ -1190,15 +1190,29 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       return match1 + '<a class="hunk" id="' + id + '">' + match2 + '</a>';
     });
 
+    // parse hunk line numbers
+    line_numbers = line.match(/^@@ -([0-9]+),[0-9]+ \+([0-9]+),[0-9]+ @@/);
+    if (line_numbers) {
+      ln1 = line_numbers[1];
+      ln2 = line_numbers[2];
+    }
+
     var classes = [], syntax = false;
     // Colorize file diff lines.
-    if (line.match(/^((Index|===|RCS|retrieving|diff|\-\-\- |\+\+\+ |@@ ).*)$/i)) {
+    if (line.match(/^((Index|===|RCS|new file mode|deleted file mode|retrieving|diff|\-\-\- |\+\+\+ |@@ ).*)$/i)) {
       classes.push('file');
+      ln1o = false;
+      ln2o = false;
+      prettify_line = false;
     }
     // Colorize old code, but skip file diff lines.
     else if (line.match(/^((?!\-\-\-)\-.*)$/)) {
       classes.push('old');
       diffstat.deletions++;
+      if (ln1) {
+        ln2o = false;
+        ln1++;
+      }
     }
     // Colorize new code, but skip file diff lines.
     else if (line.match(/^((?!\+\+\+)\+.*)$/)) {
@@ -1212,6 +1226,10 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       classes.push('new');
       diffstat.insertions++;
       syntax = true;
+      if (ln2) {
+        ln1o = false;
+        ln2++;
+      }
     }
     // Skip entirely empty lines (in diff files, this is only the last newline).
     else if (!line.length) {
@@ -1226,6 +1244,12 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       //   invisible. Although we could use .new.comment as CSS selector, the
       //   question of a sane color scheme remains.
       // syntax = true;
+      if (ln1 && ln1o) {
+        ln1++;
+      }
+      if (ln2 && ln2o) {
+        ln2++;
+      }
     }
     // Colorize comments.
     if (syntax && line.match(/^.\s*\/\/|^.\s*\/\*[\* ]|^.\s+\*/)) {
@@ -1233,7 +1257,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     }
     // Wrap all lines in PREs for copy/pasting.
     classes = (classes.length ? ' class="' + classes.join(' ') + '"' : '');
-    line = '<pre' + classes + '>' + line + '<span /></pre>';
+    line = '<tr' + classes + '><td class="ln" data-line-number="' + (ln1o ? ln1 : '') + '"></td><td class="ln" data-line-number="' + (ln2o ? ln2 : '') + '"></td><td><span class="pre">' + line + '</span></td></tr>';
 
     // Append line to parsed code.
     $code.append(line);
@@ -1248,19 +1272,76 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   // Append diffstat to sidebar.
   $diffstat.html(diffstat.files + '&nbsp;files changed, ' + diffstat.insertions + '&nbsp;insertions, ' + diffstat.deletions + '&nbsp;deletions.');
 
-  // Attach pastie to any selection.
-  $code.mouseup(function (e) {
-    // Only act on left/first mouse button.
-    if (e.which != 1) {
-      return;
+  var start_row;
+  $('tr', $code).mousedown(function(){
+    start_row = $(this)[0];
+  });
+
+  // Colorize rows during selection.
+  $('tr', $code).mouseover(function(){
+    if (start_row) {
+      end_row = $(this)[0];
+      var start = false;
+      var end = false;
+      var selection = new Array();
+      selection.push(start_row);
+      $('tr', $code).each(function(){
+        if ($(this)[0] == start_row) {
+          start = true;
+        }
+        if (start && !end) {
+          selection.push($(this)[0]);
+        }
+        if ($(this)[0] == end_row) {
+          end = true;
+        }
+      });
+      // Refresh selection.
+      $('.pre-selected').removeClass('pre-selected');
+      $.each(selection, function () {
+        $(this).addClass('pre-selected');
+      });
     }
-    var elements = Drupal.dreditor.patchReview.getSelection();
-    if (elements.length) {
-      Drupal.dreditor.patchReview.add(elements);
-      // Display pastie.
-      Drupal.dreditor.patchReview.edit();
+  });
+
+  // Finalize selection.
+  $('tr', $code).mouseup(function(){
+    if (start_row) {
+      end_row = $(this)[0];
+      var start = false;
+      var end = false;
+      var selection = new Array();
+      selection.push(start_row);
+      $('tr', $code).each(function(){
+        if ($(this)[0] == start_row) {
+          start = true;
+        }
+        if (start && !end) {
+          selection.push($(this)[0]);
+        }
+        if ($(this)[0] == end_row) {
+          end = true;
+        }
+      });
+
+      // If at least one element in selection is not yet selected, we need to select all. Otherwise, deselect all.
+      var deselect = true;
+      $.each(selection, function () {
+        if (!$(this).is('.selected')) {
+          deselect = false;
+        }
+      });
+      $('.pre-selected').removeClass('pre-selected');
+      if (deselect) {
+        Drupal.dreditor.patchReview.remove(selection);
+      }
+      else {
+        Drupal.dreditor.patchReview.add(selection);
+        // Display pastie.
+        Drupal.dreditor.patchReview.edit();
+      }
     }
-    return false;
+    start_row = false;
   });
 };
 
@@ -1331,13 +1412,13 @@ Drupal.dreditor.patchReview.behaviors.toggleDeletions = function (context) {
     var $link = $('<a href="#" class="dreditor-application-toggle">Hide deletions</a>');
     $link.toggle(
       function () {
-        $('#code pre.old', context).addClass('element-invisible');
+        $('#code tr.old', context).addClass('element-invisible');
         $link.text('Show deletions');
         this.blur();
         return false;
       },
       function () {
-        $('#code pre.old', context).removeClass('element-invisible');
+        $('#code tr.old', context).removeClass('element-invisible');
         $link.text('Hide deletions');
         this.blur();
         return false;
@@ -2337,35 +2418,72 @@ styles.innerHTML = " \
 #dreditor #bar, #dreditor-actions { width: 230px; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
 #dreditor #bar { position: absolute; height: 100%; } \
 #dreditor-actions { background-color: #fff; bottom: 0; padding-top: 5px; padding-bottom: 5px; position: absolute; } \
-.dreditor-button, .dreditor-button:link, .dreditor-button:visited, #content a.dreditor-button { background-color: #2e96d5; border: 1px solid #28d; color: #fff; cursor: pointer; font-size: 11px; font-family: sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px; } \
-.dreditor-button:hover, #content a.dreditor-button:hover { background-position: 0 -1100px; } \
+.dreditor-button, .dreditor-button:link, .dreditor-button:visited, #content a.dreditor-button { background: rgb(122,188,255); \
+  background: -moz-linear-gradient(top, rgba(122,188,255,1) 0%, rgba(96,171,248,1) 44%, rgba(64,150,238,1) 100%); \
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(122,188,255,1)), color-stop(44%,rgba(96,171,248,1)), color-stop(100%,rgba(64,150,238,1))); \
+  background: -webkit-linear-gradient(top, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); \
+  background: -o-linear-gradient(top, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); \
+  background: -ms-linear-gradient(top, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); \
+  background: linear-gradient(to bottom, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); \
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#4096ee',GradientType=0 ); \
+  border: 1px solid #28d; color: #fff; cursor: pointer; font-size: 11px; font-family: sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px; } \
+.dreditor-button:hover, #content a.dreditor-button:hover { background: rgb(145,200,255); \
+  background: -moz-linear-gradient(top, rgba(145,200,255,1) 0%, rgba(96,171,248,1) 44%, rgba(94,166,237,1) 100%); \
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(145,200,255,1)), color-stop(44%,rgba(96,171,248,1)), color-stop(100%,rgba(94,166,237,1))); \
+  background: -webkit-linear-gradient(top, rgba(145,200,255,1) 0%,rgba(96,171,248,1) 44%,rgba(94,166,237,1) 100%); \
+  background: -o-linear-gradient(top, rgba(145,200,255,1) 0%,rgba(96,171,248,1) 44%,rgba(94,166,237,1) 100%); \
+  background: -ms-linear-gradient(top, rgba(145,200,255,1) 0%,rgba(96,171,248,1) 44%,rgba(94,166,237,1) 100%); \
+  background: linear-gradient(to bottom, rgba(145,200,255,1) 0%,rgba(96,171,248,1) 44%,rgba(94,166,237,1) 100%); \
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#91c8ff', endColorstr='#5ea6ed',GradientType=0 ); } \
+.dreditor-button:active, #content a.dreditor-button:active { background: rgb(64,150,238); \
+  background: -moz-linear-gradient(top, rgba(64,150,238,1) 0%, rgba(96,171,248,1) 56%, rgba(122,188,255,1) 100%); \
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(64,150,238,1)), color-stop(56%,rgba(96,171,248,1)), color-stop(100%,rgba(122,188,255,1))); \
+  background: -webkit-linear-gradient(top, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%); \
+  background: -o-linear-gradient(top, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%); \
+  background: -ms-linear-gradient(top, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%); \
+  background: linear-gradient(to bottom, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%); \
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4096ee', endColorstr='#7abcff',GradientType=0 ); } \
 .dreditor-button { margin: 0 0.5em 0 0; } \
 .dreditor-patchreview-processed td:first-child a:first-child { margin-right: 1em; white-space: nowrap; } \
+#dreditor h3 { margin: 18px 0 0; }\
 #dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; } \
 #dreditor #menu li { list-style: none; margin: 0; overflow: hidden; padding: 0 0.5em 0 0; white-space: nowrap; } \
 #dreditor #menu li li { padding: 0 0 0 1em; } \
 #dreditor #menu > li > a { display: block; padding: 0 0 0 0.2em; background-color: #f0f0f0; } \
-#dreditor a { text-decoration: none; } \
-#dreditor .form-textarea { width: 100%; height: 12em; font: 13px 'courier new', courier, 'lucida console', monospace; color: #000; } \
+#dreditor a { text-decoration: none; background: transparent; } \
+#dreditor .form-textarea { width: 100%; height: 12em; font: 13px Consolas, 'Liberation Mono', Courier, monospace; color: #000; } \
+#dreditor .resizable-textarea { margin: 0 0 9px; } \
 #dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; overflow: scroll; height: 100%; } \
-#dreditor-content, pre { font: 13px 'courier new', courier, 'lucida console', monospace; } \
+#dreditor-content, #code tr, #code td { font: 13px/18px Consolas, 'Liberation Mono', Courier, monospace; } \
 #dreditor #code-delimiter { position: fixed; height: 100%; width: 0.5em; margin-left: 50.7em; background-color: #f9f9fa; } \
-#dreditor #code { position: relative; padding-left: 10px; } \
-#dreditor #code pre { background-color: transparent; border: 0; margin: 0; padding: 0; } \
-#dreditor #code pre span { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
-#dreditor #code pre span.error { background-color: #f99; line-height: 100%; width: auto; height: auto; border: 0; } \
-#dreditor #code pre span.error.eof { color: #fff; background-color: #f66; } \
-#dreditor #code pre span.error.tab { background-color: #fdd; } \
-#dreditor #code pre span.hidden { display: none; } \
-#dreditor #code .file { color: #088; } \
-#dreditor #code .old { color: #c00; } \
-#dreditor #code .new { color: #00c; float: none; font-size: 100%; font-weight: normal; } \
+#dreditor #code { position: relative; width:100%; } \
+#dreditor #code td { padding: 0 10px; } \
+#dreditor #code .ln { -webkit-user-select: none; width:1px; border-right: 1px solid #e5e5e5; color: #999; text-align: right; } \
+#dreditor #code .ln:before { content: attr(data-line-number); } \
+#dreditor #code tr { background: transparent; border: 0; margin: 0; padding: 0; } \
+#dreditor #code tr:hover, #dreditor #code tr:hover td { background: #f8eec7 !important; cursor: pointer; } \
+#dreditor #code .pre { white-space: pre; background: transparent; } \
+#dreditor #code .pre span.space { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
+#dreditor #code .pre span.error { background-color: #f99; line-height: 100%; width: auto; height: auto; border: 0; } \
+#dreditor #code .pre span.error.eof { color: #fff; background-color: #f66; } \
+#dreditor #code .pre span.error.tab { background-color: #fdd; } \
+#dreditor #code .pre span.hidden { display: none; } \
+#dreditor #code tr.file { color: #999; background-color: #f8f8ff; } \
+#dreditor #code .file a { color: #999; } \
+#dreditor #code .old { background-color: #fdd; } \
+#dreditor #code .old .ln { background-color: #f7c8c8; border-color: #e9aeae; } \
+#dreditor #code .new { background-color: #dfd; float: none; font-size: 100%; font-weight: normal; } \
+#dreditor #code .new .ln { background-color: #ceffce; border-color: #b4e2b4; } \
 #dreditor #code .comment { color: #070; } \
-#dreditor #code .has-comment { background-color: rgba(255, 200, 200, 0.5); } \
-#dreditor #code .selected { background-color: rgba(255, 255, 200, 0.5); } \
+\
+#dreditor #code .has-comment { background: #f6e8b5; } \
+#dreditor #code .has-comment .ln { background: #f6e8b5;  border-color: #f0db88; } \
+#dreditor #code .selected, #dreditor #code .pre-selected { background: #ffc } \
+#dreditor #code .selected .ln, #dreditor #code .pre-selected .ln { background: #ffc;  border-color: #f0db88; } \
+\
 .element-invisible { clip: rect(1px, 1px, 1px, 1px); position: absolute !important; } \
 .admin-link { font-size: 11px; font-weight: normal; text-transform: lowercase; } \
-#dreditor-overlay { } \
+#dreditor-overlay { margin-top: 18px; font-size: 13px; } \
 #column-left { z-index: 2; /* Required, or issue summary widget would be below site header. */ } \
 #dreditor-widget { position: fixed; bottom: 0; left: 2%; width: 94%; z-index: 10; overflow: auto; padding: 0 1em 1em; background-color: #fff; -moz-box-shadow: 0 0 20px #bbb; box-shadow: 0 0 20px #bbb; -moz-border-radius: 8px 8px 0 0; border-radius: 8px 8px 0 0; } \
  \
