@@ -720,19 +720,16 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
         if (this.href.substr(-4) == '.txt') {
           return;
         }
-        // Retrieve project from breadcrumb.
-        // For the Drupal project, the breadcrumb does not contain a link to the
-        // project page.
-        // @todo Provide central Dreditor metadata helper for this.
-        var project = $('.breadcrumb a:eq(0)').attr('href');
-        // @todo The comment preview page does not contain a breadcrumb and also
-        //   does not expose the project name anywhere else.
+
+        // Retrieve project shortname.
+        var project = Drupal.dreditor.issue.getProjectShortName();
+
         if (project) {
           project = (project == '/project/issues/drupal' ? 'drupal' : project.substr(9));
           // Retrieve version from comment form.
           // We need the version string (not PI's internal version ID [rid]), so
           // retrieve the label of the selected option.
-          var version = $('#edit-project-info-rid option:selected').text().replace('-dev', '');
+          var version = Drupal.dreditor.issue.getSelectedVersionCoreContrib();
           var href = 'http://simplytest.me/project/' + project + '/' + version + '?patch[]=' + this.href;
           $('<a class="dreditor-button dreditor-patchtest" href="' + href + '" target="_blank">simplytest.me</a>')
             .appendTo(this.parentNode);
@@ -1666,6 +1663,207 @@ Drupal.behaviors.dreditorFormBackup = function (context) {
   });
 };
 
+
+/**
+ * Suggest a filename for patches to upload in an issue.
+ *
+ * Developed in issue: http://drupal.org/node/1294662
+ */
+Drupal.behaviors.dreditorPatchNameSuggestion = function (context) {
+  // Attach this behavior only to project_issue nodes. Use a fast selector for
+  // the common case, but also support comment/reply/% pages.
+  if (!($('body.node-type-project-issue', context).length || $('div.project-issue', context).length)) {
+    return;
+  }
+
+  $('#comment-form #edit-upload-wrapper, #node-form #edit-upload-wrapper', context).once('dreditor-patchsuggestion', function () {
+    var $container = $('#edit-upload-wrapper > label');
+    var $link = $('<a class="dreditor-application-toggle dreditor-patchsuggestion" href="#">Patchname suggestion</a>');
+    $link.prependTo($container);
+    $link.click(function() {
+      var title = Drupal.dreditor.issue.getIssueTitle() || 'title';
+      title = title.replace(/[^a-zA-Z0-9]+/g, '_');
+      // Truncate and remove a heading/trailing undescore.
+      title = title.substr(0, 60);
+      title = title.replace(/(^_|_$)/, '');
+
+      var nid = Drupal.dreditor.issue.getNid() || 0;
+      var project = Drupal.dreditor.issue.getProjectShortName() || 'unknownProject';
+      var component = Drupal.dreditor.issue.getSelectedComponent() || 'component';
+      component = component.replace(/[^a-zA-Z0-9]+/, '-').toLowerCase();
+
+      var core = Drupal.dreditor.issue.getSelectedVersionCore() || '';
+      core = core.substring(0, 1);
+
+      // Build filename suggestion.
+      var patchName = '';
+      if (project == 'drupal') {
+        patchName = project + core + '.' + component;
+      }
+      else {
+        patchName = project + '.' + component;
+      }
+
+      if (nid != 0) {
+        newCommentNumber = Drupal.dreditor.issue.getNewCommentNumber();
+
+        patchName += '.' + nid + '-' + newCommentNumber;
+      }
+
+      patchName += '.patch';
+
+      window.prompt("Please use this value", patchName);
+      return false;
+    });
+  });
+};
+
+Drupal.dreditor.issue = {}
+
+/**
+ * Gets the issue node id.
+ */
+Drupal.dreditor.issue.getNid = function() {
+  var matches = window.location.href.match(/(?:node|comment\/reply)\/(\d+)/);
+  if (matches) {
+    return matches[1];
+  }
+  else {
+    return false;
+  }
+};
+
+/**
+ * Gets the next comment nummer for the current issue.
+ */
+Drupal.dreditor.issue.getNewCommentNumber = function() {
+  // Get comment count.
+  return parseInt($('#comment-form .comment-inner > h3').text().match(/\d+$/)[0], 10);
+};
+
+/**
+ * Gets the issue title.
+ */
+Drupal.dreditor.issue.getIssueTitle = function() {
+  // Replace double quotes with single quotes for cvs command line.
+  var title = $('#edit-title').val().replace('"', "'", 'g');
+
+  // Try to fix function names without parenthesis.
+  title = title.replace(/([a-z_]+_[a-z_]+)\b(?!\(\))/g, '$&()');
+  return title;
+};
+
+/**
+ * Gets the project shortname.
+ *
+ * @return
+ *   Return false when using the preview mode since the breadcrumb is not
+ *   included in the preview mode.
+ */
+Drupal.dreditor.issue.getProjectShortName = function() {
+
+  // Retreive project from breadcrumb.
+  var project = $('.breadcrumb a:eq(0)').attr('href');
+
+  // @todo The comment preview page does not contain a breadcrumb and also
+  //   does not expose the project name anywhere else.
+  if (project) {
+    // The Drupal (core) project breadcrumb does not contain a project page link.
+    if (project == '/project/issues/drupal') {
+      project = 'drupal';
+    }
+    else {
+      project = project.substr(9);
+    }
+  }
+  else {
+    project = false;
+  }
+
+  return project;
+};
+
+Drupal.dreditor.issue.getSelectedComponent = function() {
+  // Retrieve component from the comment form selected option label.
+  var version = $('#edit-project-info-component option:selected').text();
+  return version;
+};
+
+/**
+ * Gets the selected version.
+ *
+ * Variations:
+ *   7.x
+ *   7.x-dev
+ *   7.x-alpha1
+ *   7.20
+ *   7.x-1.x
+ *   7.x-1.12
+ *   7.x-1.x
+ *   - 8.x issues -
+ *   - Any -
+ *   All-versions-4.x-dev
+ */
+Drupal.dreditor.issue.getSelectedVersion = function() {
+  // Retrieve version from the comment form selected option label.
+  var version = $('#edit-project-info-rid option:selected').text();
+  return version;
+};
+
+/**
+ * Gets the selected core version.
+ *
+ * Variations:
+ *   7.x
+ *   7.20
+ */
+Drupal.dreditor.issue.getSelectedVersionCore = function() {
+  version = Drupal.dreditor.issue.getSelectedVersion();
+  var matches = version.match(/^(\d+\.[x\d]+)/);
+  if (matches) {
+    return matches[0];
+  }
+  else {
+    return false;
+  }
+};
+
+/**
+ * Gets the selected contrib version.
+ *
+ * Variations:
+ *   1.x
+ *   1.2
+ */
+Drupal.dreditor.issue.getSelectedVersionContrib = function() {
+  version = Drupal.dreditor.issue.getSelectedVersion();
+  var matches = version.match(/^\d+\.x-(\d+\.[x\d]+)/);
+  if (matches) {
+    return matches[1];
+  }
+  else {
+    return false;
+  }
+};
+
+/**
+ * Gets the selected core + contrib version.
+ *
+ * Variations:
+ *   7.x-1.x
+ *   7.x-1.2
+ */
+Drupal.dreditor.issue.getSelectedVersionCoreContrib = function() {
+  version = Drupal.dreditor.issue.getSelectedVersion();
+  var matches = version.match(/^(\d+\.x-\d+\.[x\d]+)/);
+  if (matches) {
+    return matches[0];
+  }
+  else {
+    return false;
+  }
+};
+
 /**
  * Attach commit message generator to issue comment form.
  */
@@ -1774,9 +1972,10 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         // Add a separator between patch submitters and commenters.
         message += contributors.join(', ');
       }
+
       // Build title.
-      // Replace double quotes with single quotes for command line.
-      var title = $('#edit-title').val().replace('"', "'", 'g');
+      var title = Drupal.dreditor.issue.getIssueTitle();
+
       // Add "Added|Fixed " prefix based on issue category.
       switch ($('#edit-category').val()) {
         case 'bug':
@@ -1796,8 +1995,7 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
           }
           break;
       }
-      // Try to fix function names without parenthesis.
-      title = title.replace(/([a-z_]+_[a-z_]+)\b(?!\(\))/g, '$&()');
+
       // Add a period (full-stop).
       if (title[title.length - 1] != '.') {
         title += '.';
