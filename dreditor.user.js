@@ -1444,7 +1444,7 @@ Drupal.behaviors.dreditorIssueSummary = function (context) {
     $edit_wrapper.find('span').append($edit_link);
     $edit_wrapper.appendTo($(this).parent().find('h2:first'));
 
-    var $widget = $('<div id="dreditor-widget"></div>').hide().insertAfter(this);
+    var $widget = $('<div id="dreditor-widget"></div>').insertAfter(this).hide();
 
     $edit_link.click(function () {
       // First of all, remove this link.
