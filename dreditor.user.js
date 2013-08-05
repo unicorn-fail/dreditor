@@ -916,7 +916,7 @@ Drupal.dreditor.patchReview = {
       html += '<code>\n';
       // Add file information.
       var lastfile = $elements.eq(0).prevAll('tr.file:has(a.file)').get(0);
-      if (lastfile) {
+      if (lastfile.length) {
         html += lastfile.textContent + '\n';
       }
       // Add hunk information.
@@ -932,7 +932,7 @@ Drupal.dreditor.patchReview = {
         var $element = $(this);
         lastfileNewlineAdded = false;
         // Add new last file, in case a comment spans over multiple files.
-        if (lastfile && lastfile != $element.prevAll('tr.file:has(a.file)').get(0)) {
+        if (lastfile.length && lastfile !== $element.prevAll('tr.file:has(a.file)').get(0)) {
           lastfile = $element.prevAll('tr.file:has(> a.file)').get(0);
           html += '\n' + lastfile.textContent + '\n';
           lastfileNewlineAdded = true;
