@@ -2426,7 +2426,7 @@ styles.innerHTML = " \
   background: -ms-linear-gradient(top, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); \
   background: linear-gradient(to bottom, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); \
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#4096ee',GradientType=0 ); \
-  border: 1px solid #28d; color: #fff; cursor: pointer; font-size: 11px; font-family: sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px; } \
+  border: 1px solid #3598E8; color: #fff; cursor: pointer; font-size: 11px; font-family: sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); } \
 .dreditor-button:hover, #content a.dreditor-button:hover { background: rgb(145,200,255); \
   background: -moz-linear-gradient(top, rgba(145,200,255,1) 0%, rgba(96,171,248,1) 44%, rgba(94,166,237,1) 100%); \
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(145,200,255,1)), color-stop(44%,rgba(96,171,248,1)), color-stop(100%,rgba(94,166,237,1))); \
@@ -2455,24 +2455,24 @@ styles.innerHTML = " \
 #dreditor .resizable-textarea { margin: 0 0 9px; } \
 #dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; overflow: scroll; height: 100%; } \
 #dreditor-content, #code tr, #code td { font: 13px/18px Consolas, 'Liberation Mono', Courier, monospace; } \
-#dreditor #code-delimiter { position: fixed; height: 100%; width: 0.5em; margin-left: 50.7em; background-color: #f9f9fa; } \
+#dreditor #code-delimiter { background: #ddd; background: rgba(0,0,0,0.08); position: fixed; height: 100%; width: 1px; margin-left: 57.35em; z-index: 1; } \
 #dreditor #code { position: relative; width:100%; } \
 #dreditor #code td { padding: 0 10px; } \
-#dreditor #code .ln { -webkit-user-select: none; width:1px; border-right: 1px solid #e5e5e5; color: #999; text-align: right; } \
+#dreditor #code .ln { -webkit-user-select: none; width:1px; border-right: 1px solid #e5e5e5; text-align: right; } \
 #dreditor #code .ln:before { content: attr(data-line-number); } \
-#dreditor #code tr { background: transparent; border: 0; margin: 0; padding: 0; } \
-#dreditor #code tr:hover, #dreditor #code tr:hover td { background: #f8eec7 !important; cursor: pointer; } \
+#dreditor #code tr { background: transparent; border: 0; color: #999; margin: 0; padding: 0; } \
+#dreditor #code tr:hover, #dreditor #code tr:hover td, #dreditor #code tr:hover td a { background: #FFF3C6 !important; border-color: #E8DAB3 !important; color: #9A7C29 !important; cursor: pointer; } \
 #dreditor #code .pre { white-space: pre; background: transparent; } \
 #dreditor #code .pre span.space { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
 #dreditor #code .pre span.error { background-color: #f99; line-height: 100%; width: auto; height: auto; border: 0; } \
 #dreditor #code .pre span.error.eof { color: #fff; background-color: #f66; } \
 #dreditor #code .pre span.error.tab { background-color: #fdd; } \
 #dreditor #code .pre span.hidden { display: none; } \
-#dreditor #code tr.file { color: #999; background-color: #f8f8ff; } \
+#dreditor #code tr.file { color: #999; background-color: #eee; } \
 #dreditor #code .file a { color: #999; } \
-#dreditor #code .old { background-color: #fdd; } \
+#dreditor #code .old { background-color: #fdd; color: #B53B3B; } \
 #dreditor #code .old .ln { background-color: #f7c8c8; border-color: #e9aeae; } \
-#dreditor #code .new { background-color: #dfd; float: none; font-size: 100%; font-weight: normal; } \
+#dreditor #code .new { background-color: #dfd; color: #167A00; float: none; font-size: 100%; font-weight: normal; } \
 #dreditor #code .new .ln { background-color: #ceffce; border-color: #b4e2b4; } \
 #dreditor #code .comment { color: #070; } \
 \
