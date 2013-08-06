@@ -209,7 +209,27 @@ Drupal.dreditor = {
     $('<ul id="menu"></ul>').appendTo($bar);
 
     // Add content region.
-    $('<div id="dreditor-content"></div>').appendTo(self.$dreditor);
+    var $content = $('<div id="dreditor-content"></div>').appendTo(self.$dreditor);
+
+    // Do not check for updates if the user just installed Dreditor.
+    var barWidth = Drupal.storage.load('barWidth');
+    if (barWidth == null) {
+      Drupal.storage.save('barWidth', $bar.width());
+    }
+
+    $bar.css('width', barWidth);
+    $content.css('marginLeft', ($bar.outerWidth() - 1));
+
+    // Make bar/content resizeable
+    $bar.resizable({
+      minWidth: 230,
+      resize: function(e, ui) {
+        $content.css('marginLeft', (ui.element.outerWidth() - 1));
+      },
+      stop: function(e, ui) {
+        Drupal.storage.save('barWidth', ui.element.width());
+      }
+    });
 
     // Add global Dreditor buttons container.
     var $actions = $('<div id="dreditor-actions"></div>');
@@ -256,12 +276,15 @@ Drupal.dreditor = {
     // Remove the ESC keyup event handler that was bound in self.setup().
     $(document).unbind('keyup', self.escapeKeyHandler);
 
-    self.$wrapper.animate({ height: 0 }, function () {
+    self.$wrapper.animate({ height: 0 }, 300, function(){
+      $(this).hide();
       $('body', context).css({ overflow: 'auto' });
-      $(this).remove();
+    });
+    setTimeout(function(){
+      self.$wrapper.stop(true, true).css('height', 0).remove();
       delete self.$dreditor;
       delete self.$wrapper;
-    });
+    }, 500);
   },
 
   /**
@@ -281,7 +304,7 @@ Drupal.dreditor = {
     var button = self.$dreditor.find('#dreditor-hide').get(0);
     button.value = 'Show';
 
-    self.$wrapper.stop().animate({ height: 34 }, function () {
+    self.$wrapper.stop(true).animate({ height: 34 }, function () {
       self.$dreditor.find('> div:not(#dreditor-actions)').hide();
       $('body').css({ overflow: 'auto' });
     });
@@ -299,7 +322,7 @@ Drupal.dreditor = {
     self.$dreditor.find('> div:not(#dreditor-actions)').show();
 
     $('body').css({ overflow: 'hidden' });
-    self.$wrapper.stop().animate({ height: '100%' }, function () {
+    self.$wrapper.stop(true).animate({ height: '100%' }, function () {
       button.value = 'Hide';
     });
 
@@ -2601,6 +2624,15 @@ Drupal.behaviors.dreditorIssuesFilterFormReset = function (context) {
 /**
  * Initialize Dreditor.
  */
+
+// Load jQuery UI if necessary.
+if (window.jQuery !== undefined && window.jQuery.fn.jquery === '1.2.6' && window.jQuery.ui === undefined) {
+  var script_tag = document.createElement('script');
+  script_tag.setAttribute("type","text/javascript");
+  script_tag.setAttribute("src","//ajax.googleapis.com/ajax/libs/jqueryui/1.6/jquery-ui.min.js");
+  (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
+}
+
 jQuery(document).ready(function () {
   Drupal.attachBehaviors(this);
 });
@@ -2645,7 +2677,7 @@ styles.innerHTML = " \
 .dreditor-patchreview-processed td:first-child a:first-child { margin-right: 1em; white-space: nowrap; } \
 #dreditor h3 { margin: 18px 0 0; }\
 #dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; } \
-#dreditor #menu li { list-style: none; margin: 0; overflow: hidden; padding: 0 0.5em 0 0; white-space: nowrap; } \
+#dreditor #menu li { list-style: none; margin: 0; white-space: nowrap; } \
 #dreditor #menu li li { padding: 0 0 0 1em; } \
 #dreditor #menu > li > a { display: block; padding: 0 0 0 0.2em; background-color: #f0f0f0; } \
 #dreditor a { text-decoration: none; background: transparent; } \
@@ -2653,7 +2685,7 @@ styles.innerHTML = " \
 #dreditor .resizable-textarea { margin: 0 0 9px; } \
 #dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; overflow: scroll; height: 100%; } \
 #dreditor-content, #code tr, #code td { font: 13px/18px Consolas, 'Liberation Mono', Courier, monospace; } \
-#dreditor #code-delimiter { background: #ddd; background: rgba(0,0,0,0.08); position: fixed; height: 100%; width: 1px; margin-left: 57.35em; z-index: 1; } \
+#dreditor #code-delimiter { background: #ddd; background: rgba(0,0,0,0.08); position: absolute; height: 100%; width: 1px; margin-left: 57.35em; z-index: 1; } \
 #dreditor #code { position: relative; width:100%; } \
 #dreditor #code td { padding: 0 10px; } \
 #dreditor #code .ln { -webkit-user-select: none; width:1px; border-right: 1px solid #e5e5e5; text-align: right; } \
