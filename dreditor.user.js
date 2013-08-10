@@ -925,6 +925,7 @@ Drupal.dreditor.patchReview = {
 
   paste: function () {
     var html = '';
+    var comments = [];
     this.comment.comments.sort(this.sort);
     $.each(this.comment.comments, function (index, comment) {
       // Skip deleted (undefined) comments; this would return window here.
@@ -932,16 +933,17 @@ Drupal.dreditor.patchReview = {
         return true;
       }
       var $elements = $(this.elements);
-      html += '<li><code>\n';
+      comments[index] = '';
+      comments[index] += '<code>\n';
       // Add file information.
       var lastfile = $elements.eq(0).prevAll('tr.file:has(a.file)').get(0);
       if (lastfile.length) {
-        html += lastfile.textContent + '\n';
+        comments[index] += lastfile.textContent + '\n';
       }
       // Add hunk information.
       var lasthunk = $elements.eq(0).prevAll('tr.file').get(0);
       if (lasthunk) {
-        html += lasthunk.textContent + '\n';
+        comments[index] += lasthunk.textContent + '\n';
       }
 
       var lastline = $elements.get(0).previousSibling;
@@ -953,7 +955,7 @@ Drupal.dreditor.patchReview = {
         // Add new last file, in case a comment spans over multiple files.
         if (lastfile.length && lastfile !== $element.prevAll('tr.file:has(a.file)').get(0)) {
           lastfile = $element.prevAll('tr.file:has(> a.file)').get(0);
-          html += '\n' + lastfile.textContent + '\n';
+          comments[index] += '\n' + lastfile.textContent + '\n';
           lastfileNewlineAdded = true;
         }
         // Add new last hunk, in case a comment spans over multiple hunks.
@@ -961,27 +963,34 @@ Drupal.dreditor.patchReview = {
           lasthunk = $element.prevAll('tr.file').get(0);
           // Only add a newline if there was no new file already.
           if (!lastfileNewlineAdded) {
-            html += '\n';
+            comments[index] += '\n';
             lastfileNewlineAdded = true;
           }
-          html += lasthunk.textContent + '\n';
+          comments[index] += lasthunk.textContent + '\n';
         }
         // Add a delimiter, in case a comment spans over multiple selections.
         else if (lastline && lastline != $element.get(0).previousSibling) {
-          html += '...\n';
+          comments[index] += '...\n';
         }
-        html += $element.find('.pre').text() + '\n';
+        comments[index] += $element.find('.pre').text() + '\n';
 
         // Use this line as previous line for next line.
         lastline = $element.get(0);
       });
 
-      html += '</code>\n';
-      html += '\n' + this.comment + '</li>\n\n';
+      comments[index] += '</code>\n';
+      comments[index] += '\n' + this.comment;
     });
-    // Wrap all comments in an ordered list.
-    if (html.length > 0) {
-      html = '<ol>\n\n' + html + '</ol>';
+    if (comments.length === 1) {
+      html += comments.join('');
+    }
+    // If there's more than one comment, wrap them in ordered list markup.
+    else if (comments.length > 1) {
+      html += '<ol>\n\n';
+      $.each(comments, function (index, comment) {
+        html += '<li>' + comment + '\n</li>\n\n';
+      });
+      html += '</ol>';
     }
 
     // Let's get some attention! :)
