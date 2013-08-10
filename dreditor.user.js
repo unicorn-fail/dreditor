@@ -933,17 +933,16 @@ Drupal.dreditor.patchReview = {
         return true;
       }
       var $elements = $(this.elements);
-      comments[index] = '';
-      comments[index] += '<code>\n';
+      var markup = '<code>\n';
       // Add file information.
       var lastfile = $elements.eq(0).prevAll('tr.file:has(a.file)').get(0);
       if (lastfile.length) {
-        comments[index] += lastfile.textContent + '\n';
+        markup += lastfile.textContent + '\n';
       }
       // Add hunk information.
       var lasthunk = $elements.eq(0).prevAll('tr.file').get(0);
       if (lasthunk) {
-        comments[index] += lasthunk.textContent + '\n';
+        markup += lasthunk.textContent + '\n';
       }
 
       var lastline = $elements.get(0).previousSibling;
@@ -955,7 +954,7 @@ Drupal.dreditor.patchReview = {
         // Add new last file, in case a comment spans over multiple files.
         if (lastfile.length && lastfile !== $element.prevAll('tr.file:has(a.file)').get(0)) {
           lastfile = $element.prevAll('tr.file:has(> a.file)').get(0);
-          comments[index] += '\n' + lastfile.textContent + '\n';
+          markup += '\n' + lastfile.textContent + '\n';
           lastfileNewlineAdded = true;
         }
         // Add new last hunk, in case a comment spans over multiple hunks.
@@ -963,23 +962,24 @@ Drupal.dreditor.patchReview = {
           lasthunk = $element.prevAll('tr.file').get(0);
           // Only add a newline if there was no new file already.
           if (!lastfileNewlineAdded) {
-            comments[index] += '\n';
+            markup += '\n';
             lastfileNewlineAdded = true;
           }
-          comments[index] += lasthunk.textContent + '\n';
+          markup += lasthunk.textContent + '\n';
         }
         // Add a delimiter, in case a comment spans over multiple selections.
         else if (lastline && lastline != $element.get(0).previousSibling) {
-          comments[index] += '...\n';
+          markup += '...\n';
         }
-        comments[index] += $element.find('.pre').text() + '\n';
+        markup += $element.find('.pre').text() + '\n';
 
         // Use this line as previous line for next line.
         lastline = $element.get(0);
       });
 
-      comments[index] += '</code>\n';
-      comments[index] += '\n' + this.comment;
+      markup += '</code>\n';
+      markup += '\n' + this.comment;
+      comments.push(markup);
     });
     if (comments.length === 1) {
       html += comments.join('');
@@ -987,9 +987,9 @@ Drupal.dreditor.patchReview = {
     // If there's more than one comment, wrap them in ordered list markup.
     else if (comments.length > 1) {
       html += '<ol>\n\n';
-      $.each(comments, function (index, comment) {
-        html += '<li>' + comment + '\n</li>\n\n';
-      });
+      for (var i = 0; i < comments.length; i++) {
+        html += '<li>\n' + comments[i] + '\n</li>\n\n';
+      }
       html += '</ol>';
     }
 
