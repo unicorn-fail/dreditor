@@ -932,7 +932,7 @@ Drupal.dreditor.patchReview = {
         return true;
       }
       var $elements = $(this.elements);
-      html += '<code>\n';
+      html += '<li><code>\n';
       // Add file information.
       var lastfile = $elements.eq(0).prevAll('tr.file:has(a.file)').get(0);
       if (lastfile.length) {
@@ -977,8 +977,13 @@ Drupal.dreditor.patchReview = {
       });
 
       html += '</code>\n';
-      html += '\n' + this.comment + '\n\n';
+      html += '\n' + this.comment + '</li>\n\n';
     });
+    // Wrap all comments in an ordered list.
+    if (html.length > 0) {
+      html = '<ol>\n\n' + html + '</ol>';
+    }
+
     // Let's get some attention! :)
     function shuffle(array) {
       for(var j, x, i = array.length; i; j = parseInt(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
