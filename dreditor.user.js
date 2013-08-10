@@ -738,24 +738,20 @@ Drupal.behaviors.dreditorPatchReview = function (context) {
         // Append review link to parent table cell.
         $link.appendTo(this.parentNode);
 
-        // Generate simplytest.me link.
-        // Exclude .txt file attachments.
-        if (this.href.substr(-4) == '.txt') {
-          return;
-        }
-
-        // Retrieve project shortname.
-        var project = Drupal.dreditor.issue.getProjectShortName();
-
-        if (project) {
-          project = (project == '/project/issues/drupal' ? 'drupal' : project.substr(9));
-          // Retrieve version from comment form.
-          // We need the version string (not PI's internal version ID [rid]), so
-          // retrieve the label of the selected option.
-          var version = Drupal.dreditor.issue.getSelectedVersionCoreContrib();
-          var href = 'http://simplytest.me/project/' + project + '/' + version + '?patch[]=' + this.href;
-          $('<a class="dreditor-button dreditor-patchtest" href="' + href + '" target="_blank">simplytest.me</a>')
-            .appendTo(this.parentNode);
+        // Generate simplytest.me links only for patches and diffs.
+        if (this.href.substr(-6) === '.patch' || this.href.substr(-5) === '.diff') {
+          // Retrieve project shortname.
+          var project = Drupal.dreditor.issue.getProjectShortName();
+          if (project) {
+            var version = Drupal.dreditor.issue.getSelectedVersion().replace('-dev', '');
+            if (version) {
+              $('<a/>').text('simplytest.me').attr({
+                class: 'dreditor-button dreditor-patchtest',
+                href: 'http://simplytest.me/project/' + project + '/' + version + '?patch[]=' + this.href,
+                target: '_blank'
+              }).appendTo(this.parentNode);
+            }
+          }
         }
       }
     });
