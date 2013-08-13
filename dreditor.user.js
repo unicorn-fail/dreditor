@@ -936,7 +936,7 @@ Drupal.dreditor.patchReview = {
       var markup = '<code>\n';
       // Add file information.
       var lastfile = $elements.eq(0).prevAll('tr.file:has(a.file)').get(0);
-      if (lastfile.length) {
+      if (lastfile) {
         markup += lastfile.textContent + '\n';
       }
       // Add hunk information.
@@ -952,20 +952,24 @@ Drupal.dreditor.patchReview = {
         var $element = $(this);
         lastfileNewlineAdded = false;
         // Add new last file, in case a comment spans over multiple files.
-        if (lastfile.length && lastfile !== $element.prevAll('tr.file:has(a.file)').get(0)) {
+        if (lastfile && lastfile !== $element.prevAll('tr.file:has(a.file)').get(0)) {
           lastfile = $element.prevAll('tr.file:has(> a.file)').get(0);
-          markup += '\n' + lastfile.textContent + '\n';
-          lastfileNewlineAdded = true;
+          if (lastfile) {
+            markup += '\n' + lastfile.textContent + '\n';
+            lastfileNewlineAdded = true;
+          }
         }
         // Add new last hunk, in case a comment spans over multiple hunks.
         if (lasthunk && lasthunk != $element.prevAll('tr.file').get(0)) {
           lasthunk = $element.prevAll('tr.file').get(0);
-          // Only add a newline if there was no new file already.
-          if (!lastfileNewlineAdded) {
-            markup += '\n';
-            lastfileNewlineAdded = true;
+          if (lasthunk) {
+            // Only add a newline if there was no new file already.
+            if (!lastfileNewlineAdded) {
+              markup += '\n';
+              lastfileNewlineAdded = true;
+            }
+            markup += lasthunk.textContent + '\n';
           }
-          markup += lasthunk.textContent + '\n';
         }
         // Add a delimiter, in case a comment spans over multiple selections.
         else if (lastline && lastline != $element.get(0).previousSibling) {
