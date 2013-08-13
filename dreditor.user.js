@@ -2715,6 +2715,41 @@ Drupal.behaviors.dreditorIssuesFilterFormReset = function (context) {
 };
 
 /**
+ * Attach clone issue button to issues.
+ */
+Drupal.behaviors.dreditorIssueClone = function (context) {
+  $('#comment-form:has(#edit-category)', context).once('dreditor-clone-button', function () {
+    var $form = $(this);
+    // Attach a button.
+    var $button = $('<li><button id="dreditor-clone-button" class="dreditor-button">Clone issue</button></li>');
+    $button.appendTo($('#tabs ul'));
+    $button.bind('click.dreditor-clone', function () {
+      // Open a new window.
+      var project = /[^/]*$/.exec($('div.breadcrumb').find('a').attr('href'))[0];
+      var w = window.open('//drupal.org/node/add/project-issue/' + project + '#edit-rid-wrapper', '_blank');
+
+      w.onload = function () {
+        $(w).ready(function () {
+          setTimeout(function () {
+            var $doc = $(w.document);
+            $doc.find('#edit-rid').val($form.find('#edit-project-info-rid').val());
+            $doc.find('#edit-component').val($form.find('#edit-project-info-component').val());
+            $doc.find('#edit-category').val($form.find('#edit-category').val());
+            $doc.find('#edit-priority').val($form.find('#edit-priority').val());
+            $doc.find('#edit-assigned').val($form.find('#edit-project-info-assigned').val());
+            $doc.find('#edit-taxonomy-tags-9').val($form.find('#edit-taxonomy-tags-9').val());
+            $doc.find('.node-form .collapsed').removeClass('collapsed');
+            var matches = window.location.href.match('^https?://drupal.org/node/([0-9]+)');
+            $doc.find('#edit-body').val('Follow-up from [#' + matches[1] + '].\n\n');
+            $doc.find('#edit-title').focus();
+          }, 10);
+        });
+      };
+    });
+  });
+};
+
+/**
  * Initialize Dreditor.
  */
 
