@@ -953,7 +953,7 @@ Drupal.dreditor.patchReview = {
         lastfileNewlineAdded = false;
         // Add new last file, in case a comment spans over multiple files.
         if (lastfile && lastfile !== $element.prevAll('tr.file:has(a.file)').get(0)) {
-          lastfile = $element.prevAll('tr.file:has(> a.file)').get(0);
+          lastfile = $element.prevAll('tr.file:has(a.file)').get(0);
           if (lastfile) {
             markup += '\n' + lastfile.textContent + '\n';
             lastfileNewlineAdded = true;
