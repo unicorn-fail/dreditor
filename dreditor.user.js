@@ -197,6 +197,9 @@ Drupal.dreditor = {
     self.$wrapper = $('<div id="dreditor-wrapper"></div>').css({ height: 0 });
     // Add Dreditor content area.
     self.$dreditor = $('<div id="dreditor"></div>').appendTo(self.$wrapper);
+    if ($.browser.safari) {
+      self.$dreditor.addClass('webkit');
+    }
     self.$wrapper.appendTo('body');
 
     // Setup Dreditor context.
@@ -1291,15 +1294,13 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     }
     // Wrap all lines in PREs for copy/pasting.
     classes = (classes.length ? ' class="' + classes.join(' ') + '"' : '');
-    line = '<tr' + classes + '><td class="ln" data-line-number="' + (ln1o ? ln1 : '') + '"></td><td class="ln" data-line-number="' + (ln2o ? ln2 : '') + '"></td><td><span class="pre">' + line + '</span></td></tr>';
+    line = '<tr' + classes + '><td class="ln" data-line-number="' + (ln1o ? ln1 : '') + '"></td><td class="ln" data-line-number="' + (ln2o ? ln2 : '') + '"></td><td><span class="pre"><div class="code-delimiter"></div>' + line + '</span></td></tr>';
 
     // Append line to parsed code.
     $code.append(line);
   }
   // Append to body...
   $('#dreditor-content', context)
-    // a container to visualize the 80 chars delimiter.
-    .append('<div id="code-delimiter"></div>')
     // the parsed code.
     .append($code);
 
@@ -2813,14 +2814,16 @@ styles.innerHTML = " \
 #dreditor .resizable-textarea { margin: 0 0 9px; } \
 #dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; overflow: scroll; height: 100%; } \
 #dreditor-content, #code tr, #code td { font: 13px/18px Consolas, 'Liberation Mono', Courier, monospace; } \
-#dreditor #code-delimiter { background: #ddd; background: rgba(0,0,0,0.08); position: absolute; height: 100%; width: 1px; margin-left: 57.35em; z-index: 1; } \
 #dreditor #code { position: relative; width:100%; } \
-#dreditor #code td { padding: 0 10px; } \
+#dreditor #code td { overflow: hidden; padding: 0 10px; } \
 #dreditor #code .ln { -webkit-user-select: none; width:1px; border-right: 1px solid #e5e5e5; text-align: right; } \
 #dreditor #code .ln:before { content: attr(data-line-number); } \
 #dreditor #code tr { background: transparent; border: 0; color: #999; margin: 0; padding: 0; } \
 #dreditor #code tr:hover, #dreditor #code tr:hover td, #dreditor #code tr:hover td a { background: #FFF3C6 !important; border-color: #E8DAB3 !important; color: #9A7C29 !important; cursor: pointer; } \
-#dreditor #code .pre { white-space: pre; background: transparent; } \
+#dreditor #code .pre { white-space: pre; background: transparent; position: relative; } \
+#dreditor #code .pre .code-delimiter { background: #ccc; background: rgba(0,0,0,0.15); position: absolute; bottom: -4px; top: -4px; width: 1px; left: 632px; z-index: 1; } \
+#dreditor.webkit #code .pre .code-delimiter { left: 648px; } \
+#dreditor #code tr:hover .pre .code-delimiter { background-color: #E8DAB3; background-color: rgba(154, 124, 41, 0.3); } \
 #dreditor #code .pre span.space { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
 #dreditor #code .pre span.error { background-color: #f99; line-height: 100%; width: auto; height: auto; border: 0; } \
 #dreditor #code .pre span.error.eof { color: #fff; background-color: #f66; } \
@@ -2830,8 +2833,10 @@ styles.innerHTML = " \
 #dreditor #code .file a { color: #999; } \
 #dreditor #code .old { background-color: #fdd; color: #B53B3B; } \
 #dreditor #code .old .ln { background-color: #f7c8c8; border-color: #e9aeae; } \
+#dreditor #code .old .code-delimiter { background-color: #B53B3B; background-color: rgba(181, 59, 59, 0.2); } \
 #dreditor #code .new { background-color: #dfd; color: #167A00; float: none; font-size: 100%; font-weight: normal; } \
 #dreditor #code .new .ln { background-color: #ceffce; border-color: #b4e2b4; } \
+#dreditor #code .new .code-delimiter { background-color: #167A00; background-color: rgba(22, 122, 0, 0.2); } \
 #dreditor #code .comment { color: #070; } \
 \
 #dreditor #code .has-comment { background: #f6e8b5; } \
