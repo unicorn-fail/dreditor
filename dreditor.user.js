@@ -197,9 +197,6 @@ Drupal.dreditor = {
     self.$wrapper = $('<div id="dreditor-wrapper"></div>').css({ height: 0 });
     // Add Dreditor content area.
     self.$dreditor = $('<div id="dreditor"></div>').appendTo(self.$wrapper);
-    if ($.browser.safari) {
-      self.$dreditor.addClass('webkit');
-    }
     self.$wrapper.appendTo('body');
 
     // Setup Dreditor context.
@@ -1202,6 +1199,19 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   var $diffstat = $('<div id="diffstat"></div>').appendTo('#dreditor #bar');
   var diffstat = { files: 0, insertions: 0, deletions: 0 };
 
+  // The line ruler must be displayed consistently across all browsers and OS
+  // that may or may not have the same fonts (kerning). Calculate the width of
+  // 81 "0" characters (80 character line plus the +/- prefix from the diff)
+  // by using an array (82 items joined by "0").
+  var $lineRuler = $('<table id="code"><tbody><tr><td class="ln"></td><td class="ln"></td><td><span class="pre">' + Array(82).join('0') + '</span></td></tr></tbody></table>')
+    .appendTo('#dreditor');
+  var lineRulerOffset = $lineRuler.find('span').width();
+  var lineRulerStyle = '';
+  // Check for a reasonable value for the ruler offset.
+  if (lineRulerOffset > 100) {
+    lineRulerStyle = 'visibility: visible; left: ' + lineRulerOffset + 'px;';
+  }
+  $lineRuler.remove();
 
   code = code.split('\n');
   var ln1 = '';
@@ -1292,9 +1302,10 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     if (syntax && line.match(/^.\s*\/\/|^.\s*\/\*[\* ]|^.\s+\*/)) {
       classes.push('comment');
     }
-    // Wrap all lines in PREs for copy/pasting.
+
+    // Wrap all lines in PREs for copy/pasting and add the 80 character ruler.
     classes = (classes.length ? ' class="' + classes.join(' ') + '"' : '');
-    line = '<tr' + classes + '><td class="ln" data-line-number="' + (ln1o ? ln1 : '') + '"></td><td class="ln" data-line-number="' + (ln2o ? ln2 : '') + '"></td><td><span class="pre"><div class="code-delimiter"></div>' + line + '</span></td></tr>';
+    line = '<tr' + classes + '><td class="ln" data-line-number="' + (ln1o ? ln1 : '') + '"></td><td class="ln" data-line-number="' + (ln2o ? ln2 : '') + '"></td><td><span class="pre"><div class="line-ruler" style="' + lineRulerStyle + '"></div>' + line + '</span></td></tr>';
 
     // Append line to parsed code.
     $code.append(line);
@@ -2821,9 +2832,8 @@ styles.innerHTML = " \
 #dreditor #code tr { background: transparent; border: 0; color: #999; margin: 0; padding: 0; } \
 #dreditor #code tr:hover, #dreditor #code tr:hover td, #dreditor #code tr:hover td a { background: #FFF3C6 !important; border-color: #E8DAB3 !important; color: #9A7C29 !important; cursor: pointer; } \
 #dreditor #code .pre { white-space: pre; background: transparent; position: relative; } \
-#dreditor #code .pre .code-delimiter { background: #ccc; background: rgba(0,0,0,0.15); position: absolute; bottom: -4px; top: -4px; width: 1px; left: 632px; z-index: 1; } \
-#dreditor.webkit #code .pre .code-delimiter { left: 648px; } \
-#dreditor #code tr:hover .pre .code-delimiter { background-color: #E8DAB3; background-color: rgba(154, 124, 41, 0.3); } \
+#dreditor #code .pre .line-ruler { background: #ccc; background: rgba(0,0,0,0.15); position: absolute; bottom: -4px; top: -4px; width: 1px; visibility: hidden; z-index: 1; } \
+#dreditor #code tr:hover .pre .line-ruler { background-color: #E8DAB3; background-color: rgba(154, 124, 41, 0.3); } \
 #dreditor #code .pre span.space { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
 #dreditor #code .pre span.error { background-color: #f99; line-height: 100%; width: auto; height: auto; border: 0; } \
 #dreditor #code .pre span.error.eof { color: #fff; background-color: #f66; } \
@@ -2833,10 +2843,10 @@ styles.innerHTML = " \
 #dreditor #code .file a { color: #999; } \
 #dreditor #code .old { background-color: #fdd; color: #B53B3B; } \
 #dreditor #code .old .ln { background-color: #f7c8c8; border-color: #e9aeae; } \
-#dreditor #code .old .code-delimiter { background-color: #B53B3B; background-color: rgba(181, 59, 59, 0.2); } \
+#dreditor #code .old .line-ruler { background-color: #B53B3B; background-color: rgba(181, 59, 59, 0.2); } \
 #dreditor #code .new { background-color: #dfd; color: #167A00; float: none; font-size: 100%; font-weight: normal; } \
 #dreditor #code .new .ln { background-color: #ceffce; border-color: #b4e2b4; } \
-#dreditor #code .new .code-delimiter { background-color: #167A00; background-color: rgba(22, 122, 0, 0.2); } \
+#dreditor #code .new .line-ruler { background-color: #167A00; background-color: rgba(22, 122, 0, 0.2); } \
 #dreditor #code .comment { color: #070; } \
 \
 #dreditor #code .has-comment { background: #f6e8b5; } \
