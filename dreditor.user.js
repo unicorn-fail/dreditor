@@ -235,14 +235,9 @@ Drupal.dreditor = {
     var $actions = $('<div id="dreditor-actions"></div>');
     // Add hide/show button to temporarily dismiss Dreditor.
     $('<input id="dreditor-hide" class="dreditor-button" type="button" value="Hide" />')
-      .toggle(
-        function () {
-          self.hide();
-        },
-        function () {
-          self.show();
-        }
-      )
+      .click(function () {
+        self.visible ? self.hide() : self.show();
+      })
       .appendTo($actions);
     // Add cancel button to tear down Dreditor.
     $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />')
