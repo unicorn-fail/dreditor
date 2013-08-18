@@ -13,8 +13,6 @@ notifications:
     channels:
       - "irc.freenode.org#dreditor"
     template:
-      - "%{author} committed %{commit}:"
-      - "  - Compare: %{compare_url})"
       - "Build #%{build_number} (%{repository}/%{branch}):"
       - "  - %{message} (%{build_url})"
     on_success: always
