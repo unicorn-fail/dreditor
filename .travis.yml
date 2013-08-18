@@ -7,10 +7,14 @@ node_js:
 before_script:
   - npm install -g grunt-cli
 notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#dreditor"
+    on_success: always
+    on_failure: always
+    skip_join: true
   email:
     recipients:
       - mark.carver@me.com
-    on_success: never # default: change
-    on_failure: always # default: always
-  irc:
-    irc: "irc.freenode.org#dreditor"
+    on_success: never
+    on_failure: always
