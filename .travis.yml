@@ -11,11 +11,12 @@ notifications:
     channels:
       - "irc.freenode.org#dreditor"
     template:
-      - "%{repository} - Build #%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
-      - "Change view : %{compare_url}"
+      - "%{author} committed %{commit}: %{compare_url}"
+      - "#%{build_number}: %{message} (%{repository}/%{branch})"
       - "Build details : %{build_url}"
     on_success: always
     on_failure: always
+    use_notice: true
     skip_join: true
   email:
     recipients:
