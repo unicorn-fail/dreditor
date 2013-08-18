@@ -1,6 +1,8 @@
 branches:
+  except:
+    - 1.x
   only:
-    - /^2.*$/
+    - 2.x
 language: node_js
 node_js:
   - 0.10
