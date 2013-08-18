@@ -13,7 +13,4 @@ notifications:
     on_success: never # default: change
     on_failure: always # default: always
   irc:
-    channels:
-      - "chat.freenode.net#dreditor"
-    use_notice: true
-    skip_join: true
+    irc: "irc.freenode.org#dreditor"
