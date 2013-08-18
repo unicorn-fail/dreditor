@@ -12,6 +12,7 @@ notifications:
       - "irc.freenode.org#dreditor"
     on_success: always
     on_failure: always
+    use_notice: true
     skip_join: true
   email:
     recipients:
