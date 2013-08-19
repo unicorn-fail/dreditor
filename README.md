@@ -1,24 +1,12 @@
 # Dreditor
 
-"The Drupal.org extension for improving the user experience and functionality."
+A Drupal.org extension for improving user experience and functionality.
 
 ## Getting Started
-Download the [production version][min] or the [development version][max].
+Download the [production version][prod] or the [development version][dev].
 
-[min]: https://raw.github.com/dreditor/dreditor.git"/master/dist/dreditor.min.js
-[max]: https://raw.github.com/dreditor/dreditor.git"/master/dist/dreditor.js
-
-In your web page:
-
-```html
-<script src="jquery.js"></script>
-<script src="dist/dreditor.min.js"></script>
-<script>
-jQuery(function($) {
-  $.awesome(); // "awesome"
-});
-</script>
-```
+[prod]: https://raw.github.com/dreditor/dreditor/2.x/dist/dreditor.min.js
+[dev]: https://raw.github.com/dreditor/dreditor/2.x/dist/dreditor.js
 
 ## Documentation
 _(Coming soon)_

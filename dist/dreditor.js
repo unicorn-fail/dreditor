@@ -1,5 +1,5 @@
 /*! Dreditor - v2.0.0 - 2013-08-18
-* "https://github.com/dreditor/dreditor"
+* https://github.com/dreditor/dreditor
 * Copyright (c) 2013 Mark Carver; Licensed GPL-2.0 */
 (function($) {
 

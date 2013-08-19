@@ -1,6 +1,28 @@
 {
-  "name": "jquery-plugin",
-  "version": "0.0.0-ignored",
+  "name": "dreditor",
+  "title": "Dreditor",
+  "description": "A Drupal.org extension for improving user experience and functionality.",
+  "version": "2.0.0",
+  "homepage": "https://github.com/dreditor/dreditor",
+  "author": {
+    "name": "Mark Carver",
+    "email": "mark.carver@me.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:dreditor/dreditor.git"
+  },
+  "bugs": "https://github.com/dreditor/dreditor/issues",
+  "licenses": [
+    {
+      "type": "GPL-2.0",
+      "url": "https://github.com/dreditor/dreditor/blob/2.x/LICENSE-GPL-2.0"
+    }
+  ],
+  "dependencies": {
+    "jquery": "1.2.6"
+  },
+  "keywords": [],
   "engines": {
     "node": ">= 0.8.0"
   },
