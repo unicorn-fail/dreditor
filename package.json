@@ -19,9 +19,6 @@
       "url": "https://github.com/dreditor/dreditor/blob/2.x/LICENSE-GPL-2.0"
     }
   ],
-  "dependencies": {
-    "jquery": "1.2.6"
-  },
   "keywords": [],
   "engines": {
     "node": ">= 0.8.0"
