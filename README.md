@@ -3,11 +3,7 @@
 A Drupal.org extension for improving user experience and functionality.
 
 ## Getting Started
-Warning: The 2.x is not yet ready.
-Download the [production version][prod] or the [development version][dev].
-
-[prod]: https://raw.github.com/dreditor/dreditor/2.x/dist/dreditor.min.js
-[dev]: https://raw.github.com/dreditor/dreditor/2.x/dist/dreditor.js
+Warning: The 2.x is not yet ready. Visit https://drupal.org/project/dreditor for the latest version.
 
 ## Documentation
 _(Coming soon)_
