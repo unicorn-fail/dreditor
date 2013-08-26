@@ -4,12 +4,10 @@
 // @description    A user script for drupal.org. Improves the user experience and functionality for Drupal contributors and power users.
 // @icon           https://drupal.org/misc/druplicon.png
 // @author         sun (Daniel F. Kudwien)
-// @version        1.5
+// @version        1.1.6
 // @grant          none
-// @include        http://drupal.org/*
-// @include        https://drupal.org/*
-// @include        http://*.drupal.org/*
-// @include        https://*.drupal.org/*
+// @include        *://dreditor.org/*
+// @include        *://drupal.org/*
 // ==/UserScript==
 
 /**
@@ -2761,7 +2759,7 @@ Drupal.behaviors.dreditorIssueClone = function (context) {
  */
 
 // Enable detection of installed chrome extension on dreditor.org.
-if (window.location.href.match('dreditor.org') && chrome !== undefined) {
+if (window.location.href.match('dreditor.org')) {
   var isInstalledNode = document.createElement('div');
   isInstalledNode.id = 'dreditor-is-installed';
   document.body.appendChild(isInstalledNode);
