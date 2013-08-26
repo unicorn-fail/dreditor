@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name           Dreditor
-// @namespace      http://drupal.org/project/dreditor
-// @description    Awesomeness for drupal.org.
+// @namespace      http://dreditor.org
+// @description    A user script for drupal.org. Improves the user experience and functionality for Drupal contributors and power users.
 // @icon           https://drupal.org/misc/druplicon.png
-// @author         Daniel F. Kudwien (sun)
-// @version        1.0
+// @author         sun (Daniel F. Kudwien)
+// @version        1.5
 // @grant          none
 // @include        http://drupal.org/*
 // @include        https://drupal.org/*
