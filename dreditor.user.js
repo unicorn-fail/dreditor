@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name           Dreditor
-// @namespace      http://drupal.org/project/dreditor
-// @description    Awesomeness for drupal.org.
+// @namespace      http://dreditor.org
+// @description    A user script for drupal.org. Improves the user experience and functionality for Drupal contributors and power users.
 // @icon           https://drupal.org/misc/druplicon.png
-// @author         Daniel F. Kudwien (sun)
-// @version        1.0
+// @author         sun (Daniel F. Kudwien)
+// @version        1.1.7
 // @grant          none
-// @include        http://drupal.org/*
-// @include        https://drupal.org/*
-// @include        http://*.drupal.org/*
-// @include        https://*.drupal.org/*
+// @include        *://dreditor.org/*
+// @include        *://*.dreditor.org/*
+// @include        *://drupal.org/*
+// @include        *://*.drupal.org/*
 // ==/UserScript==
 
 /**
@@ -2759,6 +2759,13 @@ Drupal.behaviors.dreditorIssueClone = function (context) {
 /**
  * Initialize Dreditor.
  */
+
+// Enable detection of installed chrome extension on dreditor.org.
+if (window.location.href.match('dreditor.org')) {
+  var isInstalledNode = document.createElement('div');
+  isInstalledNode.id = 'dreditor-is-installed';
+  document.body.appendChild(isInstalledNode);
+}
 
 // Load jQuery UI if necessary.
 if (window.jQuery !== undefined && window.jQuery.fn.jquery === '1.2.6' && window.jQuery.ui === undefined) {
