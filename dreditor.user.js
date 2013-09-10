@@ -2140,7 +2140,8 @@ Drupal.behaviors.dreditorCommitMessage = function (context) {
         self.createShellCommand = function (message, user) {
           // -a is evil; people should use apply/am to apply patches, and many
           // use 'git add -p' to selectively stage and commit changes.
-          var command = 'git commit -m "' + message + '"';
+          // Also make sure any PHP variables are properly excaped.
+          var command = 'git commit -m "' + message.replace(/(\$|")/g, "/$1") + '"';
           if (user && user.attribution) {
             command += ' --author="' + user.attribution + '"';
           }
