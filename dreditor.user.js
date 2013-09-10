@@ -1817,8 +1817,7 @@ Drupal.dreditor.issue.getNewCommentNumber = function() {
  * Gets the issue title.
  */
 Drupal.dreditor.issue.getIssueTitle = function() {
-  // Replace double quotes with single quotes for cvs command line.
-  var title = $('#edit-title').val().replace('"', "'", 'g');
+  var title = $('#edit-title').val();
 
   // Try to fix function names without parenthesis.
   title = title.replace(/([a-z_]+_[a-z_]+)\b(?!\(\))/g, '$&()');
