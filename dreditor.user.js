@@ -2883,7 +2883,8 @@ div.dreditor-issuecount { line-height: 200%; } \
 ";
 
 // Invoke Dreditor update check once.
-Drupal.dreditor.updateCheck();
+// @todo Is the update check still necessary?
+//Drupal.dreditor.updateCheck();
 
 // End of Content Scope Runner.
 }
