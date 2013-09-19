@@ -2,7 +2,7 @@
   "name": "dreditor",
   "title": "Dreditor",
   "description": "A Drupal.org extension for improving user experience and functionality.",
-  "version": "1.2.1 (2.0.0-rc1)",
+  "version": "2.0.0-rc1",
   "homepage": "http://dreditor.org",
   "author": {
     "name": "Mark Carver",
