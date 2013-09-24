@@ -1821,16 +1821,16 @@ Drupal.behaviors.dreditorPatchNameSuggestion = function (context) {
       // Build filename suggestion.
       var patchName = '';
       if (project == 'drupal') {
-        patchName = project + core + '.' + component;
+        patchName = project + core + '-' + component;
       }
       else {
-        patchName = project + '.' + component;
+        patchName = project + '-' + component;
       }
 
       if (nid != 0) {
         newCommentNumber = Drupal.dreditor.issue.getNewCommentNumber();
 
-        patchName += '.' + nid + '-' + newCommentNumber;
+        patchName += '-' + nid + '-' + newCommentNumber;
       }
 
       patchName += '.patch';
