@@ -2798,10 +2798,10 @@ styles.innerHTML = '#dreditor-wrapper { position: fixed; z-index: 1000; width: 1
 '#dreditor #code .pre span.hidden { display: none; }' +
 '#dreditor #code tr.file { color: #999; background-color: #eee; }' +
 '#dreditor #code .file a { color: #999; }' +
-'#dreditor #code .old { background-color: #fdd; color: #B53B3B; }' +
+'#dreditor #code .old { background-color: #fdd; color: #444; }' +
 '#dreditor #code .old .ln { background-color: #f7c8c8; border-color: #e9aeae; }' +
 '#dreditor #code .old .line-ruler { background-color: #B53B3B; background-color: rgba(181, 59, 59, 0.2); }' +
-'#dreditor #code .new { background-color: #dfd; color: #167A00; float: none; font-size: 100%; font-weight: normal; }' +
+'#dreditor #code .new { background-color: #dfd; color: #444; float: none; font-size: 100%; font-weight: normal; }' +
 '#dreditor #code .new .ln { background-color: #ceffce; border-color: #b4e2b4; }' +
 '#dreditor #code .new .line-ruler { background-color: #167A00; background-color: rgba(22, 122, 0, 0.2); }' +
 '#dreditor #code .comment { color: #070; }' +
