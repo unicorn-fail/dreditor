@@ -4,12 +4,14 @@
 // @description    A user script for drupal.org. Improves the user experience and functionality for Drupal contributors and power users.
 // @icon           https://drupal.org/misc/druplicon.png
 // @author         sun (Daniel F. Kudwien)
-// @version        1.1.7
+// @version        1.2.0
 // @grant          none
 // @include        *://dreditor.org/*
 // @include        *://*.dreditor.org/*
 // @include        *://drupal.org/*
 // @include        *://*.drupal.org/*
+// @include        *://devdrupal.org/*
+// @include        *://*.devdrupal.org/*
 // ==/UserScript==
 
 /**
@@ -90,94 +92,6 @@ jQuery.extend({
 });
 // @todo Is this the right way?
 jQuery.fn.debug = jQuery.debug;
-
-/**
- * sort() callback to sort DOM elements by their actual DOM position.
- *
- * Copied from jQuery 1.3.2.
- *
- * @see Drupal.dreditor.patchReview.sort()
- */
-var sortOrder;
-
-if ( document.documentElement.compareDocumentPosition ) {
-	sortOrder = function( a, b ) {
-		var ret = a.compareDocumentPosition(b) & 4 ? -1 : a === b ? 0 : 1;
-		if ( ret === 0 ) {
-			hasDuplicate = true;
-		}
-		return ret;
-	};
-} else if ( "sourceIndex" in document.documentElement ) {
-	sortOrder = function( a, b ) {
-		var ret = a.sourceIndex - b.sourceIndex;
-		if ( ret === 0 ) {
-			hasDuplicate = true;
-		}
-		return ret;
-	};
-} else if ( document.createRange ) {
-	sortOrder = function( a, b ) {
-		var aRange = a.ownerDocument.createRange(), bRange = b.ownerDocument.createRange();
-		aRange.selectNode(a);
-		aRange.collapse(true);
-		bRange.selectNode(b);
-		bRange.collapse(true);
-		var ret = aRange.compareBoundaryPoints(Range.START_TO_END, bRange);
-		if ( ret === 0 ) {
-			hasDuplicate = true;
-		}
-		return ret;
-	};
-}
-// end sortOrder
-
-// Forward compatibility with D7.
-if (typeof $.fn.once == 'undefined') {
-/**
- * jQuery Once Plugin v1.2
- * http://plugins.jquery.com/project/once
- */
-(function ($) {
-  var cache = {}, uuid = 0;
-
-  /**
-   * Filters elements by whether they have not yet been processed.
-   */
-  $.fn.once = function (id, fn) {
-    if (typeof id != 'string') {
-      // Generate a numeric ID if the id passed can't be used as a CSS class.
-      if (!(id in cache)) {
-        cache[id] = ++uuid;
-      }
-      // When the fn parameter is not passed, we interpret it from the id.
-      if (!fn) {
-        fn = id;
-      }
-      id = 'jquery-once-' + cache[id];
-    }
-    // Remove elements from the set that have already been processed.
-    var name = id + '-processed';
-    var elements = this.not('.' + name).addClass(name);
-
-    return $.isFunction(fn) ? elements.each(fn) : elements;
-  };
-
-  /**
-   * Filters elements that have been processed once already.
-   */
-  $.fn.removeOnce = function (id, fn) {
-    var name = id + '-processed';
-    var elements = this.filter('.' + name).removeClass(name);
-
-    return $.isFunction(fn) ? elements.each(fn) : elements;
-  };
-})(jQuery);
-}
-
-/**
- * @} End of "defgroup jquery_extensions".
- */
 
 Drupal.dreditor = {
   behaviors: {},
@@ -710,48 +624,50 @@ Drupal.dreditor.form.form.prototype = {
 /**
  * Attach patch review editor to issue attachments.
  */
-Drupal.behaviors.dreditorPatchReview = function (context) {
-  // Prevent users from starting to review patches when not logged in.
-  if (!$(context).find('#comment-form').length) {
-    return;
-  }
-  // d.o infrastructure -- are you nuts?!
-  $('#attachments, table.comment-upload-attachments, div[id^=pift-results]', context).once('dreditor-patchreview', function () {
-    $('a', this).each(function () {
-      if (this.href.match(/\.(patch|diff|txt)$/)) {
-        // Generate review link.
-        var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">Review</a>').click(function () {
-          // Load file.
-          $.get(this.href, function (content, status) {
-            if (status == 'success') {
-              // Invoke Dreditor.
-              Drupal.dreditor.setup(context, 'patchReview', content);
-            }
+Drupal.behaviors.dreditorPatchReview = {
+  attach: function (context) {
+    // Prevent users from starting to review patches when not logged in.
+    if (!$(context).find('#comment-form').length) {
+      return;
+    }
+    // d.o infrastructure -- are you nuts?!
+    $('#attachments, table.comment-upload-attachments, div[id^=pift-results]', context).once('dreditor-patchreview', function () {
+      $('a', this).each(function () {
+        if (this.href.match(/\.(patch|diff|txt)$/)) {
+          // Generate review link.
+          var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">Review</a>').click(function () {
+            // Load file.
+            $.get(this.href, function (content, status) {
+              if (status == 'success') {
+                // Invoke Dreditor.
+                Drupal.dreditor.setup(context, 'patchReview', content);
+              }
+            });
+            return false;
           });
-          return false;
-        });
-        // Append review link to parent table cell.
-        $link.appendTo(this.parentNode);
+          // Append review link to parent table cell.
+          $link.appendTo(this.parentNode);
 
-        // Generate simplytest.me links only for patches and diffs.
-        if (this.href.substr(-6) === '.patch' || this.href.substr(-5) === '.diff') {
-          // Retrieve project shortname.
-          var project = Drupal.dreditor.issue.getProjectShortName();
-          if (project) {
-            var version = Drupal.dreditor.issue.getSelectedVersion().replace('-dev', '');
-            if (version) {
-              $('<a/>').text('simplytest.me').attr({
-                class: 'dreditor-button dreditor-patchtest',
-                href: 'http://simplytest.me/project/' + project + '/' + version + '?patch[]=' + this.href,
-                target: '_blank'
-              }).appendTo(this.parentNode);
+          // Generate simplytest.me links only for patches and diffs.
+          if (this.href.substr(-6) === '.patch' || this.href.substr(-5) === '.diff') {
+            // Retrieve project shortname.
+            var project = Drupal.dreditor.issue.getProjectShortName();
+            if (project) {
+              var version = Drupal.dreditor.issue.getSelectedVersion().replace('-dev', '');
+              if (version) {
+                $('<a/>').text('simplytest.me').attr({
+                  class: 'dreditor-button dreditor-patchtest',
+                  href: 'http://simplytest.me/project/' + project + '/' + version + '?patch[]=' + this.href,
+                  target: '_blank'
+                }).appendTo(this.parentNode);
+              }
             }
           }
         }
-      }
+      });
     });
-  });
-};
+  }
+}
 
 /**
  * @defgroup dreditor_patchreview Dreditor patch reviewer
@@ -1476,168 +1392,169 @@ Drupal.dreditor.patchReview.behaviors.toggleDeletions = function (context) {
 /**
  * Issue summary AJAX editor.
  */
-Drupal.behaviors.dreditorIssueSummary = function (context) {
-  // Limit to project_issue node view page.
-  $('#project-summary-container').once('dreditor-issue-summary', function () {
-    // Clone "Edit" link after "Issue summary" title.
-    var $edit_wrapper = $('<small class="admin-link"> [ <span></span> ] </small>');
-    var $edit_link = $('#tabs a:contains("Edit")').clone();
-    $edit_wrapper.find('span').append($edit_link);
-    $edit_wrapper.appendTo($(this).parent().find('h2:first'));
+Drupal.behaviors.dreditorIssueSummary = {
+  attach: function (context) {
+    // Limit to project_issue node view page.
+    $('#project-summary-container').once('dreditor-issue-summary', function () {
+      // Clone "Edit" link after "Issue summary" title.
+      var $edit_wrapper = $('<small class="admin-link"> [ <span></span> ] </small>');
+      var $edit_link = $('#tabs a:contains("Edit")').clone();
+      $edit_wrapper.find('span').append($edit_link);
+      $edit_wrapper.appendTo($(this).parent().find('h2:first'));
 
-    var $widget = $('<div id="dreditor-widget"></div>').insertAfter(this).hide();
+      var $widget = $('<div id="dreditor-widget"></div>').insertAfter(this).hide();
 
-    $edit_link.click(function () {
-      // First of all, remove this link.
-      $edit_wrapper.remove();
-      // Retrieve the node edit form.
-      $.get(this.href, function (data) {
-        var $data = $(data);
-        // Do power users really need this advise? Investigate this.
-        // $widget.append($data.find('div.help'));
-        $widget.append($data.find('#node-form'));
+      $edit_link.click(function () {
+        // First of all, remove this link.
+        $edit_wrapper.remove();
+        // Retrieve the node edit form.
+        $.get(this.href, function (data) {
+          var $data = $(data);
+          // Do power users really need this advise? Investigate this.
+          // $widget.append($data.find('div.help'));
+          $widget.append($data.find('#node-form'));
 
-        // For users with just one input format, wrap filter tips in a fieldset.
-        // @todo Abstract this into a behavior. Also applies to comment form.
-        $widget.find('fieldset > ul.tips')
-          .wrap('<fieldset class="collapsible collapsed"></fieldset>')
-          .before('<legend>Input format</legend>');
-        // Clean up.
-        // Remove messages; contains needless info.
-        $widget.find('div.messages.status').remove();
-        // That info about issue fields in .standard .standard thingy, too.
-        $widget.find('div.node-form > div.standard > div.standard').remove();
-        // Hide node admin fieldsets; removing these would result in nodes being
-        // unpublished and author being changed to Anonymous on submit.
-        $widget.find('div.admin').hide();
+          // For users with just one input format, wrap filter tips in a fieldset.
+          // @todo Abstract this into a behavior. Also applies to comment form.
+          $widget.find('fieldset > ul.tips')
+            .wrap('<fieldset class="collapsible collapsed"></fieldset>')
+            .before('<legend>Input format</legend>');
+          // Clean up.
+          // Remove messages; contains needless info.
+          $widget.find('div.messages.status').remove();
+          // That info about issue fields in .standard .standard thingy, too.
+          $widget.find('div.node-form > div.standard > div.standard').remove();
+          // Hide node admin fieldsets; removing these would result in nodes being
+          // unpublished and author being changed to Anonymous on submit.
+          $widget.find('div.admin').hide();
 
-        // Flatten issue summary, input format, and revision info fielsets.
-        // Blatantly remove all other fieldsets. :)
-        $widget.find('fieldset')
-          .not(':has(#edit-body, .tips, #edit-log)')
-          .removeClass('collapsible').hide();
-        // Visually remove top-level fieldsets, except text format.
-        $widget.find('fieldset:has(#edit-body, #edit-log)')
-          .removeClass('collapsible').addClass('fieldset-flat');
-        // Remove needless spacing between summary and revision elements.
-        $widget.find('.fieldset-flat:eq(0)').css('marginBottom', 0);
+          // Flatten issue summary, input format, and revision info fielsets.
+          // Blatantly remove all other fieldsets. :)
+          $widget.find('fieldset')
+            .not(':has(#edit-body, .tips, #edit-log)')
+            .removeClass('collapsible').hide();
+          // Visually remove top-level fieldsets, except text format.
+          $widget.find('fieldset:has(#edit-body, #edit-log)')
+            .removeClass('collapsible').addClass('fieldset-flat');
+          // Remove needless spacing between summary and revision elements.
+          $widget.find('.fieldset-flat:eq(0)').css('marginBottom', 0);
 
-        // Hide revision checkbox (only visible for admins, can't be disabled)
-        // and revision log message description.
-        $widget.find('#edit-revision-wrapper, #edit-log-wrapper .description').hide();
-        // Convert revision log message textarea into textfield and prepopulate it.
-        var $textarea = $widget.find('#edit-log');
-        var $textfield = $('<input type="text" size="60" style="width: 95%;" />');
-        $.each($textarea[0].attributes, function (index, attr) {
-          $textfield.attr(attr.name, attr.value);
-        });
-        // Enforced log message doesn't really make sense for power users.
-        // We're not crafting an encyclopedia with issues.
-        $textfield.val('Updated issue summary.');
-        $textarea.replaceWith($textfield);
+          // Hide revision checkbox (only visible for admins, can't be disabled)
+          // and revision log message description.
+          $widget.find('#edit-revision-wrapper, #edit-log-wrapper .description').hide();
+          // Convert revision log message textarea into textfield and prepopulate it.
+          var $textarea = $widget.find('#edit-log');
+          var $textfield = $('<input type="text" size="60" style="width: 95%;" />');
+          $.each($textarea[0].attributes, function (index, attr) {
+            $textfield.attr(attr.name, attr.value);
+          });
+          // Enforced log message doesn't really make sense for power users.
+          // We're not crafting an encyclopedia with issues.
+          $textfield.val('Updated issue summary.');
+          $textarea.replaceWith($textfield);
 
-        // Remove "Preview changes" and "Delete" buttons.
-        $widget.find('#edit-preview-changes').remove();
-        $widget.find('#edit-delete').remove();
-        // Sorry, no support for "Preview" yet.
-        $widget.find('#edit-preview').remove();
+          // Remove "Preview changes" and "Delete" buttons.
+          $widget.find('#edit-preview-changes').remove();
+          $widget.find('#edit-delete').remove();
+          // Sorry, no support for "Preview" yet.
+          $widget.find('#edit-preview').remove();
 
-        // Add a Cancel button. Move it far away from the submit button. ;)
-        $widget.find('#edit-submit').before(
-          $('<a href="javascript:void(0);" class="dreditor-button right">Cancel</a>').click(function () {
-            $widget.slideUp('fast', function () {
-              $widget.remove();
-            });
-            return false;
-          })
-        );
+          // Add a Cancel button. Move it far away from the submit button. ;)
+          $widget.find('#edit-submit').before(
+            $('<a href="javascript:void(0);" class="dreditor-button right">Cancel</a>').click(function () {
+              $widget.slideUp('fast', function () {
+                $widget.remove();
+              });
+              return false;
+            })
+          );
 
-        // Lastly, attach behaviors and slide in.
-        Drupal.attachBehaviors($widget.get(0));
-        $widget.slideDown();
-      }, 'html');
-      return false;
+          // Lastly, attach behaviors and slide in.
+          Drupal.attachBehaviors($widget.get(0));
+          $widget.slideDown();
+        }, 'html');
+        return false;
+      });
     });
-  });
+  }
 };
 
 /**
  * Adds a button to insert the issue summary template.
  */
-Drupal.behaviors.dreditorIssueSummaryTemplate = function() {
-  "use strict";
+Drupal.behaviors.dreditorIssueSummaryTemplate = {
+  attach: function (context) {
+    // Add the template button above the issue summary field.
+    $('body.logged-in.page-node div.project-issue #edit-body').once('dreditorIssueTemplate', function () {
+      var $body = $(this);
 
-  // Add the template button above the issue summary field.
-  $('body.logged-in.page-node div.project-issue #edit-body').once('dreditorIssueTemplate', function () {
-    var $body = $(this);
+      // Append this button to the label area.
+      var $label = $('label[for="edit-body"]');
 
-    // Append this button to the label area.
-    var $label = $('label[for="edit-body"]');
-
-    // Create a button to insert the template.
-    $('<a/>')
-      .attr({
-        class: 'dreditor-button',
-        href:  '#',
-        style: 'margin-left: 10px;'
-      })
-      .text('Insert template')
-      .appendTo($label)
-      .click(function (e) {
-        // Load the issue summary instructions.
-        $.get('//drupal.org/node/1326662', function (data) {
-          // Retrieve the template.
-          var $template = $('<div/>').html($(data).find('#node-1326662 code').text());
-          // On node add, remove the "Original report by" section.
-          if (location.href.search('node/add') !== -1) {
-            $template.find('#summary-original-report').remove();
-          }
-          // On quick edit, we can go ahead and replace the @username with the
-          // existing link to the original author.
-          else if (!location.href.match(/^.*node\/[^\/]*\/edit/)) {
-            var $profileLink = $('div.node > div.submitted a').clone();
-            if ($profileLink.length) {
-              $profileLink.text('@' + $profileLink.text());
+      // Create a button to insert the template.
+      $('<a/>')
+        .attr({
+          class: 'dreditor-button',
+          href:  '#',
+          style: 'margin-left: 10px;'
+        })
+        .text('Insert template')
+        .appendTo($label)
+        .click(function (e) {
+          // Load the issue summary instructions.
+          $.get('//drupal.org/node/1326662', function (data) {
+            // Retrieve the template.
+            var $template = $('<div/>').html($(data).find('#node-1326662 code').text());
+            // On node add, remove the "Original report by" section.
+            if (location.href.search('node/add') !== -1) {
+              $template.find('#summary-original-report').remove();
             }
+            // On quick edit, we can go ahead and replace the @username with the
+            // existing link to the original author.
+            else if (!location.href.match(/^.*node\/[^\/]*\/edit/)) {
+              var $profileLink = $('div.node > div.submitted a').clone();
+              if ($profileLink.length) {
+                $profileLink.text('@' + $profileLink.text());
+              }
+              else {
+                $profileLink = $('<a/>').text('Anonymous').attr('href', '#');
+              }
+              $template.find('#summary-original-report a').replaceWith($('<div/>').html($profileLink).html());
+            }
+            // On actual node edit pages, we need to do an AJAX callback to get
+            // the JSON data for the issue and replace @username with the original
+            // author asynchronously.
             else {
-              $profileLink = $('<a/>').text('Anonymous').attr('href', '#');
+              var nodePath = location.href.match(/^.*node\/[0-9]*/);
+              if (nodePath) {
+                $.getJSON(nodePath[0] + '/project-issue/json', function (json){
+                  var $profileLink, $bodyVal = $('<div/>').html($body.val());
+                  if (!json.authorId || !json.authorName || !json.authorUrl) {
+                    $profileLink = $('<a/>').text('Anonymous').attr('href', '#');
+                  }
+                  else {
+                    $profileLink = $('<a/>').text('@' + json.authorName).attr('href', json.authorUrl);
+                  }
+                  $bodyVal.find('#summary-original-report a').replaceWith($('<div/>').html($profileLink).html());
+                  $body.val($bodyVal.html());
+                });
+              }
             }
-            $template.find('#summary-original-report a').replaceWith($('<div/>').html($profileLink).html());
-          }
-          // On actual node edit pages, we need to do an AJAX callback to get
-          // the JSON data for the issue and replace @username with the original
-          // author asynchronously.
-          else {
-            var nodePath = location.href.match(/^.*node\/[0-9]*/);
-            if (nodePath) {
-              $.getJSON(nodePath[0] + '/project-issue/json', function (json){
-                var $profileLink, $bodyVal = $('<div/>').html($body.val());
-                if (!json.authorId || !json.authorName || !json.authorUrl) {
-                  $profileLink = $('<a/>').text('Anonymous').attr('href', '#');
-                }
-                else {
-                  $profileLink = $('<a/>').text('@' + json.authorName).attr('href', json.authorUrl);
-                }
-                $bodyVal.find('#summary-original-report a').replaceWith($('<div/>').html($profileLink).html());
-                $body.val($bodyVal.html());
-              });
-            }
-          }
-          // Prepend text to current body.
-          $body.val($template.html().replace(/<\/em>/g, "</em>\n\n").replace(/<\/h3>/g, "</h3>\n\n") + $body.val());
+            // Prepend text to current body.
+            $body.val($template.html().replace(/<\/em>/g, "</em>\n\n").replace(/<\/h3>/g, "</h3>\n\n") + $body.val());
+          });
+          // Prevent default "click" event.
+          e.preventDefault();
         });
-        // Prevent default "click" event.
-        e.preventDefault();
-      });
 
-    // Add a link to view the issue summary instructions.
-    $('<a href="//drupal.org/issue-summaries" target="_blank">Issue summary instructions</a>')
-      .appendTo($label)
-      .before('(')
-      .after(')');
+      // Add a link to view the issue summary instructions.
+      $('<a href="//drupal.org/issue-summaries" target="_blank">Issue summary instructions</a>')
+        .appendTo($label)
+        .before('(')
+        .after(')');
 
-  });
-
+    });
+  }
 };
 
 /**
@@ -1650,76 +1567,78 @@ Drupal.behaviors.dreditorIssueSummaryTemplate = function() {
  * Moving form elements around, unwrapping them, and similar actions are not
  * supported.
  */
-Drupal.behaviors.dreditorIssueCommentForm = function (context) {
-  $('#comment-form:has(#edit-category)', context).once('dreditor-issue-comment-form', function () {
-    // On comment/reply path pages, drupal.org does not apply the required
-    // .node-type-project-issue to BODY, which the Bluecheese theme targets for
-    // styling comments. Ensure that it is set.
-    // @todo Fix upstream.
-    $('body').addClass('node-type-project-issue');
+Drupal.behaviors.dreditorIssueCommentForm = {
+  attach: function (context) {
+    $('#comment-form:has(#edit-category)', context).once('dreditor-issue-comment-form', function () {
+      // On comment/reply path pages, drupal.org does not apply the required
+      // .node-type-project-issue to BODY, which the Bluecheese theme targets for
+      // styling comments. Ensure that it is set.
+      // @todo Fix upstream.
+      $('body').addClass('node-type-project-issue');
 
-    var $form = $('> div', this);
-    // Remove that ugly looking heading.
-    $form.parents('.content').prev('h2').remove();
+      var $form = $('> div', this);
+      // Remove that ugly looking heading.
+      $form.parents('.content').prev('h2').remove();
 
-    // Since we cannot move DOM elements around, we need to use advanced CSS
-    // positioning to achieve a sane order of form elements.
-    $form.css({ position: 'relative', paddingTop: '20em' });
+      // Since we cannot move DOM elements around, we need to use advanced CSS
+      // positioning to achieve a sane order of form elements.
+      $form.css({ position: 'relative', paddingTop: '20em' });
 
-    // Unwrap basic issue data.
-    $form
-      .find('fieldset:first')
+      // Unwrap basic issue data.
+      $form
+        .find('fieldset:first')
         .css({ position: 'absolute', top: '2em', width: '100%' })
         .attr('id', 'dreditor-issue-data')
         .removeClass('collapsible').addClass('fieldset-flat')
         .find('.fieldset-wrapper')
-          // Hide note about issue title for n00bs.
-          .find('.description:first').hide().end();
+        // Hide note about issue title for n00bs.
+        .find('.description:first').hide().end();
 
-    // Hide label for comment textarea.
-    $form.find('label[for="edit-comment"]').hide();
+      // Hide label for comment textarea.
+      $form.find('label[for="edit-comment"]').hide();
 
-    // Move issue tags into issue data.
-    // Note: Issue tags are still reset upon page refresh, but that's caused by
-    // by collapse.js in D6, which inserts div.fieldset-wrapper into the form.
-    // Issue tags are a constant drama on d.o, got moved into a fieldset and
-    // back out at least twice already. Ignore epic discussions and simply find
-    // both.
-    var $tags = $form.find('fieldset:has(.form-item[id*=tags])')
-      .removeClass('collapsible collapsed').addClass('fieldset-flat');
-    if (!$tags.length) {
-      $tags = $form.find('.form-item[id*=tags]');
-    }
-    $tags
-      .css({ position: 'absolute', top: '15.5em', width: '100%', margin: 0 })
-      .find('label').each(function () {
-        var $label = $(this).hide();
-        $('#' + $label.attr('for'), context).attr('title', $label.text());
-      });
+      // Move issue tags into issue data.
+      // Note: Issue tags are still reset upon page refresh, but that's caused by
+      // by collapse.js in D6, which inserts div.fieldset-wrapper into the form.
+      // Issue tags are a constant drama on d.o, got moved into a fieldset and
+      // back out at least twice already. Ignore epic discussions and simply find
+      // both.
+      var $tags = $form.find('fieldset:has(.form-item[id*=tags])')
+        .removeClass('collapsible collapsed').addClass('fieldset-flat');
+      if (!$tags.length) {
+        $tags = $form.find('.form-item[id*=tags]');
+      }
+      $tags
+        .css({ position: 'absolute', top: '15.5em', width: '100%', margin: 0 })
+        .find('label').each(function () {
+          var $label = $(this).hide();
+          $('#' + $label.attr('for'), context).attr('title', $label.text());
+        });
 
-    // Unwrap attachments.
-    $form
-      .find('.attachments fieldset')
+      // Unwrap attachments.
+      $form
+        .find('.attachments fieldset')
         .removeClass('collapsible').addClass('fieldset-flat')
         .find('.description:first').hide();
 
-    // Add expected comment #number; parse last comment, since deleted/
-    // unpublished comments are counted. Also, there
-    // are no comments to count on fresh issues.
-    var count = $('#comments .comment:last .comment-title', context).text() || 0;
-    if (count) {
-      count = parseInt(count.match(/\d+$/)[0], 10);
-    }
-    count++;
-    $('<h3 class="comment-title">#' + count + '</h3>')
-      .css({ position: 'absolute', top: 11 })
-      .prependTo($form);
+      // Add expected comment #number; parse last comment, since deleted/
+      // unpublished comments are counted. Also, there
+      // are no comments to count on fresh issues.
+      var count = $('#comments .comment:last .comment-title', context).text() || 0;
+      if (count) {
+        count = parseInt(count.match(/\d+$/)[0], 10);
+      }
+      count++;
+      $('<h3 class="comment-title">#' + count + '</h3>')
+        .css({ position: 'absolute', top: 11 })
+        .prependTo($form);
 
-    // Add classes to make it look licky. Needs to stay last to not break
-    // comment count.
-    $(this).addClass('comment');
-    $form.addClass('comment-inner');
-  });
+      // Add classes to make it look licky. Needs to stay last to not break
+      // comment count.
+      $(this).addClass('comment');
+      $form.addClass('comment-inner');
+    });
+  }
 };
 
 /**
@@ -1732,22 +1651,24 @@ Drupal.behaviors.dreditorIssueCommentForm = function (context) {
  * issue summary widget), so the user is able to read, scroll, and comment at
  * the same time.
  */
-Drupal.behaviors.dreditorIssueCommentFormSticky = function (context) {
-  $(context).find('.dreditor-issue-comment-form-processed').once('dreditor-issue-comment-form-sticky', function () {
-    var $wrapper = $(this).find('#edit-comment-wrapper > .resizable-textarea');
-    var $toggle = $('<a href="javascript:void(0);" class="dreditor-application-toggle">Make sticky</a>');
-    $toggle.click(function () {
-      if ($wrapper.attr('id')) {
-        $wrapper.removeAttr('id');
-        $toggle.removeClass('active').text('Make sticky');
-      }
-      else {
-        $wrapper.attr('id', 'dreditor-widget');
-        $toggle.addClass('active').text('Unstick');
-      }
+Drupal.behaviors.dreditorIssueCommentFormSticky = {
+  attach: function (context) {
+    $(context).find('.dreditor-issue-comment-form-processed').once('dreditor-issue-comment-form-sticky', function () {
+      var $wrapper = $(this).find('#edit-comment-wrapper > .resizable-textarea');
+      var $toggle = $('<a href="javascript:void(0);" class="dreditor-application-toggle">Make sticky</a>');
+      $toggle.click(function () {
+        if ($wrapper.attr('id')) {
+          $wrapper.removeAttr('id');
+          $toggle.removeClass('active').text('Make sticky');
+        }
+        else {
+          $wrapper.attr('id', 'dreditor-widget');
+          $toggle.addClass('active').text('Unstick');
+        }
+      });
+      $wrapper.find('> span').prepend($toggle);
     });
-    $wrapper.find('> span').prepend($toggle);
-  });
+  }
 };
 
 /**
@@ -1759,31 +1680,33 @@ Drupal.behaviors.dreditorIssueCommentFormSticky = function (context) {
  * hi-jacked in those cases; the browser doesn't even know anymore that it
  * posted something.
  */
-Drupal.behaviors.dreditorFormBackup = function (context) {
-  $(context).find('#comment-form:has(#edit-category)').once('dreditor-form-backup', function () {
-    var $form = $(this);
+Drupal.behaviors.dreditorFormBackup = {
+  attach: function (context) {
+    $(context).find('#comment-form:has(#edit-category)').once('dreditor-form-backup', function () {
+      var $form = $(this);
 
-    var $restore = $('<a href="javascript:void()" class="dreditor-application-toggle">Restore previously entered data</a>').click(function () {
-      if (window.confirm('Reset this form to your last submitted values?')) {
-        var values = Drupal.storage.unserialize(Drupal.storage.load('form.backup'));
-        $form.find('[name]').not('[type=hidden]').each(function () {
-          if (typeof values[this.name] != 'undefined') {
-            $(this).val(values[this.name]);
-          }
-        });
-        // Remove this (restore) button.
-        $(this).fadeOut();
-      }
-      return false;
+      var $restore = $('<a href="javascript:void()" class="dreditor-application-toggle">Restore previously entered data</a>').click(function () {
+        if (window.confirm('Reset this form to your last submitted values?')) {
+          var values = Drupal.storage.unserialize(Drupal.storage.load('form.backup'));
+          $form.find('[name]').not('[type=hidden]').each(function () {
+            if (typeof values[this.name] != 'undefined') {
+              $(this).val(values[this.name]);
+            }
+          });
+          // Remove this (restore) button.
+          $(this).fadeOut();
+        }
+        return false;
+      });
+
+      $form.find('[type="submit"]')
+        .bind('click', function () {
+          Drupal.storage.save('form.backup', $form.serialize());
+        })
+        // @todo Replace with .eq(-1), available in jQuery 1.4+.
+        .filter(':last').after($restore);
     });
-
-    $form.find('[type="submit"]')
-      .bind('click', function () {
-        Drupal.storage.save('form.backup', $form.serialize());
-      })
-      // @todo Replace with .eq(-1), available in jQuery 1.4+.
-      .filter(':last').after($restore);
-  });
+  }
 };
 
 
@@ -1792,53 +1715,55 @@ Drupal.behaviors.dreditorFormBackup = function (context) {
  *
  * Developed in issue: http://drupal.org/node/1294662
  */
-Drupal.behaviors.dreditorPatchNameSuggestion = function (context) {
-  // Attach this behavior only to project_issue nodes. Use a fast selector for
-  // the common case, but also support comment/reply/% pages.
-  if (!($('body.node-type-project-issue', context).length || $('div.project-issue', context).length)) {
-    return;
-  }
+Drupal.behaviors.dreditorPatchNameSuggestion = {
+  attach: function (context) {
+    // Attach this behavior only to project_issue nodes. Use a fast selector for
+    // the common case, but also support comment/reply/% pages.
+    if (!($('body.node-type-project-issue', context).length || $('div.project-issue', context).length)) {
+      return;
+    }
 
-  $('#comment-form #edit-upload-wrapper, #node-form #edit-upload-wrapper', context).once('dreditor-patchsuggestion', function () {
-    var $container = $('#edit-upload-wrapper > label');
-    var $link = $('<a class="dreditor-application-toggle dreditor-patchsuggestion" href="#">Patchname suggestion</a>');
-    $link.prependTo($container);
-    $link.click(function() {
-      var title = Drupal.dreditor.issue.getIssueTitle() || 'title';
-      title = title.replace(/[^a-zA-Z0-9]+/g, '_');
-      // Truncate and remove a heading/trailing undescore.
-      title = title.substr(0, 60);
-      title = title.replace(/(^_|_$)/, '');
+    $('#comment-form #edit-upload-wrapper, #node-form #edit-upload-wrapper', context).once('dreditor-patchsuggestion', function () {
+      var $container = $('#edit-upload-wrapper > label');
+      var $link = $('<a class="dreditor-application-toggle dreditor-patchsuggestion" href="#">Patchname suggestion</a>');
+      $link.prependTo($container);
+      $link.click(function() {
+        var title = Drupal.dreditor.issue.getIssueTitle() || 'title';
+        title = title.replace(/[^a-zA-Z0-9]+/g, '_');
+        // Truncate and remove a heading/trailing undescore.
+        title = title.substr(0, 60);
+        title = title.replace(/(^_|_$)/, '');
 
-      var nid = Drupal.dreditor.issue.getNid() || 0;
-      var project = Drupal.dreditor.issue.getProjectShortName() || 'unknownProject';
-      var component = Drupal.dreditor.issue.getSelectedComponent() || 'component';
-      component = component.replace(/[^a-zA-Z0-9]+/, '-').toLowerCase();
+        var nid = Drupal.dreditor.issue.getNid() || 0;
+        var project = Drupal.dreditor.issue.getProjectShortName() || 'unknownProject';
+        var component = Drupal.dreditor.issue.getSelectedComponent() || 'component';
+        component = component.replace(/[^a-zA-Z0-9]+/, '-').toLowerCase();
 
-      var core = Drupal.dreditor.issue.getSelectedVersionCore() || '';
-      core = core.substring(0, 1);
+        var core = Drupal.dreditor.issue.getSelectedVersionCore() || '';
+        core = core.substring(0, 1);
 
-      // Build filename suggestion.
-      var patchName = '';
-      if (project == 'drupal') {
-        patchName = project + core + '-' + component;
-      }
-      else {
-        patchName = project + '-' + component;
-      }
+        // Build filename suggestion.
+        var patchName = '';
+        if (project == 'drupal') {
+          patchName = project + core + '-' + component;
+        }
+        else {
+          patchName = project + '-' + component;
+        }
 
-      if (nid != 0) {
-        newCommentNumber = Drupal.dreditor.issue.getNewCommentNumber();
+        if (nid != 0) {
+          newCommentNumber = Drupal.dreditor.issue.getNewCommentNumber();
 
-        patchName += '-' + nid + '-' + newCommentNumber;
-      }
+          patchName += '-' + nid + '-' + newCommentNumber;
+        }
 
-      patchName += '.patch';
+        patchName += '.patch';
 
-      window.prompt("Please use this value", patchName);
-      return false;
+        window.prompt("Please use this value", patchName);
+        return false;
+      });
     });
-  });
+  }
 };
 
 Drupal.dreditor.issue = {}
@@ -1989,255 +1914,261 @@ Drupal.dreditor.issue.getSelectedVersionCoreContrib = function() {
 /**
  * Attach commit message generator to issue comment form.
  */
-Drupal.behaviors.dreditorCommitMessage = function (context) {
-  // Attach this behavior only to project_issue nodes. Use a fast selector for
-  // the common case, but also support comment/reply/% pages.
-  if (!($('body.node-type-project-issue', context).length || $('div.project-issue', context).length)) {
-    return;
-  }
-  var self = this;
-  $('#edit-comment-wrapper', context).once('dreditor-commitmessage', function () {
-    // Prepend commit message button to comment form.
-    // @todo Generalize this setup. Somehow.
-    var $container = $('<div class="dreditor-actions" style="width: 95%;"></div>')
-      .prependTo(this);
-    // Generate commit message button.
-    var $link = $('<a class="dreditor-application-toggle dreditor-commitmessage" href="#">Create commit message</a>');
-    $link.click(function () {
-      // A port of PHP's array_count_values(), combined with a keysort.
-      $.fn.extend({
-        countvalues: function () {
-          var elems = this.get();
-          // Count array values.
-          var counts = {}, i = elems.length, j;
-          while (i--) {
-            var value = elems[i].textContent;
-            j = counts[value];
-            counts[value] = (j ? j + 1 : 1);
-          }
-          // Sort value counts by counts.
-          var temp = [];
-          for (var key in counts) {
-            temp.push([ counts[key], key ]);
-          }
-          temp.sort(function (a, b) {
-            return a[0] > b[0];
-          });
-          // Return the list of values, ordered by counts (descending).
-          var result = [], i = temp.length;
-          while (i--) {
-            result.push(temp[i][1]);
-          }
-          return result;
-        }
-      });
-      // Retrieve all comments in this issue.
-      var $comments = $('#comments div.comment', context);
-      // Build list of top patch submitters.
-      var $submitters = $comments
-        // Filter comments by those having patches.
-        .filter(':has(a.dreditor-patchreview)').find('div.submitted a')
-        // Add original post if it contains a patch.
-        .add('div.node:has(a.dreditor-patchreview) div.submitted a');
-      // Count and sort by occurrences.
-      var submitters = $submitters.countvalues();
-
-      // Build list of unique users for commit attribution, keyed by uid.
-      var users = {}, user, uid;
-      for (user in $submitters.get()) {
-        uid = $submitters[user].href.match(/\d+/)[0];
-        users[uid] = {
-          id: uid,
-          name: $submitters[user].textContent,
-          href: $submitters[user].href
-        };
-      }
-
-      // Build list of top commenters.
-      var commenters = $comments.find('div.author a')
-        // Skip test bot.
-        .not(':contains("System Message")')
-        // Add original poster.
-        .add('div.node div.submitted a')
-        // Count and sort by occurrences.
-        .countvalues();
-      // Compile a list of top commenters (max. 10% of # of all follow-ups).
-      var contributors = [];
-      var max = parseInt(($comments.length > 10 ? $comments.length : 10) / 10, 10);
-      if (max) {
-        $.each(commenters, function(index, name) {
-          if (max < 1) {
-            return false;
-          }
-          // Skip already listed contributors.
-          for (var i in submitters) {
-            if (submitters[i] == name) {
-              return;
+Drupal.behaviors.dreditorCommitMessage = {
+  attach: function (context) {
+    // Attach this behavior only to project_issue nodes. Use a fast selector for
+    // the common case, but also support comment/reply/% pages.
+    if (!($('body.node-type-project-issue', context).length || $('div.project-issue', context).length)) {
+      return;
+    }
+    var self = this;
+    $('#edit-comment-wrapper', context).once('dreditor-commitmessage', function () {
+      // Prepend commit message button to comment form.
+      // @todo Generalize this setup. Somehow.
+      var $container = $('<div class="dreditor-actions" style="width: 95%;"></div>')
+        .prependTo(this);
+      // Generate commit message button.
+      var $link = $('<a class="dreditor-application-toggle dreditor-commitmessage" href="#">Create commit message</a>');
+      $link.click(function () {
+        // A port of PHP's array_count_values(), combined with a keysort.
+        $.fn.extend({
+          countvalues: function () {
+            var elems = this.get();
+            // Count array values.
+            var counts = {}, i = elems.length, j;
+            while (i--) {
+              var value = elems[i].textContent;
+              j = counts[value];
+              counts[value] = (j ? j + 1 : 1);
             }
+            // Sort value counts by counts.
+            var temp = [];
+            for (var key in counts) {
+              temp.push([ counts[key], key ]);
+            }
+            temp.sort(function (a, b) {
+              return a[0] > b[0];
+            });
+            // Return the list of values, ordered by counts (descending).
+            var result = [], i = temp.length;
+            while (i--) {
+              result.push(temp[i][1]);
+            }
+            return result;
           }
-          contributors.push(name);
-          max--;
         });
-      }
-      // Build commit message.
-      // @todo Add configuration option for prefix. For now, manually override:
-      //   Drupal.storage.save('commitmessage.prefix', '-');
-      var prefix = Drupal.storage.load('commitmessage.prefix');
-      prefix = (prefix ? prefix : 'Issue');
+        // Retrieve all comments in this issue.
+        var $comments = $('#comments div.comment', context);
+        // Build list of top patch submitters.
+        var $submitters = $comments
+          // Filter comments by those having patches.
+          .filter(':has(a.dreditor-patchreview)').find('div.submitted a')
+          // Add original post if it contains a patch.
+          .add('div.node:has(a.dreditor-patchreview) div.submitted a');
+        // Count and sort by occurrences.
+        var submitters = $submitters.countvalues();
 
-      var message = prefix + ' #' + window.location.href.match(/(?:node|comment\/reply)\/(\d+)/)[1] + ' ';
-      message += 'by ' + submitters.join(', ');
-      if (contributors.length) {
-        if (submitters.length) {
-          message += ' | ';
+        // Build list of unique users for commit attribution, keyed by uid.
+        var users = {}, user, uid;
+        for (user in $submitters.get()) {
+          uid = $submitters[user].href.match(/\d+/)[0];
+          users[uid] = {
+            id: uid,
+            name: $submitters[user].textContent,
+            href: $submitters[user].href
+          };
         }
-        // Add a separator between patch submitters and commenters.
-        message += contributors.join(', ');
-      }
 
-      // Build title.
-      var title = Drupal.dreditor.issue.getIssueTitle();
+        // Build list of top commenters.
+        var commenters = $comments.find('div.author a')
+          // Skip test bot.
+          .not(':contains("System Message")')
+          // Add original poster.
+          .add('div.node div.submitted a')
+          // Count and sort by occurrences.
+          .countvalues();
+        // Compile a list of top commenters (max. 10% of # of all follow-ups).
+        var contributors = [];
+        var max = parseInt(($comments.length > 10 ? $comments.length : 10) / 10, 10);
+        if (max) {
+          $.each(commenters, function(index, name) {
+            if (max < 1) {
+              return false;
+            }
+            // Skip already listed contributors.
+            for (var i in submitters) {
+              if (submitters[i] == name) {
+                return;
+              }
+            }
+            contributors.push(name);
+            max--;
+          });
+        }
+        // Build commit message.
+        // @todo Add configuration option for prefix. For now, manually override:
+        //   Drupal.storage.save('commitmessage.prefix', '-');
+        var prefix = Drupal.storage.load('commitmessage.prefix');
+        prefix = (prefix ? prefix : 'Issue');
 
-      // Add "Added|Fixed " prefix based on issue category.
-      switch ($('#edit-category').val()) {
-        case 'bug':
-          title = title.replace(/^fix\S*\s*/i, '');
-          title = 'Fixed ' + title;
-          break;
-
-        case 'feature':
-          title = title.replace(/^add\S*\s*/i, '');
-          title = 'Added ' + title;
-          break;
-
-        default:
-          // For anything else, we just ensure proper capitalization.
-          if (title[0].toLowerCase() == title[0]) {
-            title = title[0].toUpperCase() + title.substring(1);
+        var message = prefix + ' #' + window.location.href.match(/(?:node|comment\/reply)\/(\d+)/)[1] + ' ';
+        message += 'by ' + submitters.join(', ');
+        if (contributors.length) {
+          if (submitters.length) {
+            message += ' | ';
           }
-          break;
-      }
+          // Add a separator between patch submitters and commenters.
+          message += contributors.join(', ');
+        }
 
-      // Add a period (full-stop).
-      if (title[title.length - 1] != '.') {
-        title += '.';
-      }
-      message += ': ' + title;
+        // Build title.
+        var title = Drupal.dreditor.issue.getIssueTitle();
 
-      // Inject a text field.
-      var $input = $('#dreditor-commitmessage-input', context);
-      if (!$input.length) {
-        // Setup first input widget for plain commit message.
-        // @todo Revise animation for box-sizing:border-box.
-        $input = $('<input id="dreditor-commitmessage-input" class="dreditor-input" type="text" autocomplete="off" />')
-          .css({ position: 'absolute', right: $link.outerWidth(), width: 0 })
-          .val(message)
-          .insertAfter($link);
-        $link.css({ position: 'relative', zIndex: 1 }).before($input);
+        // Add "Added|Fixed " prefix based on issue category.
+        switch ($('#edit-category').val()) {
+          case 'bug':
+            title = title.replace(/^fix\S*\s*/i, '');
+            title = 'Fixed ' + title;
+            break;
 
-        // Setup second input widget for full git commit command line.
-        self.createShellCommand = function (message, user) {
-          // -a is evil; people should use apply/am to apply patches, and many
-          // use 'git add -p' to selectively stage and commit changes.
-          // Also make sure any PHP variables are properly excaped.
-          var command = 'git commit -m "' + message.replace(/(\$|")/g, "/$1") + '"';
-          if (user && user.attribution) {
-            command += ' --author="' + user.attribution + '"';
+          case 'feature':
+            title = title.replace(/^add\S*\s*/i, '');
+            title = 'Added ' + title;
+            break;
+
+          default:
+            // For anything else, we just ensure proper capitalization.
+            if (title[0].toLowerCase() == title[0]) {
+              title = title[0].toUpperCase() + title.substring(1);
+            }
+            break;
+        }
+
+        // Add a period (full-stop).
+        if (title[title.length - 1] != '.') {
+          title += '.';
+        }
+        message += ': ' + title;
+
+        // Inject a text field.
+        var $input = $('#dreditor-commitmessage-input', context);
+        if (!$input.length) {
+          // Setup first input widget for plain commit message.
+          // @todo Revise animation for box-sizing:border-box.
+          $input = $('<input id="dreditor-commitmessage-input" class="dreditor-input" type="text" autocomplete="off" />')
+            .css({ position: 'absolute', right: $link.outerWidth(), width: 0 })
+            .val(message)
+            .insertAfter($link);
+          $link.css({ position: 'relative', zIndex: 1 }).before($input);
+
+          // Setup second input widget for full git commit command line.
+          self.createShellCommand = function (message, user) {
+            // -a is evil; people should use apply/am to apply patches, and many
+            // use 'git add -p' to selectively stage and commit changes.
+            // Also make sure any PHP variables are properly excaped.
+            var command = 'git commit -m "' + message.replace(/(\$|")/g, "/$1") + '"';
+            if (user && user.attribution) {
+              command += ' --author="' + user.attribution + '"';
+            }
+            return command;
+          };
+          var $commandContainer = $('<div id="dreditor-commitmessage-command" style="clear: both; padding: 1em 0;" />')
+            .appendTo($container);
+          var $commandInput = $('<input class="dreditor-input" type="text" autocomplete="off" />')
+            .val(self.createShellCommand(message));
+          // Add user list as commit attribution choices.
+          for (var user in users) {
+            var $userLink = $('<a href="#' + users[user].href + '/git-attribution" class="choice">' + users[user].name + '</a>')
+              .data('user', users[user]);
+            $userLink.click(function () {
+              var link = this;
+              // @todo Cache response per user.
+              $.getJSON(this.hash.substring(1), function (response) {
+                users[user].attribution = response.author;
+                $commandInput
+                  // Take over current commit message (might have been customized).
+                  .val(self.createShellCommand($input.val(), users[user]))
+                  .get(0).select();
+                $(link).addClass('selected').siblings().removeClass('selected');
+              });
+              return false;
+            });
+            $commandContainer.append($userLink);
           }
-          return command;
-        };
-        var $commandContainer = $('<div id="dreditor-commitmessage-command" style="clear: both; padding: 1em 0;" />')
-          .appendTo($container);
-        var $commandInput = $('<input class="dreditor-input" type="text" autocomplete="off" />')
-          .val(self.createShellCommand(message));
-        // Add user list as commit attribution choices.
-        for (var user in users) {
-          var $userLink = $('<a href="#' + users[user].href + '/git-attribution" class="choice">' + users[user].name + '</a>')
-            .data('user', users[user]);
-          $userLink.click(function () {
-            var link = this;
-            // @todo Cache response per user.
-            $.getJSON(this.hash.substring(1), function (response) {
-              users[user].attribution = response.author;
-              $commandInput
-                // Take over current commit message (might have been customized).
-                .val(self.createShellCommand($input.val(), users[user]))
-                .get(0).select();
-              $(link).addClass('selected').siblings().removeClass('selected');
+
+          $input.animate({ width: $container.width() - $link.width() - 10 }, null, null, function () {
+            this.select();
+
+            // Make the commit message text input dynamically attach to the bottom
+            // of the viewport upon scrolling.
+            var $window = $(window);
+            var inputOffset = $input.offset().top;
+            var inputOriginalStyle = $input.attr('style');
+            $window.scroll(function () {
+              if (inputOffset > $window.scrollTop() + $window.height()) {
+                $input.css({ position: 'fixed', bottom: 0 });
+              }
+              else {
+                $input.attr('style', inputOriginalStyle);
+              }
+            });
+
+            // Inject the shell command widget.
+            $commandContainer.hide().append($commandInput).slideDown('fast');
+          });
+
+          $link.one('click', function () {
+            $commandContainer.slideUp('fast');
+            $input.animate({ width: 0 }, null, null, function () {
+              $commandContainer.remove();
+              $input.remove();
             });
             return false;
           });
-          $commandContainer.append($userLink);
         }
-
-        $input.animate({ width: $container.width() - $link.width() - 10 }, null, null, function () {
-          this.select();
-
-          // Make the commit message text input dynamically attach to the bottom
-          // of the viewport upon scrolling.
-          var $window = $(window);
-          var inputOffset = $input.offset().top;
-          var inputOriginalStyle = $input.attr('style');
-          $window.scroll(function () {
-            if (inputOffset > $window.scrollTop() + $window.height()) {
-              $input.css({ position: 'fixed', bottom: 0 });
-            }
-            else {
-              $input.attr('style', inputOriginalStyle);
-            }
-          });
-
-          // Inject the shell command widget.
-          $commandContainer.hide().append($commandInput).slideDown('fast');
-        });
-
-        $link.one('click', function () {
-          $commandContainer.slideUp('fast');
-          $input.animate({ width: 0 }, null, null, function () {
-            $commandContainer.remove();
-            $input.remove();
-          });
-          return false;
-        });
-      }
-      return false;
+        return false;
+      });
+      $link.prependTo($container);
     });
-    $link.prependTo($container);
-  });
+  }
 };
 
 /**
  * Attach image attachment inline HTML injector to file attachments.
  */
-Drupal.behaviors.dreditorInlineImage = function (context) {
-  $('#upload-attachments, #comment-upload-attachments', context).once('dreditor-inlineimage', function () {
-    $(this).find('div.description').each(function () {
-      var url = $(this).text();
-      // Only process image attachments.
-      if (!url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
-        return;
-      }
-      // Generate inline image button.
-      var $button = $('<a class="dreditor-button dreditor-inlineimage" href="javascript:void(0);">Embed</a>').click(function () {
-        var desc = $(this).parent().siblings('input').val();
-        var image = '<img src="' + url + '" alt="' + desc + '" />';
-        // Append image to issue comment textarea (context is AHAH content here).
-        $('#edit-body, #edit-comment').val($('#edit-body, #edit-comment').val() + "\n" + image + "\n");
-        return false;
+Drupal.behaviors.dreditorInlineImage = {
+  attach: function (context) {
+    $('#upload-attachments, #comment-upload-attachments', context).once('dreditor-inlineimage', function () {
+      $(this).find('div.description').each(function () {
+        var url = $(this).text();
+        // Only process image attachments.
+        if (!url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
+          return;
+        }
+        // Generate inline image button.
+        var $button = $('<a class="dreditor-button dreditor-inlineimage" href="javascript:void(0);">Embed</a>').click(function () {
+          var desc = $(this).parent().siblings('input').val();
+          var image = '<img src="' + url + '" alt="' + desc + '" />';
+          // Append image to issue comment textarea (context is AHAH content here).
+          $('#edit-body, #edit-comment').val($('#edit-body, #edit-comment').val() + "\n" + image + "\n");
+          return false;
+        });
+        // Append inline image button to attachment.
+        $button.appendTo(this);
       });
-      // Append inline image button to attachment.
-      $button.appendTo(this);
     });
-  });
+  }
 };
 
 /**
  * Attaches syntax/markup autocompletion to all textareas.
  */
-Drupal.behaviors.dreditorSyntaxAutocomplete = function (context) {
-  $('textarea', context).once('dreditor-syntaxautocomplete', function () {
-    new Drupal.dreditor.syntaxAutocomplete(this);
-  });
+Drupal.behaviors.dreditorSyntaxAutocomplete = {
+  attach: function (context) {
+    $('textarea', context).once('dreditor-syntaxautocomplete', function () {
+      new Drupal.dreditor.syntaxAutocomplete(this);
+    });
+  }
 };
 
 /**
@@ -2500,152 +2431,160 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.comment = function (nee
 /**
  * Attach collapsing behavior to user project tables.
  */
-Drupal.behaviors.dreditorProjectsCollapse = function (context) {
-  var $tables = $('table.projects', context);
-  if (!$tables.length) {
-    return;
-  }
-  var enabled = Drupal.storage.load('projectscollapse.status');
+Drupal.behaviors.dreditorProjectsCollapse = {
+  attach: function (context) {
+    var $tables = $('table.projects', context);
+    if (!$tables.length) {
+      return;
+    }
+    var enabled = Drupal.storage.load('projectscollapse.status');
 
-  // Add link to toggle this feature.
-  $('<a href="#" class="dreditor-application-toggle"></a>')
-    .text(enabled ? 'Always show projects' : 'Collapse projects')
-    .click(function () {
-      Drupal.storage.save('projectscollapse.status', !enabled);
-      // Reload the current page without refresh from server.
-      window.location.href = window.location.href;
-      return false;
-    })
-    .insertBefore('table.projects:first');
-
-  if (!enabled) {
-    return;
-  }
-
-  // First table does not have a heading.
-  var $heading = $('h2#sandboxes').clone();
-  $heading.html($heading.html().replace('Sandbox p', 'P'))
-    .removeAttr('id')
-    .insertBefore('table.projects:first');
-
-  $tables.once('dreditor-projectscollapse', function () {
-    var $table = $(this);
-    $heading = $table.prevAll('h2').eq(0);
-    $heading.css({ cursor: 'pointer' })
-      .bind('click.projectscollapse', function () {
-        // .slideToggle() forgets about table width in d.o's outdated jQuery
-        // version.
-        $table.toggle();
+    // Add link to toggle this feature.
+    $('<a href="#" class="dreditor-application-toggle"></a>')
+      .text(enabled ? 'Always show projects' : 'Collapse projects')
+      .click(function () {
+        Drupal.storage.save('projectscollapse.status', !enabled);
+        // Reload the current page without refresh from server.
+        window.location.href = window.location.href;
+        return false;
       })
-      .triggerHandler('click');
-  });
+      .insertBefore('table.projects:first');
+
+    if (!enabled) {
+      return;
+    }
+
+    // First table does not have a heading.
+    var $heading = $('h2#sandboxes').clone();
+    $heading.html($heading.html().replace('Sandbox p', 'P'))
+      .removeAttr('id')
+      .insertBefore('table.projects:first');
+
+    $tables.once('dreditor-projectscollapse', function () {
+      var $table = $(this);
+      $heading = $table.prevAll('h2').eq(0);
+      $heading.css({ cursor: 'pointer' })
+        .bind('click.projectscollapse', function () {
+          // .slideToggle() forgets about table width in d.o's outdated jQuery
+          // version.
+          $table.toggle();
+        })
+        .triggerHandler('click');
+    });
+  }
 };
 
 /**
  * Attach mark as read to project issue tables.
  */
-Drupal.behaviors.dreditorIssueMarkAsRead = function (context) {
-  $('table.project-issue', context).once('dreditor-issuemarkasread', function () {
-    $(this).find('.marker').addClass('clickable').bind('click.dreditor-markasread', function () {
-      var $marker = $(this);
-      var $link = $marker.prev('a');
-      $.ajax({
-        // The actual HTML page output is irrelevant, so denote that by using
-        // the appropriate HTTP method.
-        type: 'HEAD',
-        url: $link.attr('href'),
-        complete: function () {
-          $marker.remove();
-        }
+Drupal.behaviors.dreditorIssueMarkAsRead = {
+  attach: function (context) {
+    $('table.project-issue', context).once('dreditor-issuemarkasread', function () {
+      $(this).find('.marker').addClass('clickable').bind('click.dreditor-markasread', function () {
+        var $marker = $(this);
+        var $link = $marker.prev('a');
+        $.ajax({
+          // The actual HTML page output is irrelevant, so denote that by using
+          // the appropriate HTTP method.
+          type: 'HEAD',
+          url: $link.attr('href'),
+          complete: function () {
+            $marker.remove();
+          }
+        });
       });
     });
-  });
+  }
 };
 
 /**
  * Attach issue count to project issue tables and hide fixed/needs more info issues without update marker.
  */
-Drupal.behaviors.dreditorIssueCount = function (context) {
-  $('table.project-issue', context).once('dreditor-issuecount', function () {
-    var $table = $(this);
-    var countTotal = $table.find('tbody tr').length;
-    var countSuffix = ($table.parent().parent().find('.pager').length ? '+' : '');
-    var countHidden = 0;
+Drupal.behaviors.dreditorIssueCount = {
+  attach: function (context) {
+    $('table.project-issue', context).once('dreditor-issuecount', function () {
+      var $table = $(this);
+      var countTotal = $table.find('tbody tr').length;
+      var countSuffix = ($table.parent().parent().find('.pager').length ? '+' : '');
+      var countHidden = 0;
 
-    var $container = $('<div class="dreditor-issuecount"></div>');
-    $table.before($container);
+      var $container = $('<div class="dreditor-issuecount"></div>');
+      $table.before($container);
 
-    // Add link to toggle this feature.
-    var enabled = Drupal.storage.load('issuecount.status');
-    $('<a href="#" class="dreditor-application-toggle"></a>')
-      .text(enabled ? 'Show all issues' : 'Hide irrelevant issues')
-      .click(function () {
-        Drupal.storage.save('issuecount.status', !enabled);
-        // Reload the current page without refresh from server.
-        window.location.href = window.location.href;
-        return false;
-      })
-      .prependTo($container);
-
-    if (enabled) {
-      countHidden = $table.find('tr.state-2, tr.state-16').not(':has(.marker)').addClass('dreditor-issue-hidden').hide().length;
-    }
-
-    // Output optimized count (minus hidden).
-    // Separate calculation required, or otherwise some browsers output NaN.
-    var count = countTotal - countHidden;
-    $container.append('<span class="dreditor-issuecount-total">Displaying <span class="count">' + count + '</span>' + countSuffix + ' issues.</span>');
-    if (!countHidden) {
-      return;
-    }
-    var $counter = $container.find('span.dreditor-issuecount-total span.count');
-
-    // Output 'fixed' count.
-    var $issuesFixed = $table.find('tr.state-2.dreditor-issue-hidden');
-    if ($issuesFixed.length) {
-      $('<a href="#" title="Show" class="dreditor-issuecount-hidden">' + $issuesFixed.length + ' fixed issues.' + '</a>')
+      // Add link to toggle this feature.
+      var enabled = Drupal.storage.load('issuecount.status');
+      $('<a href="#" class="dreditor-application-toggle"></a>')
+        .text(enabled ? 'Show all issues' : 'Hide irrelevant issues')
         .click(function () {
-          $issuesFixed.removeClass('dreditor-issue-hidden').show();
-          $counter.text(parseInt($counter.text(), 10) + $issuesFixed.length);
-          $(this).remove();
+          Drupal.storage.save('issuecount.status', !enabled);
+          // Reload the current page without refresh from server.
+          window.location.href = window.location.href;
           return false;
         })
-        .appendTo($container);
-    }
+        .prependTo($container);
 
-    // Output 'needs more info' count.
-    var $issuesInfo = $table.find('tr.state-16.dreditor-issue-hidden');
-    if ($issuesInfo.length) {
-      $('<a href="#" title="Show" class="dreditor-issuecount-hidden">' + $issuesInfo.length + ' issues need more info.' + '</a>')
-        .click(function () {
-          $issuesInfo.removeClass('dreditor-issue-hidden').show();
-          $counter.text(parseInt($counter.text(), 10) + $issuesInfo.length);
-          $(this).remove();
-          return false;
-        })
-        .appendTo($container);
-    }
-  });
+      if (enabled) {
+        countHidden = $table.find('tr.state-2, tr.state-16').not(':has(.marker)').addClass('dreditor-issue-hidden').hide().length;
+      }
+
+      // Output optimized count (minus hidden).
+      // Separate calculation required, or otherwise some browsers output NaN.
+      var count = countTotal - countHidden;
+      $container.append('<span class="dreditor-issuecount-total">Displaying <span class="count">' + count + '</span>' + countSuffix + ' issues.</span>');
+      if (!countHidden) {
+        return;
+      }
+      var $counter = $container.find('span.dreditor-issuecount-total span.count');
+
+      // Output 'fixed' count.
+      var $issuesFixed = $table.find('tr.state-2.dreditor-issue-hidden');
+      if ($issuesFixed.length) {
+        $('<a href="#" title="Show" class="dreditor-issuecount-hidden">' + $issuesFixed.length + ' fixed issues.' + '</a>')
+          .click(function () {
+            $issuesFixed.removeClass('dreditor-issue-hidden').show();
+            $counter.text(parseInt($counter.text(), 10) + $issuesFixed.length);
+            $(this).remove();
+            return false;
+          })
+          .appendTo($container);
+      }
+
+      // Output 'needs more info' count.
+      var $issuesInfo = $table.find('tr.state-16.dreditor-issue-hidden');
+      if ($issuesInfo.length) {
+        $('<a href="#" title="Show" class="dreditor-issuecount-hidden">' + $issuesInfo.length + ' issues need more info.' + '</a>')
+          .click(function () {
+            $issuesInfo.removeClass('dreditor-issue-hidden').show();
+            $counter.text(parseInt($counter.text(), 10) + $issuesInfo.length);
+            $(this).remove();
+            return false;
+          })
+          .appendTo($container);
+      }
+    });
+  }
 };
 
 /**
  * Prepopulate issue creation form with last used values.
  */
-Drupal.behaviors.dreditorIssueValues = function (context) {
-  // This catches only the issue creation form, since project issue/release data
-  // cannot be altered on node/#/edit.
-  $('#node-form:has(#edit-rid)', context).once('dreditor-issuevalues', function () {
-    var $form = $(this);
-    var values = Drupal.storage.load('issuevalues');
-    if (values) {
-      $.each(Drupal.storage.unserialize(values), function (name, value) {
-        $form.find(':input[name=' + name + ']').val(value);
+Drupal.behaviors.dreditorIssueValues = {
+  attach: function (context) {
+    // This catches only the issue creation form, since project issue/release data
+    // cannot be altered on node/#/edit.
+    $('#node-form:has(#edit-rid)', context).once('dreditor-issuevalues', function () {
+      var $form = $(this);
+      var values = Drupal.storage.load('issuevalues');
+      if (values) {
+        $.each(Drupal.storage.unserialize(values), function (name, value) {
+          $form.find(':input[name=' + name + ']').val(value);
+        });
+      }
+      $form.submit(function () {
+        Drupal.storage.save('issuevalues', Drupal.storage.serialize($('.inline-options:first :input', $form)));
       });
-    }
-    $form.submit(function () {
-      Drupal.storage.save('issuevalues', Drupal.storage.serialize($('.inline-options:first :input', $form)));
     });
-  });
+  }
 };
 
 /**
@@ -2658,102 +2597,108 @@ Drupal.behaviors.dreditorIssueValues = function (context) {
  * Input elements (except multiple selects) always serialize into an empty
  * string, so the entire element needs to be disabled.
  */
-Drupal.behaviors.dreditorIssuesFilterFormValuesClean = function (context) {
-  $('.view-filters form', context).once('dreditor-issues-form-values-clean', function () {
-    $(this).submit(function (event) {
-      var $form = $(this);
-      $.each(event.target.elements, function (index, element) {
-        var $element = $(element);
-        var value = $element.val();
-        switch (element.name) {
-          case 'text':
-          case 'assigned':
-          case 'submitted':
-          case 'participant':
-          case 'issue_tags':
-            if (value == '') {
-              element.disabled = true;
-            }
-            break;
+Drupal.behaviors.dreditorIssuesFilterFormValuesClean = {
+  attach: function (context) {
+    $('.view-filters form', context).once('dreditor-issues-form-values-clean', function () {
+      $(this).submit(function (event) {
+        var $form = $(this);
+        $.each(event.target.elements, function (index, element) {
+          var $element = $(element);
+          var value = $element.val();
+          switch (element.name) {
+            case 'text':
+            case 'assigned':
+            case 'submitted':
+            case 'participant':
+            case 'issue_tags':
+              if (value == '') {
+                element.disabled = true;
+              }
+              break;
 
-          case 'status':
-            if (value == 'Open') {
-              element.disabled = true;
-            }
-            break;
+            case 'status':
+              if (value == 'Open') {
+                element.disabled = true;
+              }
+              break;
 
-          case 'priorities':
-          case 'categories':
-          case 'version':
-          case 'component':
-            if (value == 'All') {
-              element.disabled = true;
-            }
-            break;
+            case 'priorities':
+            case 'categories':
+            case 'version':
+            case 'component':
+              if (value == 'All') {
+                element.disabled = true;
+              }
+              break;
 
-          case 'issue_tags_op':
-            if (value == 'or') {
-              element.disabled = true;
-            }
-            break;
-        }
+            case 'issue_tags_op':
+              if (value == 'or') {
+                element.disabled = true;
+              }
+              break;
+          }
+        });
       });
     });
-  });
+  }
 };
 
 /**
  * Add a 'Reset' button to project issue exposed views filter form.
  */
-Drupal.behaviors.dreditorIssuesFilterFormReset = function (context) {
-  if (!window.location.search) {
-    return;
+Drupal.behaviors.dreditorIssuesFilterFormReset = {
+  attach: function (context) {
+    if (!window.location.search) {
+      return;
+    }
+    $('.view-filters form', context).once('dreditor-issues-form-reset', function () {
+      var $form = $(this);
+      var $container = $form.find('input.form-submit').parent();
+      var $button = $container.clone().find('input').val('Reset').click(function () {
+        // Reload the current page without query string and without refresh.
+        Drupal.dreditor.redirect(null, { query: '' });
+        return false;
+      }).end();
+      $container.after($button);
+    });
   }
-  $('.view-filters form', context).once('dreditor-issues-form-reset', function () {
-    var $form = $(this);
-    var $container = $form.find('input.form-submit').parent();
-    var $button = $container.clone().find('input').val('Reset').click(function () {
-      // Reload the current page without query string and without refresh.
-      Drupal.dreditor.redirect(null, { query: '' });
-      return false;
-    }).end();
-    $container.after($button);
-  });
 };
 
 /**
  * Attach clone issue button to issues.
  */
-Drupal.behaviors.dreditorIssueClone = function (context) {
-  $('#comment-form:has(#edit-category)', context).once('dreditor-clone-button', function () {
-    var $form = $(this);
-    // Attach a button.
-    var $button = $('<li><button id="dreditor-clone-button" class="dreditor-button">Clone issue</button></li>');
-    $button.appendTo($('#tabs ul'));
-    $button.bind('click.dreditor-clone', function () {
-      // Open a new window.
-      var project = /[^/]*$/.exec($('div.breadcrumb').find('a').attr('href'))[0];
-      var w = window.open('//drupal.org/node/add/project-issue/' + project + '#edit-rid-wrapper', '_blank');
+Drupal.behaviors.dreditorIssueClone = {
+  attach: function (context) {
+    $('#comment-form:has(#edit-category)', context).once('dreditor-clone-button', function () {
+      var $form = $(this);
+      // Attach a button.
+      var $button = $('<li><button id="dreditor-clone-button" class="dreditor-button">Clone issue</button></li>');
+      $button.appendTo($('#tabs ul'));
+      $button.bind('click.dreditor-clone', function () {
+        // Open a new window.
+        var project = /[^/]*$/.exec($('div.breadcrumb').find('a').attr('href'))[0];
+        var w = window.open('//drupal.org/node/add/project-issue/' + project + '#edit-rid-wrapper', '_blank');
 
-      w.onload = function () {
-        $(w).ready(function () {
-          setTimeout(function () {
-            var $doc = $(w.document);
-            $doc.find('#edit-rid').val($form.find('#edit-project-info-rid').val());
-            $doc.find('#edit-component').val($form.find('#edit-project-info-component').val());
-            $doc.find('#edit-category').val($form.find('#edit-category').val());
-            $doc.find('#edit-priority').val($form.find('#edit-priority').val());
-            $doc.find('#edit-assigned').val($form.find('#edit-project-info-assigned').val());
-            $doc.find('#edit-taxonomy-tags-9').val($form.find('#edit-taxonomy-tags-9').val());
-            $doc.find('.node-form .collapsed').removeClass('collapsed');
-            var matches = window.location.href.match('^https?://drupal.org/node/([0-9]+)');
-            $doc.find('#edit-body').val('Follow-up from [#' + matches[1] + '].\n\n');
-            $doc.find('#edit-title').focus();
-          }, 10);
-        });
-      };
+        w.onload = function () {
+          $(w).ready(function () {
+            setTimeout(function () {
+              var $doc = $(w.document);
+              $doc.find('#edit-rid').val($form.find('#edit-project-info-rid').val());
+              $doc.find('#edit-component').val($form.find('#edit-project-info-component').val());
+              $doc.find('#edit-category').val($form.find('#edit-category').val());
+              $doc.find('#edit-priority').val($form.find('#edit-priority').val());
+              $doc.find('#edit-assigned').val($form.find('#edit-project-info-assigned').val());
+              $doc.find('#edit-taxonomy-tags-9').val($form.find('#edit-taxonomy-tags-9').val());
+              $doc.find('.node-form .collapsed').removeClass('collapsed');
+              var matches = window.location.href.match('^https?://drupal.org/node/([0-9]+)');
+              $doc.find('#edit-body').val('Follow-up from [#' + matches[1] + '].\n\n');
+              $doc.find('#edit-title').focus();
+            }, 10);
+          });
+        };
+      });
     });
-  });
+  }
 };
 
 /**
