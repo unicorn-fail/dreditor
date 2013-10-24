@@ -93,6 +93,47 @@ jQuery.extend({
 // @todo Is this the right way?
 jQuery.fn.debug = jQuery.debug;
 
+/**
+ * sort() callback to sort DOM elements by their actual DOM position.
+ *
+ * Copied from jQuery 1.3.2.
+ *
+ * @see Drupal.dreditor.patchReview.sort()
+ */
+var sortOrder;
+
+if ( document.documentElement.compareDocumentPosition ) {
+  sortOrder = function( a, b ) {
+    var ret = a.compareDocumentPosition(b) & 4 ? -1 : a === b ? 0 : 1;
+    if ( ret === 0 ) {
+      hasDuplicate = true;
+    }
+    return ret;
+  };
+} else if ( "sourceIndex" in document.documentElement ) {
+  sortOrder = function( a, b ) {
+    var ret = a.sourceIndex - b.sourceIndex;
+    if ( ret === 0 ) {
+      hasDuplicate = true;
+    }
+    return ret;
+  };
+} else if ( document.createRange ) {
+  sortOrder = function( a, b ) {
+    var aRange = a.ownerDocument.createRange(), bRange = b.ownerDocument.createRange();
+    aRange.selectNode(a);
+    aRange.collapse(true);
+    bRange.selectNode(b);
+    bRange.collapse(true);
+    var ret = aRange.compareBoundaryPoints(Range.START_TO_END, bRange);
+    if ( ret === 0 ) {
+      hasDuplicate = true;
+    }
+    return ret;
+  };
+}
+// end sortOrder
+
 Drupal.dreditor = {
   behaviors: {},
 
@@ -631,7 +672,7 @@ Drupal.behaviors.dreditorPatchReview = {
       return;
     }
     // d.o infrastructure -- are you nuts?!
-    $('#attachments, table.comment-upload-attachments, div[id^=pift-results]', context).once('dreditor-patchreview', function () {
+    $('.field-type-file, .nodechanges-file-changes', context).once('dreditor-patchreview', function () {
       $('a', this).each(function () {
         if (this.href.match(/\.(patch|diff|txt)$/)) {
           // Generate review link.
@@ -960,7 +1001,7 @@ Drupal.dreditor.patchReview = {
     }
 
     // Paste comment into issue comment textarea.
-    var $commentField = $('#edit-comment');
+    var $commentField = $('#comment-form textarea[name^="comment_body"]');
     $commentField.val($commentField.val() + html);
     // Flush posted comments.
     this.comment.comments = [];
@@ -968,7 +1009,7 @@ Drupal.dreditor.patchReview = {
     // @todo Prevent unintended/inappropriate status changes.
     //$('#edit-sid').val(13);
     // Jump to the issue comment textarea after pasting.
-    Drupal.dreditor.goto('#edit-comment');
+    Drupal.dreditor.goto('#comment-form');
     // Close Dreditor.
     Drupal.dreditor.tearDown();
   }
@@ -2713,10 +2754,10 @@ if (window.location.href.match('dreditor.org')) {
 }
 
 // Load jQuery UI if necessary.
-if (window.jQuery !== undefined && window.jQuery.fn.jquery === '1.2.6' && window.jQuery.ui === undefined) {
+if (window.jQuery !== undefined && window.jQuery.fn.jquery >= '1.4.4' && window.jQuery.ui === undefined) {
   var script_tag = document.createElement('script');
   script_tag.setAttribute("type","text/javascript");
-  script_tag.setAttribute("src","//ajax.googleapis.com/ajax/libs/jqueryui/1.6/jquery-ui.min.js");
+  script_tag.setAttribute("src","//ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js");
   (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
 }
 
