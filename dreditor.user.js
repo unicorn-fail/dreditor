@@ -100,8 +100,7 @@ jQuery.fn.debug = jQuery.debug;
  *
  * @see Drupal.dreditor.patchReview.sort()
  */
-var sortOrder;
-
+var sortOrder, hasDuplicate;
 if ( document.documentElement.compareDocumentPosition ) {
   sortOrder = function( a, b ) {
     var ret = a.compareDocumentPosition(b) & 4 ? -1 : a === b ? 0 : 1;
@@ -135,8 +134,8 @@ if ( document.documentElement.compareDocumentPosition ) {
 // end sortOrder
 
 Drupal.dreditor = {
+  version: '1.2.0',
   behaviors: {},
-
   setup: function (context) {
     var self = this;
 
@@ -177,6 +176,7 @@ Drupal.dreditor = {
 
     // Make bar/content resizeable
     $bar.resizable({
+      handles: 'e',
       minWidth: 230,
       resize: function(e, ui) {
         $content.css('marginLeft', (ui.element.outerWidth() - 1));
@@ -563,26 +563,27 @@ Drupal.storage.unserialize = function (str) {
  * Checks for Dreditor updates every once in a while.
  */
 Drupal.dreditor.updateCheck = function () {
+  // Do not update check for any webkit based browsers, they are extensions and
+  // are automatically updated.
+  if (jQuery.browser.webkit) {
+    return;
+  }
+
   var now = new Date();
   // Time of the last update check performed.
   var lastUpdateCheck = Drupal.storage.load('lastUpdateCheck');
-  // Time of the last change parsed out of commit log.
-  var lastUpdate = Drupal.storage.load('lastUpdate');
 
   // Do not check for updates if the user just installed Dreditor.
   if (lastUpdateCheck == null) {
     Drupal.storage.save('lastUpdateCheck', now.getTime());
-    // As we just installed/updated, the last change is also now.
-    Drupal.storage.save('lastUpdate', now.getTime());
     return;
   }
   else {
     lastUpdateCheck = new Date(lastUpdateCheck);
-    lastUpdate = new Date(lastUpdate);
   }
 
-  // Check whether it is time to check for updates.
-  var interval = 1000 * 60 * 60 * 24 * 14; // 14 days
+  // Check whether it is time to check for updates (one a week).
+  var interval = 1000 * 60 * 60 * 24 * 7;
   // Convert to time; JS confuses timezone offset in ISO dates with seconds.
   if (lastUpdateCheck.getTime() + interval > now.getTime()) {
     return;
@@ -594,22 +595,24 @@ Drupal.dreditor.updateCheck = function () {
   // would run on every page load again.
   Drupal.storage.save('lastUpdateCheck', now.getTime());
 
-  var lastChange, doUpdate;
-  $.ajax({
-    url: '//drupal.org/node/525726/commits',
-    success: function (data) {
-      lastChange = $('.commit-global:first h3 a:last', data);
-      if (lastChange.length) {
-        lastChange = new Date(lastChange.text());
-        if (lastChange > lastUpdate) {
-          doUpdate = window.confirm('Dreditor got improved! Visit the project page to update?');
-          if (doUpdate) {
-            window.open('//drupal.org/project/dreditor', 'dreditor');
-            // Update the stored timestamp if the user confirmed.
-            Drupal.storage.save('lastUpdate', lastChange.getTime());
-          }
-        }
+  var latestVersion, installedVersion = Drupal.dreditor.version;
+  // Determine the latest tagged release from GitHub API.
+  $.getJSON('https://api.github.com/repos/dreditor/dreditor/tags', function (json) {
+    for (var i = 0; i < json.length; i++) {
+      // Find the latest stable release (no "rc", "beta" or "dev" releases).
+      if (json[i].name.indexOf('rc') === -1 && json[i].name.indexOf('beta') === -1 && json[i].name.indexOf('dev') === -1) {
+        latestVersion = json[i].name;
+        break;
       }
+    }
+    if (latestVersion > installedVersion) {
+      if (window.confirm('A new version of Dreditor is available: ' + latestVersion + '. Your current installed version of Dreditor is: ' + installedVersion + '. Would you like to visit http://dreditor.org and update?')) {
+        window.open('//dreditor.org', 'dreditor');
+      }
+    }
+    if (window.console) {
+      window.console.log('Installed Dreditor version: ' + installedVersion);
+      window.console.log('Latest Dreditor version: ' + latestVersion);
     }
   });
 };
@@ -648,7 +651,7 @@ Drupal.dreditor.form.form.prototype = {
   addButton: function (op, onSubmit) {
     var self = this;
     self.submitHandlers[op] = onSubmit;
-    var $button = $('<input name="op" class="dreditor-button" type="submit" value="' + op + '" />');
+    var $button = $('<input name="op" class="dreditor-button" type="button" value="' + op + '" />');
     $button.bind('click.form', function () {
       self.submitHandlers[op].call(self, $button);
     });
@@ -662,6 +665,83 @@ Drupal.dreditor.form.form.prototype = {
  * @} End of "defgroup form_api".
  */
 
+
+
+/**
+ * PIFT enhancements.
+ */
+Drupal.behaviors.dreditorPIFT = {
+  attach: function (context) {
+    var $context = $(context);
+    var $table = $context.find('.field-name-field-issue-files table');
+    $table.find('th[name*="size"], th[name*="uid"]').remove();
+    $table.find('tbody tr').each(function() {
+      var $row = $(this);
+      // File row.
+      if ($row.is('.extended-file-field-table-row:not(.pift-test-info)')) {
+        var $cid = $row.find('.extended-file-field-table-cid');
+        var $file = $row.find('.extended-file-field-table-filename .file');
+        var $size = $row.find('.extended-file-field-table-filesize');
+        var $name = $row.find('.extended-file-field-table-uid');
+        var comment = parseInt($cid.text().replace('#', ''), 10);
+        $file.prepend('<span class="size">' + $size.text() + '</span>');
+        $size.remove();
+        $cid.append($name.html());
+        $name.remove();
+        var $prevCid = $table.find('tr[data-comment="' + comment +'"] .extended-file-field-table-cid');
+        if ($prevCid.length) {
+          var rowspan = parseInt($cid.attr('rowspan'), 10) || 1;
+          $prevCid.attr('rowspan', (parseInt($prevCid.attr('rowspan'), 10) + rowspan));
+          $cid.remove();
+        }
+        else {
+          $row.attr('data-comment', comment);
+        }
+      }
+      // PIFT row.
+      else if ($row.is('.pift-test-info')) {
+        var $cell = $row.find('td');
+        $row.prev().find('td:not(.extended-file-field-table-cid)').addClass($cell.attr('class'));
+        $cell.find('.pift-operations').prependTo($cell).find('a').each(function () {
+          if (this.innerText === 'View') {
+            this.innerText = Drupal.t('View Results');
+          }
+          else if (this.innerText === 'Retest') {
+            this.innerText = Drupal.t('Re-test');
+          }
+        });
+      }
+    });
+
+    $table = $context.find('.field-name-field-issue-changes table');
+    $table.find('th:first, th:last').remove();
+    $table.find('tbody tr').each(function() {
+      var $row = $(this);
+      $row.find('.nodechanges-file-status').remove();
+      // File row.
+      if ($row.is('.pift-file-info')) {
+        var $file = $row.find('.nodechanges-file-link .file');
+        var $size = $row.find('.nodechanges-file-size');
+        $file.prepend('<span class="size">' + $size.text() + '</span>');
+        $size.remove();
+      }
+      // PIFT row.
+      else if ($row.is('.pift-test-info')) {
+        var $cell = $row.find('td');
+        $row.prev().find('td').addClass($cell.attr('class'));
+        $cell.find('.pift-operations').prependTo($cell).find('a').each(function () {
+          if (this.innerText === 'View') {
+            this.innerText = Drupal.t('View Results');
+          }
+          else if (this.innerText === 'Retest') {
+            this.innerText = Drupal.t('Re-test');
+          }
+        });
+      }
+    });
+  }
+};
+
 /**
  * Attach patch review editor to issue attachments.
  */
@@ -671,7 +751,6 @@ Drupal.behaviors.dreditorPatchReview = {
     if (!$(context).find('#comment-form').length) {
       return;
     }
-    // d.o infrastructure -- are you nuts?!
     $('.field-type-file, .nodechanges-file-changes', context).once('dreditor-patchreview', function () {
       $('a', this).each(function () {
         if (this.href.match(/\.(patch|diff|txt)$/)) {
@@ -687,7 +766,7 @@ Drupal.behaviors.dreditorPatchReview = {
             return false;
           });
           // Append review link to parent table cell.
-          $link.appendTo(this.parentNode);
+          $link.prependTo($(this).parents('tr').find('.file'));
 
           // Generate simplytest.me links only for patches and diffs.
           if (this.href.substr(-6) === '.patch' || this.href.substr(-5) === '.diff') {
@@ -1190,7 +1269,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     });
 
     // parse hunk line numbers
-    line_numbers = line.match(/^@@ -([0-9]+),[0-9]+ \+([0-9]+),[0-9]+ @@/);
+    var line_numbers = line.match(/^@@ -([0-9]+),[0-9]+ \+([0-9]+),[0-9]+ @@/);
     if (line_numbers) {
       ln1 = line_numbers[1];
       ln2 = line_numbers[2];
@@ -1198,14 +1277,14 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
 
     var classes = [], syntax = false;
     // Colorize file diff lines.
-    if (line.match(/^((Index|===|RCS|new file mode|deleted file mode|retrieving|diff|\-\-\- |\+\+\+ |@@ ).*)$/i)) {
+    if (line.match(/^((index|===|RCS|new file mode|deleted file mode|retrieving|diff|\-\-\-\s|\-\-\s|\+\+\+\s|@@\s).*)$/i)) {
       classes.push('file');
       ln1o = false;
       ln2o = false;
       prettify_line = false;
     }
     // Colorize old code, but skip file diff lines.
-    else if (line.match(/^((?!\-\-\-)\-.*)$/)) {
+    else if (line.match(/^((?!\-\-\-|\-\-)\-.*)$/)) {
       classes.push('old');
       diffstat.deletions++;
       if (ln1) {
@@ -1230,9 +1309,16 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
         ln2++;
       }
     }
-    // Skip entirely empty lines (in diff files, this is only the last newline).
+    // Replace line with a space (so ruler shows up).
     else if (!line.length) {
-      continue;
+      line = '&nbsp;';
+    }
+    // Match git format-patch EOF lines and reset line count.
+    else if (line.match(/^\-\-$/)) {
+      ln1o = false;
+      ln2o = false;
+      ln1 = '';
+      ln2 = '';
     }
     // Detect missing newline at end of file.
     else if (line.match(/.*No newline at end of file.*/i)) {
@@ -1240,8 +1326,8 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     }
     else {
       // @todo Also colorizing unchanged lines makes added comments almost
-      //   invisible. Although we could use .new.comment as CSS selector, the
-      //   question of a sane color scheme remains.
+      // invisible. Although we could use .new.comment as CSS selector, the
+      // question of a sane color scheme remains.
       // syntax = true;
       if (ln1 && ln1o) {
         ln1++;
@@ -1393,7 +1479,7 @@ Drupal.dreditor.patchReview.behaviors.attachPastie = function (context) {
 Drupal.dreditor.patchReview.behaviors.saveButton = function (context) {
   if (!$('#dreditor-actions #dreditor-save', context).length) {
     // @todo Convert global Dreditor buttons into a Dreditor form.
-    var $save = $('<input id="dreditor-save" class="dreditor-button" type="submit" value="Paste" />');
+    var $save = $('<input id="dreditor-save" class="dreditor-button" type="button" value="Paste" />');
     $save.click(function () {
       Drupal.dreditor.patchReview.paste();
       return false;
@@ -1793,7 +1879,7 @@ Drupal.behaviors.dreditorPatchNameSuggestion = {
         }
 
         if (nid != 0) {
-          newCommentNumber = Drupal.dreditor.issue.getNewCommentNumber();
+          var newCommentNumber = Drupal.dreditor.issue.getNewCommentNumber();
 
           patchName += '-' + nid + '-' + newCommentNumber;
         }
@@ -1906,7 +1992,7 @@ Drupal.dreditor.issue.getSelectedVersion = function() {
  *   7.20
  */
 Drupal.dreditor.issue.getSelectedVersionCore = function() {
-  version = Drupal.dreditor.issue.getSelectedVersion();
+  var version = Drupal.dreditor.issue.getSelectedVersion();
   var matches = version.match(/^(\d+\.[x\d]+)/);
   if (matches) {
     return matches[0];
@@ -1924,7 +2010,7 @@ Drupal.dreditor.issue.getSelectedVersionCore = function() {
  *   1.2
  */
 Drupal.dreditor.issue.getSelectedVersionContrib = function() {
-  version = Drupal.dreditor.issue.getSelectedVersion();
+  var version = Drupal.dreditor.issue.getSelectedVersion();
   var matches = version.match(/^\d+\.x-(\d+\.[x\d]+)/);
   if (matches) {
     return matches[1];
@@ -2755,10 +2841,15 @@ if (window.location.href.match('dreditor.org')) {
 
 // Load jQuery UI if necessary.
 if (window.jQuery !== undefined && window.jQuery.fn.jquery >= '1.4.4' && window.jQuery.ui === undefined) {
-  var script_tag = document.createElement('script');
-  script_tag.setAttribute("type","text/javascript");
-  script_tag.setAttribute("src","//ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js");
-  (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
+  var jqueryui_script = document.createElement('script');
+  jqueryui_script.setAttribute('type', 'text/javascript');
+  jqueryui_script.setAttribute("src", '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js');
+  (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(jqueryui_script);
+  var jqueryui_style = document.createElement('link');
+  jqueryui_style.setAttribute('type', 'text/css');
+  jqueryui_style.setAttribute('rel', 'stylesheet');
+  jqueryui_style.setAttribute('href', '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/themes/base/jquery-ui.css');
+  (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(jqueryui_style);
 }
 
 jQuery(document).ready(function () {
@@ -2773,9 +2864,9 @@ document.getElementsByTagName('head')[0].appendChild(styles);
 styles.innerHTML = " \
 #dreditor-wrapper { position: fixed; z-index: 1000; width: 100%; top: 0; } \
 #dreditor { position: relative; width: 100%; height: 100%; background-color: #fff; border: 1px solid #ccc; } \
-#dreditor #bar, #dreditor-actions { width: 230px; padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; } \
+#dreditor #bar, #dreditor-actions { padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; min-width: 230px; } \
 #dreditor #bar { position: absolute; height: 100%; } \
-#dreditor-actions { background-color: #fff; bottom: 0; padding-top: 5px; padding-bottom: 5px; position: absolute; } \
+#dreditor-actions { bottom: 0; left: -5px; padding-top: 5px; padding-bottom: 5px; position: absolute; } \
 .dreditor-button, .dreditor-button:link, .dreditor-button:visited, #content a.dreditor-button { background: rgb(122,188,255); \
   background: -moz-linear-gradient(top, rgba(122,188,255,1) 0%, rgba(96,171,248,1) 44%, rgba(64,150,238,1) 100%); \
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(122,188,255,1)), color-stop(44%,rgba(96,171,248,1)), color-stop(100%,rgba(64,150,238,1))); \
@@ -2801,8 +2892,8 @@ styles.innerHTML = " \
   background: -ms-linear-gradient(top, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%); \
   background: linear-gradient(to bottom, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%); \
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4096ee', endColorstr='#7abcff',GradientType=0 ); } \
-.dreditor-button { margin: 0 0.5em 0 0; } \
-.dreditor-patchreview-processed td:first-child a:first-child { margin-right: 1em; white-space: nowrap; } \
+.dreditor-button { margin: 0 0.5em 0.5em; } \
+.dreditor-patchreview { float: right; line-height: 1.25em; margin: 0 0 0 1em; }\
 #dreditor h3 { margin: 18px 0 0; }\
 #dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; } \
 #dreditor #menu li { list-style: none; margin: 0; white-space: nowrap; } \
@@ -2827,9 +2918,9 @@ styles.innerHTML = " \
 #dreditor #code .pre span.error.eof { color: #fff; background-color: #f66; } \
 #dreditor #code .pre span.error.tab { background-color: #fdd; } \
 #dreditor #code .pre span.hidden { display: none; } \
-#dreditor #code tr.file { color: #999; background-color: #eee; } \
-#dreditor #code .file a { color: #999; } \
-#dreditor #code .old { background-color: #fdd; color: #444; } \
+#dreditor #code tr.file { color: #718CAA; background-color: #E8F1F6; } \
+#dreditor #code .file a { color: #718CAA; } \
+#dreditor #code .old { background-color: #fdd; color: #CC0000; } \
 #dreditor #code .old .ln { background-color: #f7c8c8; border-color: #e9aeae; } \
 #dreditor #code .old .line-ruler { background-color: #B53B3B; background-color: rgba(181, 59, 59, 0.2); } \
 #dreditor #code .new { background-color: #dfd; color: #444; float: none; font-size: 100%; font-weight: normal; } \
@@ -2839,8 +2930,8 @@ styles.innerHTML = " \
 \
 #dreditor #code .has-comment { background: #f6e8b5; } \
 #dreditor #code .has-comment .ln { background: #f6e8b5;  border-color: #f0db88; } \
-#dreditor #code .selected, #dreditor #code .pre-selected { background: #ffc } \
-#dreditor #code .selected .ln, #dreditor #code .pre-selected .ln { background: #ffc;  border-color: #f0db88; } \
+#dreditor #code .selected, #dreditor #code .pre-selected { background: #FFE47E; } \
+#dreditor #code .selected .ln, #dreditor #code .pre-selected .ln { background: #FFE47E;  border-color: #f0db88; } \
 \
 .element-invisible { clip: rect(1px, 1px, 1px, 1px); position: absolute !important; } \
 .admin-link { font-size: 11px; font-weight: normal; text-transform: lowercase; } \
@@ -2866,6 +2957,23 @@ div.dreditor-issuecount { line-height: 200%; } \
 #dreditor-issue-data .inline-options .form-item { margin-bottom: 0.3em; } \
  \
 .dreditor-tooltip { display: none; position: fixed; bottom: 0; background-color: #ffffbf; border: 1px solid #000; padding: 0 3px; font-family: sans-serif; font-size: 11px; line-height: 150%; } \
+\
+.field-name-field-issue-changes table td .file { display: block; }\
+td.extended-file-field-table-cid { text-align: right; }\
+td.extended-file-field-table-cid .username { color: #999; display: block; font-size: 10px; }\
+td.extended-file-field-table-filename .file { font-weight: 600; }\
+td.extended-file-field-table-filename .file a { display: block; overflow: hidden; }\
+td.extended-file-field-table-filename .file .file-icon { float: left; margin-right: .5em; }\
+td.extended-file-field-table-filename .file .size { color: #999; float: right; font-size: 10px; margin-left: .5em; }\
+tr.extended-file-field-table-row td, .field-name-field-issue-changes table td { padding: .75em; }\
+tr.extended-file-field-table-row:not(.pift-test-info) td.pift-pass, tr.extended-file-field-table-row:not(.pift-test-info) td.pift-fail { padding-bottom: 0; }\
+tr.pift-test-info td { font-size: 11px; font-style: italic; padding: 0.5em .75em .75em 2.9em; }\
+div.pift-operations { color: inherit; float: right; font-size: 10px; font-style: normal; font-weight: 600; margin-left: 1em; text-transform: uppercase; }\
+td.pift-pass { background: #DDFFDD; color: #00AA00; }\
+tr.extended-file-field-table-row td.pift-pass { border-color: #87CF87; }\
+tr.extended-file-field-table-row td.pift-fail { border-color: #EEBBBB; }\
+td.pift-fail { background: #FFECEC; color: #CC0000; }\
+td.pift-pass a, td.pift-fail a, td.pift-pass .file .size, td.pift-fail .file .size { color: inherit; }\
 ";
 
 // Invoke Dreditor update check once.
