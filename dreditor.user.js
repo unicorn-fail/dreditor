@@ -673,51 +673,54 @@ Drupal.dreditor.form.form.prototype = {
 Drupal.behaviors.dreditorPIFT = {
   attach: function (context) {
     var $context = $(context);
-    var $table = $context.find('.field-name-field-issue-files table');
-    $table.find('th[name*="size"], th[name*="uid"]').remove();
-    $table.find('tbody tr').each(function() {
-      var $row = $(this);
-      // File row.
-      if ($row.is('.extended-file-field-table-row:not(.pift-test-info)')) {
-        var $cid = $row.find('.extended-file-field-table-cid');
-        var $file = $row.find('.extended-file-field-table-filename .file');
-        var $size = $row.find('.extended-file-field-table-filesize');
-        var $name = $row.find('.extended-file-field-table-uid');
-        var comment = parseInt($cid.text().replace('#', ''), 10);
-        $file.prepend('<span class="size">' + $size.text() + '</span>');
-        $size.remove();
-        $cid.append($name.html());
-        $name.remove();
-        var $prevCid = $table.find('tr[data-comment="' + comment +'"] .extended-file-field-table-cid');
-        if ($prevCid.length) {
-          var rowspan = parseInt($cid.attr('rowspan'), 10) || 1;
-          $prevCid.attr('rowspan', (parseInt($prevCid.attr('rowspan'), 10) + rowspan));
-          $cid.remove();
-        }
-        else {
-          $row.attr('data-comment', comment);
-        }
-      }
-      // PIFT row.
-      else if ($row.is('.pift-test-info')) {
-        var $cell = $row.find('td');
-        $row.prev().find('td:not(.extended-file-field-table-cid)').addClass($cell.attr('class'));
-        $cell.find('.pift-operations').prependTo($cell).find('a').each(function () {
-          if (this.innerText === 'View') {
-            this.innerText = Drupal.t('View Results');
+    $context.find('.field-name-field-issue-files').attr('id', 'recent-files');
+    $context.find('.field-name-field-issue-files table').each(function () {
+      var $table = $(this);
+      $table.find('th[name*="size"], th[name*="uid"]').remove();
+      $table.find('tbody tr').each(function() {
+        var $row = $(this);
+        // File row.
+        if ($row.is('.extended-file-field-table-row:not(.pift-test-info)')) {
+          var $cid = $row.find('.extended-file-field-table-cid');
+          var $file = $row.find('.extended-file-field-table-filename .file');
+          var $size = $row.find('.extended-file-field-table-filesize');
+          var $name = $row.find('.extended-file-field-table-uid');
+          var comment = parseInt($cid.text().replace('#', ''), 10);
+          $file.prepend('<span class="size">' + $size.text() + '</span>');
+          $size.remove();
+          $cid.append($name.html());
+          $name.remove();
+          var $prevCid = $table.find('tr[data-comment="' + comment +'"] .extended-file-field-table-cid');
+          if ($prevCid.length) {
+            var rowspan = $cid.attr('rowspan');
+            $prevCid.attr('rowspan', ($prevCid.attr('rowspan') + rowspan));
+            $cid.remove();
           }
-          else if (this.innerText === 'Retest') {
-            this.innerText = Drupal.t('Re-test');
+          else {
+            $row.attr('data-comment', comment);
           }
-        });
-      }
+        }
+        // PIFT row.
+        else if ($row.is('.pift-test-info')) {
+          var $cell = $row.find('td');
+          $row.prev().find('td:not(.extended-file-field-table-cid)').addClass($cell.attr('class'));
+          $cell.find('.pift-operations').prependTo($cell).find('a').each(function () {
+            if (this.innerText === 'View') {
+              this.innerText = Drupal.t('View Results');
+            }
+            else if (this.innerText === 'Retest') {
+              this.innerText = Drupal.t('Re-test');
+            }
+          });
+        }
+      });
     });
 
-    $table = $context.find('.field-name-field-issue-changes table');
-    $table.find('th:first, th:last').remove();
+    var $table = $context.find('.field-name-field-issue-changes table').filter('.sticky-table');
+    $table.after('<p><a href="#recent-files">Back to recent files</a></p>');
+    $table.find('th:last').remove();
     $table.find('tbody tr').each(function() {
       var $row = $(this);
-      $row.find('.nodechanges-file-status').remove();
       // File row.
       if ($row.is('.pift-file-info')) {
         var $file = $row.find('.nodechanges-file-link .file');
@@ -1222,7 +1225,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   code = code.replace(/^\# .+\n|^\? .+\n/mg, '');
 
   // Setup code container.
-  var $code = $('<table id="code"></table>');
+  var $code = $('<table id="code" unselectable="on"></table>');
   var $menu = $('#menu', context);
   var $lastFile = $('<li>Parse error</li>');
 
@@ -1780,8 +1783,8 @@ Drupal.behaviors.dreditorIssueCommentForm = {
  */
 Drupal.behaviors.dreditorIssueCommentFormSticky = {
   attach: function (context) {
-    $(context).find('.dreditor-issue-comment-form-processed').once('dreditor-issue-comment-form-sticky', function () {
-      var $wrapper = $(this).find('#edit-comment-wrapper > .resizable-textarea');
+    $(context).find('.comment-form').once('dreditor-issue-comment-form-sticky', function () {
+      var $wrapper = $(this).find('.resizable-textarea');
       var $toggle = $('<a href="javascript:void(0);" class="dreditor-application-toggle">Make sticky</a>');
       $toggle.click(function () {
         if ($wrapper.attr('id')) {
@@ -1793,7 +1796,7 @@ Drupal.behaviors.dreditorIssueCommentFormSticky = {
           $toggle.addClass('active').text('Unstick');
         }
       });
-      $wrapper.find('> span').prepend($toggle);
+      $wrapper.prepend($toggle);
     });
   }
 };
@@ -2893,7 +2896,7 @@ styles.innerHTML = " \
   background: linear-gradient(to bottom, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%); \
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4096ee', endColorstr='#7abcff',GradientType=0 ); } \
 .dreditor-button { margin: 0 0.5em 0.5em; } \
-.dreditor-patchreview { float: right; line-height: 1.25em; margin: 0 0 0 1em; }\
+.dreditor-patchreview { float: right; line-height: 1.25em; margin: 0 0 0 1em; } \
 #dreditor h3 { margin: 18px 0 0; }\
 #dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; } \
 #dreditor #menu li { list-style: none; margin: 0; white-space: nowrap; } \
@@ -2904,12 +2907,11 @@ styles.innerHTML = " \
 #dreditor .resizable-textarea { margin: 0 0 9px; } \
 #dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; overflow: scroll; height: 100%; } \
 #dreditor-content, #code tr, #code td { font: 13px/18px Consolas, 'Liberation Mono', Courier, monospace; } \
-#dreditor #code { position: relative; width:100%; } \
+#dreditor #code { position: relative; width:100%; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; } \
 #dreditor #code td { overflow: hidden; padding: 0 10px; } \
 #dreditor #code .ln { -webkit-user-select: none; width:1px; border-right: 1px solid #e5e5e5; text-align: right; } \
 #dreditor #code .ln:before { content: attr(data-line-number); } \
-#dreditor #code tr { background: transparent; border: 0; color: #999; margin: 0; padding: 0; } \
-#dreditor #code tr:hover, #dreditor #code tr:hover td, #dreditor #code tr:hover td a { background: #FFF3C6 !important; border-color: #E8DAB3 !important; color: #9A7C29 !important; cursor: pointer; } \
+#dreditor #code tr { background: transparent; border: 0; color: #aaa; margin: 0; padding: 0; } \
 #dreditor #code .pre { white-space: pre; background: transparent; position: relative; } \
 #dreditor #code .pre .line-ruler { background: #ccc; background: rgba(0,0,0,0.15); position: absolute; bottom: -4px; top: -4px; width: 1px; visibility: hidden; z-index: 1; } \
 #dreditor #code tr:hover .pre .line-ruler { background-color: #E8DAB3; background-color: rgba(154, 124, 41, 0.3); } \
@@ -2918,20 +2920,27 @@ styles.innerHTML = " \
 #dreditor #code .pre span.error.eof { color: #fff; background-color: #f66; } \
 #dreditor #code .pre span.error.tab { background-color: #fdd; } \
 #dreditor #code .pre span.hidden { display: none; } \
-#dreditor #code tr.file { color: #718CAA; background-color: #E8F1F6; } \
-#dreditor #code .file a { color: #718CAA; } \
-#dreditor #code .old { background-color: #fdd; color: #CC0000; } \
-#dreditor #code .old .ln { background-color: #f7c8c8; border-color: #e9aeae; } \
-#dreditor #code .old .line-ruler { background-color: #B53B3B; background-color: rgba(181, 59, 59, 0.2); } \
-#dreditor #code .new { background-color: #dfd; color: #444; float: none; font-size: 100%; font-weight: normal; } \
-#dreditor #code .new .ln { background-color: #ceffce; border-color: #b4e2b4; } \
-#dreditor #code .new .line-ruler { background-color: #167A00; background-color: rgba(22, 122, 0, 0.2); } \
+#dreditor #code tr.file { color: #708E9E; background-color: #E8F1F6; } \
+#dreditor #code tr.file a { color: #708E9E; } \
+#dreditor #code tr.file .ln { background-color: #DAEAF3; border-color: #BFD4EE; } \
+#dreditor #code tr.old { background-color: #fdd; color: #CC0000; } \
+#dreditor #code tr.old a { color: #CC0000; } \
+#dreditor #code tr.old .ln { background-color: #f7c8c8; border-color: #e9aeae; } \
+#dreditor #code tr.old .line-ruler { background-color: #B53B3B; background-color: rgba(181, 59, 59, 0.2); } \
+#dreditor #code tr.new { background-color: #dfd; color: #00AA00; float: none; font-size: 100%; font-weight: normal; } \
+#dreditor #code tr.new a { color: #00AA00; } \
+#dreditor #code tr.new .ln { background-color: #ceffce; border-color: #b4e2b4; } \
+#dreditor #code tr.new .line-ruler { background-color: #167A00; background-color: rgba(22, 122, 0, 0.2); } \
 #dreditor #code .comment { color: #070; } \
 \
-#dreditor #code .has-comment { background: #f6e8b5; } \
-#dreditor #code .has-comment .ln { background: #f6e8b5;  border-color: #f0db88; } \
-#dreditor #code .selected, #dreditor #code .pre-selected { background: #FFE47E; } \
-#dreditor #code .selected .ln, #dreditor #code .pre-selected .ln { background: #FFE47E;  border-color: #f0db88; } \
+tr.selected td { background: transparent; } \
+#dreditor #code tr.has-comment { background: #ffc; } \
+#dreditor #code tr.has-comment .ln { background: #FFF0B8;  border-color: #EEDB91; } \
+#dreditor #code tr.selected, #dreditor #code tr.pre-selected { background: #ffc; cursor: pointer; } \
+#dreditor #code tr.selected .ln, #dreditor #code tr.pre-selected .ln { background: #FFEFB3;  border-color: #ECD784; } \
+\
+#dreditor #code tr:hover, #dreditor #code tr:hover td, #dreditor #code tr:hover td a { background: #FFFFEC !important; border-color: #FCD773 !important; color: #A77E00 !important; cursor: pointer; } \
+#dreditor #code tr:hover td { box-shadow: 0px -1px 0 0px #FCD773 inset, 0px 1px 0 0px #FCD773 inset; } \
 \
 .element-invisible { clip: rect(1px, 1px, 1px, 1px); position: absolute !important; } \
 .admin-link { font-size: 11px; font-weight: normal; text-transform: lowercase; } \
@@ -2955,25 +2964,30 @@ div.dreditor-issuecount { line-height: 200%; } \
 .fieldset-flat > legend { display: none; } \
 #dreditor-issue-data #edit-title-wrapper { margin-top: 0; } \
 #dreditor-issue-data .inline-options .form-item { margin-bottom: 0.3em; } \
- \
+\
 .dreditor-tooltip { display: none; position: fixed; bottom: 0; background-color: #ffffbf; border: 1px solid #000; padding: 0 3px; font-family: sans-serif; font-size: 11px; line-height: 150%; } \
 \
-.field-name-field-issue-changes table td .file { display: block; }\
-td.extended-file-field-table-cid { text-align: right; }\
-td.extended-file-field-table-cid .username { color: #999; display: block; font-size: 10px; }\
-td.extended-file-field-table-filename .file { font-weight: 600; }\
-td.extended-file-field-table-filename .file a { display: block; overflow: hidden; }\
-td.extended-file-field-table-filename .file .file-icon { float: left; margin-right: .5em; }\
-td.extended-file-field-table-filename .file .size { color: #999; float: right; font-size: 10px; margin-left: .5em; }\
-tr.extended-file-field-table-row td, .field-name-field-issue-changes table td { padding: .75em; }\
-tr.extended-file-field-table-row:not(.pift-test-info) td.pift-pass, tr.extended-file-field-table-row:not(.pift-test-info) td.pift-fail { padding-bottom: 0; }\
-tr.pift-test-info td { font-size: 11px; font-style: italic; padding: 0.5em .75em .75em 2.9em; }\
-div.pift-operations { color: inherit; float: right; font-size: 10px; font-style: normal; font-weight: 600; margin-left: 1em; text-transform: uppercase; }\
-td.pift-pass { background: #DDFFDD; color: #00AA00; }\
-tr.extended-file-field-table-row td.pift-pass { border-color: #87CF87; }\
-tr.extended-file-field-table-row td.pift-fail { border-color: #EEBBBB; }\
-td.pift-fail { background: #FFECEC; color: #CC0000; }\
-td.pift-pass a, td.pift-fail a, td.pift-pass .file .size, td.pift-fail .file .size { color: inherit; }\
+/* Drupal.org Styling Fixes */\
+\
+#comment-form textarea { min-height: 300px; } \
+.field-name-field-issue-files table.sticky-enabled { width: 100%; } \
+.extended-file-field-table-cid, th[name=\"extended-file-field-table-header-cid\"] { width: 100px; word-wrap: break-word; } \
+.field-name-field-issue-changes table td .file { display: block; } \
+td.extended-file-field-table-cid { text-align: right; } \
+td.extended-file-field-table-cid .username { color: #999; display: block; font-size: 10px; } \
+td.extended-file-field-table-filename .file, tr.pift-file-info .file { font-weight: 600; } \
+td.extended-file-field-table-filename .file a, tr.pift-file-info .file a { display: block; overflow: hidden; } \
+td.extended-file-field-table-filename .file .file-icon, tr.pift-file-info .file .file-icon { float: left; margin-right: .5em; } \
+td.extended-file-field-table-filename .file .size, tr.pift-file-info .file .size { color: #999; float: right; font-size: 10px; margin-left: .5em; } \
+tr.extended-file-field-table-row td, .field-name-field-issue-changes table.sticky-enabled td { padding: .75em; } \
+tr.extended-file-field-table-row:not(.pift-test-info) td.pift-pass, tr.extended-file-field-table-row:not(.pift-test-info) td.pift-fail, .pift-file-info td.pift-pass, .pift-file-info td.pift-fail { padding-bottom: 0; } \
+tr.pift-test-info td { font-size: 11px; font-style: italic; padding: 0.5em .75em .75em 2.9em; } \
+div.pift-operations { color: inherit; float: right; font-size: 10px; font-style: normal; font-weight: 600; margin-left: 1em; text-transform: uppercase; } \
+td.pift-pass { background: #DDFFDD; color: #00AA00; } \
+tr.extended-file-field-table-row td.pift-pass { border-color: #87CF87; } \
+tr.extended-file-field-table-row td.pift-fail { border-color: #EEBBBB; } \
+td.pift-fail { background: #FFECEC; color: #CC0000; } \
+td.pift-pass a, td.pift-fail a, td.pift-pass .file .size, td.pift-fail .file .size { color: inherit; } \
 ";
 
 // Invoke Dreditor update check once.
