@@ -1923,7 +1923,7 @@ Drupal.dreditor.issue.getNewCommentNumber = function() {
  * Gets the issue title.
  */
 Drupal.dreditor.issue.getIssueTitle = function() {
-  var title = $('#edit-title').val();
+  var title = $('#page-subtitle').text() || '';
 
   // Try to fix function names without parenthesis.
   title = title.replace(/([a-z_]+_[a-z_]+)\b(?!\(\))/g, '$&()');
@@ -2052,11 +2052,11 @@ Drupal.behaviors.dreditorCommitMessage = {
       return;
     }
     var self = this;
-    $('#edit-comment-wrapper', context).once('dreditor-commitmessage', function () {
+    $('#comment-form .form-textarea-wrapper', context).once('dreditor-commitmessage', function () {
       // Prepend commit message button to comment form.
       // @todo Generalize this setup. Somehow.
-      var $container = $('<div class="dreditor-actions" style="width: 95%;"></div>')
-        .prependTo(this);
+      var $container = $('<div class="dreditor-actions"></div>');
+      $(this).before($container);
       // Generate commit message button.
       var $link = $('<a class="dreditor-application-toggle dreditor-commitmessage" href="#">Create commit message</a>');
       $link.click(function () {
@@ -2969,7 +2969,7 @@ div.dreditor-issuecount { line-height: 200%; } \
 \
 /* Drupal.org Styling Fixes */\
 \
-#comment-form textarea { min-height: 300px; } \
+#comment-form textarea { min-height: 200px; } \
 .field-name-field-issue-files table.sticky-enabled { width: 100%; } \
 .extended-file-field-table-cid, th[name=\"extended-file-field-table-header-cid\"] { width: 100px; word-wrap: break-word; } \
 .field-name-field-issue-changes table td .file { display: block; } \
