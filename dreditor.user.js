@@ -2541,7 +2541,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.comment = function (nee
       };
       // Add issue author to comment authors and build the suggestion list.
       var n, id;
-      $('.comment-title a').each(function () {
+      $('.comment > a').each(function () {
         n = this.text.substring(1);
         id = this.hash.substring(1);
         self.suggestionCommentList[n] = id;
