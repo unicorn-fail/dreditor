@@ -1615,11 +1615,11 @@ Drupal.behaviors.dreditorIssueSummary = {
 Drupal.behaviors.dreditorIssueSummaryTemplate = {
   attach: function (context) {
     // Add the template button above the issue summary field.
-    $('body.logged-in.page-node div.project-issue #edit-body').once('dreditorIssueTemplate', function () {
+    $('body.logged-in.node-type-project-issue.page-node-edit textarea[name="body[und][0][value]"]').once('dreditorIssueTemplate', function () {
       var $body = $(this);
 
       // Append this button to the label area.
-      var $label = $('label[for="edit-body"]');
+      var $label = $('label[for*="edit-body-und-0-value"]');
 
       // Create a button to insert the template.
       $('<a/>')
@@ -1632,7 +1632,7 @@ Drupal.behaviors.dreditorIssueSummaryTemplate = {
         .appendTo($label)
         .click(function (e) {
           // Load the issue summary instructions.
-          $.get('//drupal.org/node/1326662', function (data) {
+          $.get('/node/1326662', function (data) {
             // Retrieve the template.
             var $template = $('<div/>').html($(data).find('#node-1326662 code').text());
             // On node add, remove the "Original report by" section.
@@ -1658,6 +1658,8 @@ Drupal.behaviors.dreditorIssueSummaryTemplate = {
               var nodePath = location.href.match(/^.*node\/[0-9]*/);
               if (nodePath) {
                 $.getJSON(nodePath[0] + '/project-issue/json', function (json){
+                  // @todo fix this once JSON data can be extracted again.
+                  return;
                   var $profileLink, $bodyVal = $('<div/>').html($body.val());
                   if (!json.authorId || !json.authorName || !json.authorUrl) {
                     $profileLink = $('<a/>').text('Anonymous').attr('href', '#');
@@ -1678,7 +1680,7 @@ Drupal.behaviors.dreditorIssueSummaryTemplate = {
         });
 
       // Add a link to view the issue summary instructions.
-      $('<a href="//drupal.org/issue-summaries" target="_blank">Issue summary instructions</a>')
+      $('<a href="/issue-summaries" target="_blank">Issue summary instructions</a>')
         .appendTo($label)
         .before('(')
         .after(')');
