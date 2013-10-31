@@ -2801,34 +2801,35 @@ Drupal.behaviors.dreditorIssuesFilterFormReset = {
  */
 Drupal.behaviors.dreditorIssueClone = {
   attach: function (context) {
-    $('#comment-form:has(#edit-category)', context).once('dreditor-clone-button', function () {
-      var $form = $(this);
-      // Attach a button.
-      var $button = $('<li><button id="dreditor-clone-button" class="dreditor-button">Clone issue</button></li>');
-      $button.appendTo($('#tabs ul'));
-      $button.bind('click.dreditor-clone', function () {
-        // Open a new window.
-        var project = /[^/]*$/.exec($('div.breadcrumb').find('a').attr('href'))[0];
-        var w = window.open('//drupal.org/node/add/project-issue/' + project + '#edit-rid-wrapper', '_blank');
-
-        w.onload = function () {
-          $(w).ready(function () {
-            setTimeout(function () {
-              var $doc = $(w.document);
-              $doc.find('#edit-rid').val($form.find('#edit-project-info-rid').val());
-              $doc.find('#edit-component').val($form.find('#edit-project-info-component').val());
-              $doc.find('#edit-category').val($form.find('#edit-category').val());
-              $doc.find('#edit-priority').val($form.find('#edit-priority').val());
-              $doc.find('#edit-assigned').val($form.find('#edit-project-info-assigned').val());
-              $doc.find('#edit-taxonomy-tags-9').val($form.find('#edit-taxonomy-tags-9').val());
-              $doc.find('.node-form .collapsed').removeClass('collapsed');
-              var matches = window.location.href.match('^https?://drupal.org/node/([0-9]+)');
-              $doc.find('#edit-body').val('Follow-up from [#' + matches[1] + '].\n\n');
-              $doc.find('#edit-title').focus();
-            }, 10);
+    var _window = window;
+    var $context = $(context);
+    $context.find('body.node-type-project-issue:not(.page-node-edit)').once('dreditor-clone-button', function () {
+      $('<li><button id="dreditor-clone-button" class="dreditor-button">Clone issue</button></li>')
+        .appendTo($context.find('#tabs ul'))
+        .find('button').bind('click.dreditor-clone', function () {
+          var project = /[^/]*$/.exec($('div.breadcrumb').find('a').attr('href'))[0];
+          // Open a new window.
+          var w = _window.open('/node/add/project-issue/' + project + '#project-issue-node-form', '_blank');
+          $.get(_window.location.pathname + '/edit', function(content) {
+            var $edit = $(content);
+            $(w).ready(function () {
+              setTimeout(function () {
+                var $doc = $(w.document);
+                $doc.find('#edit-field-issue-version-und').val($edit.find('#edit-field-issue-version-und').val());
+                $doc.find('#edit-field-issue-component-und').val($edit.find('#edit-field-issue-component-und').val());
+                $doc.find('#edit-field-issue-assigned-und').val($edit.find('#edit-field-issue-assigned-und').val());
+                $doc.find('#edit-field-issue-category-und').val($edit.find('#edit-field-issue-category-und').val());
+                $doc.find('#edit-field-issue-priority-und').val($edit.find('#edit-field-issue-priority-und').val());
+                $doc.find('#edit-field-issue-status-und').val($edit.find('#edit-field-issue-status-und').val());
+                $doc.find('#edit-taxonomy-vocabulary-9-und').val($edit.find('#edit-taxonomy-vocabulary-9-und').val());
+                $doc.find('.node-form .collapsed').removeClass('collapsed');
+                var matches = window.location.href.match('/node/([0-9]+)');
+                $doc.find('#edit-body-und-0-value').val('Follow-up from [#' + matches[1] + '].\n\n');
+                $doc.find('#edit-title').focus();
+              }, 10);
+            });
           });
-        };
-      });
+        });
     });
   }
 };
