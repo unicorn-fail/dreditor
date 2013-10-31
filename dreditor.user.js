@@ -2977,7 +2977,7 @@ div.dreditor-issuecount { line-height: 200%; } \
 .extended-file-field-table-cid, th[name=\"extended-file-field-table-header-cid\"] { width: 100px; word-wrap: break-word; } \
 .field-name-field-issue-changes table td .file { display: block; } \
 td.extended-file-field-table-cid { text-align: right; } \
-td.extended-file-field-table-cid .username { color: #999; display: block; font-size: 10px; } \
+td.extended-file-field-table-cid .username { color: #666; display: block; font-size: 10px; } \
 td.extended-file-field-table-filename .file, tr.pift-file-info .file { font-weight: 600; } \
 td.extended-file-field-table-filename .file a, tr.pift-file-info .file a { display: block; overflow: hidden; } \
 td.extended-file-field-table-filename .file .file-icon, tr.pift-file-info .file .file-icon { float: left; margin-right: .5em; } \
