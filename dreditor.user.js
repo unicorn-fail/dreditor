@@ -1617,7 +1617,7 @@ Drupal.behaviors.dreditorIssueSummary = {
 Drupal.behaviors.dreditorIssueSummaryTemplate = {
   attach: function (context) {
     // Add the template button above the issue summary field.
-    $('body.logged-in.node-type-project-issue.page-node-edit textarea[name="body[und][0][value]"]').once('dreditorIssueTemplate', function () {
+    $('body.logged-in.page-node form.node-project_issue-form textarea[name="body[und][0][value]"]').once('dreditorIssueTemplate', function () {
       var $body = $(this);
 
       // Append this button to the label area.
