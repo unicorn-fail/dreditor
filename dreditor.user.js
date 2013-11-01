@@ -2092,7 +2092,7 @@ Drupal.behaviors.dreditorCommitMessage = {
           }
         });
         // Retrieve all comments in this issue.
-        var $comments = $('#comments div.comment', context);
+        var $comments = $('section.comments div.comment', context);
         // Build list of top patch submitters.
         var $submitters = $comments
           // Filter comments by those having patches.
