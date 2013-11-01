@@ -674,7 +674,7 @@ Drupal.behaviors.dreditorPIFT = {
   attach: function (context) {
     var $context = $(context);
     $context.find('.field-name-field-issue-files').attr('id', 'recent-files');
-    $context.find('.field-name-field-issue-files table').each(function () {
+    $context.find('.field-name-field-issue-files table').once('dreditor-pift', function () {
       var $table = $(this);
       $table.find('th[name*="size"], th[name*="uid"]').remove();
       $table.find('tbody tr').each(function() {
@@ -716,31 +716,33 @@ Drupal.behaviors.dreditorPIFT = {
       });
     });
 
-    var $table = $context.find('.field-name-field-issue-changes table').filter('.sticky-table');
-    $table.after('<p><a href="#recent-files">Back to recent files</a></p>');
-    $table.find('th:last').remove();
-    $table.find('tbody tr').each(function() {
-      var $row = $(this);
-      // File row.
-      if ($row.is('.pift-file-info')) {
-        var $file = $row.find('.nodechanges-file-link .file');
-        var $size = $row.find('.nodechanges-file-size');
-        $file.prepend('<span class="size">' + $size.text() + '</span>');
-        $size.remove();
-      }
-      // PIFT row.
-      else if ($row.is('.pift-test-info')) {
-        var $cell = $row.find('td');
-        $row.prev().find('td').addClass($cell.attr('class'));
-        $cell.find('.pift-operations').prependTo($cell).find('a').each(function () {
-          if (this.innerText === 'View') {
-            this.innerText = Drupal.t('View Results');
-          }
-          else if (this.innerText === 'Retest') {
-            this.innerText = Drupal.t('Re-test');
-          }
-        });
-      }
+    $context.find('.field-name-field-issue-changes table').filter('.sticky-table').once('dreditor-pift', function() {
+      var $table = $(this);
+      $table.after('<p><a href="#recent-files">Back to recent files</a></p>');
+      $table.find('th:last').remove();
+      $table.find('tbody tr').each(function() {
+        var $row = $(this);
+        // File row.
+        if ($row.is('.pift-file-info')) {
+          var $file = $row.find('.nodechanges-file-link .file');
+          var $size = $row.find('.nodechanges-file-size');
+          $file.prepend('<span class="size">' + $size.text() + '</span>');
+          $size.remove();
+        }
+        // PIFT row.
+        else if ($row.is('.pift-test-info')) {
+          var $cell = $row.find('td');
+          $row.prev().find('td').addClass($cell.attr('class'));
+          $cell.find('.pift-operations').prependTo($cell).find('a').each(function () {
+            if (this.innerText === 'View') {
+              this.innerText = Drupal.t('View Results');
+            }
+            else if (this.innerText === 'Retest') {
+              this.innerText = Drupal.t('Re-test');
+            }
+          });
+        }
+      });
     });
   }
 };
@@ -2977,7 +2979,7 @@ div.dreditor-issuecount { line-height: 200%; } \
 .extended-file-field-table-cid, th[name=\"extended-file-field-table-header-cid\"] { width: 100px; word-wrap: break-word; } \
 .field-name-field-issue-changes table td .file { display: block; } \
 td.extended-file-field-table-cid { text-align: right; } \
-td.extended-file-field-table-cid .username { color: #666; display: block; font-size: 10px; } \
+td.extended-file-field-table-cid .username { color: #777; display: block; font-size: 10px; } \
 td.extended-file-field-table-filename .file, tr.pift-file-info .file { font-weight: 600; } \
 td.extended-file-field-table-filename .file a, tr.pift-file-info .file a { display: block; overflow: hidden; } \
 td.extended-file-field-table-filename .file .file-icon, tr.pift-file-info .file .file-icon { float: left; margin-right: .5em; } \
