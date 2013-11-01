@@ -1853,12 +1853,11 @@ Drupal.behaviors.dreditorPatchNameSuggestion = {
   attach: function (context) {
     // Attach this behavior only to project_issue nodes. Use a fast selector for
     // the common case, but also support comment/reply/% pages.
-    if (!($('body.node-type-project-issue', context).length || $('div.project-issue', context).length)) {
+    if (!($('#project-issue-node-form', context).length)) {
       return;
     }
-
-    $('#comment-form #edit-upload-wrapper, #node-form #edit-upload-wrapper', context).once('dreditor-patchsuggestion', function () {
-      var $container = $('#edit-upload-wrapper > label');
+    $('#project-issue-node-form', context).once('dreditor-patchsuggestion', function () {
+      var $container = $('div.form-type-managed-file > label');
       var $link = $('<a class="dreditor-application-toggle dreditor-patchsuggestion" href="#">Patchname suggestion</a>');
       $link.prependTo($container);
       $link.click(function() {
@@ -1920,7 +1919,9 @@ Drupal.dreditor.issue.getNid = function() {
  */
 Drupal.dreditor.issue.getNewCommentNumber = function() {
   // Get comment count.
-  return parseInt($('#comment-form .comment-inner > h3').text().match(/\d+$/)[0], 10);
+  // TODO find a D7 replacement
+  //return parseInt($('#comment-form .comment-inner > h3').text().match(/\d+$/)[0], 10);
+  return 0;
 };
 
 /**
