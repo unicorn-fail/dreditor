@@ -4,7 +4,7 @@
 // @description    A user script for drupal.org. Improves the user experience and functionality for Drupal contributors and power users.
 // @icon           https://drupal.org/misc/druplicon.png
 // @author         sun (Daniel F. Kudwien)
-// @version        1.2.0
+// @version        1.2.1
 // @grant          none
 // @include        *://dreditor.org/*
 // @include        *://*.dreditor.org/*
