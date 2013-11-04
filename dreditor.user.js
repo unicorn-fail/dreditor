@@ -784,7 +784,7 @@ Drupal.behaviors.dreditorPatchReview = {
                   class: 'dreditor-button dreditor-patchtest',
                   href: 'http://simplytest.me/project/' + project + '/' + version + '?patch[]=' + this.href,
                   target: '_blank'
-                }).appendTo(this.parentNode);
+                }).prependTo(this.parentNode);
               }
             }
           }
@@ -1987,7 +1987,7 @@ Drupal.dreditor.issue.getSelectedComponent = function() {
  */
 Drupal.dreditor.issue.getSelectedVersion = function() {
   // Retrieve version from the comment form selected option label.
-  var version = $('#edit-project-info-rid option:selected').text();
+  var version = $('.field-name-field-issue-version .field-item').text();
   return version;
 };
 
@@ -2901,7 +2901,7 @@ styles.innerHTML = " \
   background: linear-gradient(to bottom, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%); \
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4096ee', endColorstr='#7abcff',GradientType=0 ); } \
 .dreditor-button { margin: 0 0.5em 0.5em; } \
-.dreditor-patchreview { float: right; line-height: 1.25em; margin: 0 0 0 1em; } \
+.dreditor-patchreview, .dreditor-patchtest { float: right; line-height: 1.25em; margin: 0 0 0 1em; } \
 #dreditor h3 { margin: 18px 0 0; }\
 #dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; } \
 #dreditor #menu li { list-style: none; margin: 0; white-space: nowrap; } \
