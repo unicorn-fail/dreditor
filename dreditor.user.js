@@ -1900,7 +1900,30 @@ Drupal.behaviors.dreditorPatchNameSuggestion = {
   }
 };
 
+// TODO: grab code from dreditor_clemens sandbox on d.o.
+Drupal.dreditor.clemens_cache = {};
+
 Drupal.dreditor.issue = {}
+
+/**
+ * Fetch the JSON version of the current issue page.
+ */
+Drupal.dreditor.issue.fetchIssueJson = function() {
+  var nid = Drupal.dreditor.issue.getNid();
+  if (nid) {
+    Drupal.dreditor.fetchNodeAsJson(nid);
+  }
+}
+
+/**
+ * Fetch the node as json by nid.
+ */
+Drupal.dreditor.fetchNodeAsJson = function(nid) {
+  var path = 'node/' + nid;
+  $.getJSON( '/' + path, function (json) {
+    Drupal.dreditor.clemens_cache[path] = json;
+  });
+}
 
 /**
  * Gets the issue node id.
