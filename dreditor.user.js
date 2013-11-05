@@ -606,8 +606,8 @@ Drupal.dreditor.updateCheck = function () {
       }
     }
     if (latestVersion > installedVersion) {
-      if (window.confirm('A new version of Dreditor is available: ' + latestVersion + '. Your current installed version of Dreditor is: ' + installedVersion + '. Would you like to visit http://dreditor.org and update?')) {
-        window.open('//dreditor.org', 'dreditor');
+      if (window.confirm('A new version of Dreditor is available: ' + latestVersion + '. Your current installed version of Dreditor is: ' + installedVersion + '. Would you like to visit https://dreditor.org and update?')) {
+        window.open('https://dreditor.org', 'dreditor');
       }
     }
     if (window.console) {
