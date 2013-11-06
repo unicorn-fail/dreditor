@@ -134,7 +134,7 @@ if ( document.documentElement.compareDocumentPosition ) {
 // end sortOrder
 
 Drupal.dreditor = {
-  version: '1.2.0',
+  version: '1.2.1',
   behaviors: {},
   setup: function (context) {
     var self = this;
