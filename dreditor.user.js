@@ -1856,6 +1856,7 @@ Drupal.behaviors.dreditorPatchNameSuggestion = {
     if (!($('#project-issue-node-form', context).length)) {
       return;
     }
+    Drupal.dreditor.issue.fetchIssueJson();
     $('#project-issue-node-form', context).once('dreditor-patchsuggestion', function () {
       var $container = $('div.form-type-managed-file > label');
       var $link = $('<a class="dreditor-application-toggle dreditor-patchsuggestion" href="#">Patchname suggestion</a>');
@@ -1899,8 +1900,20 @@ Drupal.behaviors.dreditorPatchNameSuggestion = {
   }
 };
 
-// TODO: grab code from dreditor_clemens sandbox on d.o.
-Drupal.dreditor.clemens_cache = {};
+/**
+ * Cache for a json object representing the current page node.
+ *
+ * @see Drupal.dreditor.issue.fetchIssueJson
+ */
+Drupal.dreditor.current_page_json = {};
+
+/**
+ * Generic cache for json objects representing nodes.
+ *
+ * @see Drupal.dreditor.fetchNodeAsJson
+ * @see Drupal.dreditor.issue.fetchIssueJson
+ */
+Drupal.dreditor.json_cache = {};
 
 Drupal.dreditor.issue = {}
 
@@ -1910,7 +1923,11 @@ Drupal.dreditor.issue = {}
 Drupal.dreditor.issue.fetchIssueJson = function() {
   var nid = Drupal.dreditor.issue.getNid();
   if (nid) {
-    Drupal.dreditor.fetchNodeAsJson(nid);
+    var path = '/node/' + nid;
+    $.getJSON(path, function (json) {
+      Drupal.dreditor.current_page_json = json;
+      Drupal.dreditor.json_cache[nid] = json;
+    });
   }
 }
 
@@ -1918,9 +1935,9 @@ Drupal.dreditor.issue.fetchIssueJson = function() {
  * Fetch the node as json by nid.
  */
 Drupal.dreditor.fetchNodeAsJson = function(nid) {
-  var path = 'node/' + nid;
-  $.getJSON( '/' + path, function (json) {
-    Drupal.dreditor.clemens_cache[path] = json;
+  var path = '/node/' + nid;
+  $.getJSON(path, function (json) {
+    Drupal.dreditor.json_cache[nid] = json;
   });
 }
 
@@ -1941,10 +1958,12 @@ Drupal.dreditor.issue.getNid = function() {
  * Gets the next comment nummer for the current issue.
  */
 Drupal.dreditor.issue.getNewCommentNumber = function() {
-  // Get comment count.
-  // TODO find a D7 replacement
-  //return parseInt($('#comment-form .comment-inner > h3').text().match(/\d+$/)[0], 10);
-  return 0;
+  if (Drupal.dreditor.current_page_json) {
+    return Drupal.dreditor.current_page_json.comment_count + 1;
+  }
+  else {
+    return 0;
+  }
 };
 
 /**
