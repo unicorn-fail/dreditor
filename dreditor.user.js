@@ -2996,7 +2996,8 @@ td.pift-pass a, td.pift-fail a, td.pift-pass .file .size, td.pift-fail .file .si
 ";
 
 // Invoke Dreditor update check once.
-Drupal.dreditor.updateCheck();
+// @todo Is the update check still necessary?
+//Drupal.dreditor.updateCheck();
 
 // End of Content Scope Runner.
 }
