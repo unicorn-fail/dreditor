@@ -1928,9 +1928,6 @@ Drupal.dreditor.issue.getNewCommentNumber = function() {
  */
 Drupal.dreditor.issue.getIssueTitle = function() {
   var title = $('#page-subtitle').text() || '';
-
-  // Try to fix function names without parenthesis.
-  title = title.replace(/([a-z_]+_[a-z_]+)\b(?!\(\))/g, '$&()');
   return title;
 };
 
