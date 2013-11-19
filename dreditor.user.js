@@ -2972,7 +2972,7 @@ div.dreditor-issuecount { line-height: 200%; } \
 /* Drupal.org Styling Fixes */\
 \
 #comment-form textarea { min-height: 200px; } \
-.field-name-field-issue-files table, .field-name-field-issue-changes table { width: 100%; } \
+.field-name-field-issue-files table, .field-name-field-issue-changes table.nodechanges-file-changes { width: 100%; } \
 .extended-file-field-table-cid, th[name=\"extended-file-field-table-header-cid\"] { width: 100px; word-wrap: break-word; } \
 .field-name-field-issue-changes table td .file { display: block; } \
 td.extended-file-field-table-cid { text-align: right; } \
