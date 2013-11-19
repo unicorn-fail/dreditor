@@ -1906,13 +1906,11 @@ Drupal.dreditor.issue = {}
  * Gets the issue node id.
  */
 Drupal.dreditor.issue.getNid = function() {
-  var matches = window.location.href.match(/(?:node|comment\/reply)\/(\d+)/);
-  if (matches) {
-    return matches[1];
+  var href = $('#tabs a:first').attr('href');
+  if (href.length) {
+    return href.match(/(?:node|comment\/reply)\/(\d+)/)[1];
   }
-  else {
-    return false;
-  }
+  return false;
 };
 
 /**
@@ -2142,7 +2140,7 @@ Drupal.behaviors.dreditorCommitMessage = {
         var prefix = Drupal.storage.load('commitmessage.prefix');
         prefix = (prefix ? prefix : 'Issue');
 
-        var message = prefix + ' #' + window.location.href.match(/(?:node|comment\/reply)\/(\d+)/)[1] + ' ';
+        var message = prefix + ' #' + Drupal.dreditor.issue.getNid() + ' ';
         message += 'by ' + submitters.join(', ');
         if (contributors.length) {
           if (submitters.length) {
@@ -2822,8 +2820,7 @@ Drupal.behaviors.dreditorIssueClone = {
                 $doc.find('#edit-field-issue-status-und').val($edit.find('#edit-field-issue-status-und').val());
                 $doc.find('#edit-taxonomy-vocabulary-9-und').val($edit.find('#edit-taxonomy-vocabulary-9-und').val());
                 $doc.find('.node-form .collapsed').removeClass('collapsed');
-                var matches = window.location.href.match('/node/([0-9]+)');
-                $doc.find('#edit-body-und-0-value').val('Follow-up from [#' + matches[1] + '].\n\n');
+                $doc.find('#edit-body-und-0-value').val('Follow-up from [#' + Drupal.dreditor.issue.getNid() + '].\n\n');
                 $doc.find('#edit-title').focus();
               }, 10);
             });
