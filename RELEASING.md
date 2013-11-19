@@ -24,7 +24,7 @@ steps to ensure we create a solid release:
 2. Make a commit with just the version bump. Something like `git commit -m
    'Dreditor vMAJOR.MINOR.PATCH'`.
 3. Tag that commit, ensuring that you provide a message so we get an annotated
-   tag. Like this: `git tag -m vMAJOR.MINOR.PATCH vMAJOR.MINOR.PATCH`
+   tag. Like this: `git tag -m MAJOR.MINOR.PATCH MAJOR.MINOR.PATCH`
 4. Push the commit and the tag: `git push --follow-tags`
 5. Notify Mark Carver of this tag so he can create the Chrome and Safari
    browser extensions.
