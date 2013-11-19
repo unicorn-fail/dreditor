@@ -685,7 +685,7 @@ Drupal.behaviors.dreditorPIFT = {
           var $file = $row.find('.extended-file-field-table-filename .file');
           var $size = $row.find('.extended-file-field-table-filesize');
           var $name = $row.find('.extended-file-field-table-uid');
-          var comment = parseInt($cid.text().replace('#', ''), 10);
+          var comment = parseInt($cid.text().replace('#', ''), 10) || 0;
           $file.prepend('<span class="size">' + $size.text() + '</span>');
           $size.remove();
           $cid.append($name.html());
@@ -2122,14 +2122,10 @@ Drupal.behaviors.dreditorCommitMessage = {
             return result;
           }
         });
-        // Retrieve all comments in this issue.
-        var $comments = $('section.comments div.comment', context);
+
         // Build list of top patch submitters.
-        var $submitters = $comments
-          // Filter comments by those having patches.
-          .filter(':has(a.dreditor-patchreview)').find('div.submitted a')
-          // Add original post if it contains a patch.
-          .add('div.node:has(a.dreditor-patchreview) div.submitted a');
+        var $submitters = $('.field-name-field-issue-files table tr:has(a.dreditor-patchreview) a.username', context);
+
         // Count and sort by occurrences.
         var submitters = $submitters.countvalues();
 
@@ -2143,6 +2139,9 @@ Drupal.behaviors.dreditorCommitMessage = {
             href: $submitters[user].href
           };
         }
+
+        // Retrieve all comments in this issue.
+        var $comments = $('section.comments div.comment', context);
 
         // Build list of top commenters.
         var commenters = $comments.find('div.author a')
