@@ -2941,9 +2941,9 @@ styles.innerHTML = " \
 #dreditor .resizable-textarea { margin: 0 0 9px; } \
 #dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; overflow: scroll; height: 100%; } \
 #dreditor-content, #code tr, #code td { font: 13px/18px Consolas, 'Liberation Mono', Courier, monospace; } \
-#dreditor #code { position: relative; width:100%; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; } \
+#dreditor #code { position: relative; width:100%; } \
 #dreditor #code td { overflow: hidden; padding: 0 10px; } \
-#dreditor #code .ln { -webkit-user-select: none; width:1px; border-right: 1px solid #e5e5e5; text-align: right; } \
+#dreditor #code .ln { width: 1px; border-right: 1px solid #e5e5e5; text-align: right; } \
 #dreditor #code .ln:before { content: attr(data-line-number); } \
 #dreditor #code tr { background: transparent; border: 0; color: #aaa; margin: 0; padding: 0; } \
 #dreditor #code .pre { white-space: pre; background: transparent; position: relative; } \
