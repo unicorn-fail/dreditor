@@ -4,7 +4,7 @@
 // @description    A user script for drupal.org. Improves the user experience and functionality for Drupal contributors and power users.
 // @icon           https://drupal.org/misc/druplicon.png
 // @author         sun (Daniel F. Kudwien)
-// @version        1.2.2
+// @version        1.2.3
 // @grant          none
 // @include        *://dreditor.org/*
 // @include        *://*.dreditor.org/*
@@ -134,7 +134,7 @@ if ( document.documentElement.compareDocumentPosition ) {
 // end sortOrder
 
 Drupal.dreditor = {
-  version: '1.2.2',
+  version: '1.2.3',
   behaviors: {},
   setup: function (context) {
     var self = this;
