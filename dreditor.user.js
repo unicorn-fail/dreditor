@@ -716,7 +716,7 @@ Drupal.behaviors.dreditorPIFT = {
       });
     });
 
-    $context.find('.field-name-field-issue-changes table').filter('.sticky-table').once('dreditor-pift', function() {
+    $context.find('.field-name-field-issue-changes table.nodechanges-file-changes').once('dreditor-pift', function() {
       var $table = $(this);
       $table.after('<p><a href="#recent-files">Back to recent files</a></p>');
       $table.find('th:last').remove();
@@ -2981,8 +2981,8 @@ td.extended-file-field-table-filename .file, tr.pift-file-info .file { font-weig
 td.extended-file-field-table-filename .file a, tr.pift-file-info .file a { display: block; overflow: hidden; } \
 td.extended-file-field-table-filename .file .file-icon, tr.pift-file-info .file .file-icon { float: left; margin-right: .5em; } \
 td.extended-file-field-table-filename .file .size, tr.pift-file-info .file .size { color: #999; float: right; font-size: 10px; margin-left: .5em; } \
-tr.extended-file-field-table-row td, .field-name-field-issue-changes table.sticky-enabled td { padding: .75em; } \
-tr.extended-file-field-table-row:not(.pift-test-info) td.pift-pass, tr.extended-file-field-table-row:not(.pift-test-info) td.pift-fail, .pift-file-info td.pift-pass, .pift-file-info td.pift-fail { padding-bottom: 0; } \
+tr.extended-file-field-table-row td, .field-name-field-issue-changes table.nodechanges-file-changes td { padding: .75em; } \
+tr.extended-file-field-table-row:not(.pift-test-info) td.pift-pass, tr.extended-file-field-table-row:not(.pift-test-info) td.pift-fail, table.nodechanges-file-changes .pift-file-info td.pift-pass, table.nodechanges-file-changes .pift-file-info td.pift-fail { padding-bottom: 0; } \
 tr.pift-test-info td { font-size: 11px; font-style: italic; padding: 0.5em .75em .75em 2.9em; } \
 div.pift-operations { color: inherit; float: right; font-size: 10px; font-style: normal; font-weight: 600; margin-left: 1em; text-transform: uppercase; } \
 td.pift-pass { background: #DDFFDD; color: #00AA00; } \
