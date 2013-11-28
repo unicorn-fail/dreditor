@@ -1,8 +1,12 @@
+# blacklist
 branches:
   except:
-    - 1.x
+    - /^[^2].*$/
+
+# whitelist
+branches:
   only:
-    - 2.x
+    - /^2/
 language: node_js
 node_js:
   - 0.10
