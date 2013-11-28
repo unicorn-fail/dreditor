@@ -3,7 +3,7 @@
 // @namespace      http://dreditor.org
 // @description    A user script for drupal.org. Improves the user experience and functionality for Drupal contributors and power users.
 // @icon           https://drupal.org/misc/druplicon.png
-// @author         sun (Daniel F. Kudwien)
+// @author         Daniel F. Kudwien (sun)
 // @version        1.2.3
 // @grant          none
 // @include        *://dreditor.org/*
@@ -70,22 +70,22 @@ jQuery.extend({
     // named keys, this needs to be an Array, so we can determine its length.
     window.debug = window.debug || [];
 
-    var args = jQuery.makeArray(arguments);
+    var name, data, args = jQuery.makeArray(arguments);
     // Determine data source; this is an object for $variable.debug().
     // Also determine the identifier to store data with.
-    if (typeof this == 'object') {
-      var name = (args.length ? args[0] : window.debug.length);
-      var data = this;
+    if (typeof this === 'object') {
+      name = (args.length ? args[0] : window.debug.length);
+      data = this;
     }
     else {
-      var name = (args.length > 1 ? args.pop() : window.debug.length);
-      var data = args[0];
+      name = (args.length > 1 ? args.pop() : window.debug.length);
+      data = args[0];
     }
     // Store data.
     window.debug[name] = data;
     // Dump data into Firebug console.
-    if (console !== undefined) {
-      console.log(name, data);
+    if (typeof window.console !== 'undefined') {
+      window.console.log(name, data);
     }
     return this;
   }
@@ -124,7 +124,7 @@ if ( document.documentElement.compareDocumentPosition ) {
     aRange.collapse(true);
     bRange.selectNode(b);
     bRange.collapse(true);
-    var ret = aRange.compareBoundaryPoints(Range.START_TO_END, bRange);
+    var ret = aRange.compareBoundaryPoints(window.Range.START_TO_END, bRange);
     if ( ret === 0 ) {
       hasDuplicate = true;
     }
@@ -145,7 +145,7 @@ Drupal.dreditor = {
     // Prevent repeated setup (not supported yet).
     if (self.$dreditor) {
       self.show();
-      return false;
+      return;
     }
     // Setup Dreditor overlay.
     self.$wrapper = $('<div id="dreditor-wrapper"></div>').css({ height: 0 });
@@ -167,7 +167,7 @@ Drupal.dreditor = {
 
     // Do not check for updates if the user just installed Dreditor.
     var barWidth = Drupal.storage.load('barWidth');
-    if (barWidth == null) {
+    if (barWidth === null) {
       Drupal.storage.save('barWidth', $bar.width());
     }
 
@@ -191,16 +191,21 @@ Drupal.dreditor = {
     // Add hide/show button to temporarily dismiss Dreditor.
     $('<input id="dreditor-hide" class="dreditor-button" type="button" value="Hide" />')
       .click(function () {
-        self.visible ? self.hide() : self.show();
+        if (self.visible) {
+          self.hide();
+        }
+        else {
+          self.show();
+        }
       })
       .appendTo($actions);
     // Add cancel button to tear down Dreditor.
     $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />')
       .click(function () {
-        if (Drupal.dreditor.patchReview.comment.comments.length == 0 || confirm('Do you really want to cancel Dreditor and discard your changes?')) {
+        if (Drupal.dreditor.patchReview.comment.comments.length === 0 || window.confirm('Do you really want to cancel Dreditor and discard your changes?')) {
           Drupal.dreditor.tearDown(context);
         }
-        return false;
+        return;
       })
       .appendTo($actions);
     $actions.appendTo(self.$dreditor);
@@ -288,13 +293,18 @@ Drupal.dreditor = {
    */
   escapeKeyHandler: function (event) {
     var self = event.data.dreditor;
-    if (event.which == 27) {
-      self.visible ? self.hide() : self.show();
+    if (event.which === 27) {
+      if (self.visible) {
+        self.hide();
+      }
+      else {
+        self.show();
+      }
     }
   },
 
   attachBehaviors: function (args) {
-    if (args === undefined || typeof args != 'object') {
+    if (args === undefined || typeof args !== 'object') {
       args = [];
     }
     // Add Dreditor context as first argument.
@@ -329,12 +339,12 @@ Drupal.dreditor = {
     var length = prefix.length;
     var params = {};
     for (var i in classes) {
-      if (classes[i].substr(0, length + 1) == prefix + '-') {
+      if (classes[i].substr(0, length + 1) === prefix + '-') {
         var parts = classes[i].split('-');
         var value = parts.slice(2).join('-');
         params[parts[1]] = value;
         // Convert numeric values.
-        if (parseInt(value, 10) == value) {
+        if (parseInt(value, 10) === value) {
           params[parts[1]] = parseInt(value, 10);
         }
       }
@@ -348,7 +358,7 @@ Drupal.dreditor = {
    * To be used for jump links within Dreditor overlay only.
    */
   goto: function (selector) {
-    if (!(typeof selector == 'string' && selector.length)) {
+    if (!(typeof selector === 'string' && selector.length)) {
       return;
     }
     // @todo Does not work because of overflow: hidden.
@@ -359,8 +369,8 @@ Drupal.dreditor = {
     if ($target.length) {
       $target.get(0).scrollIntoView();
     }
-    else if (typeof console.warn == 'function') {
-      console.warn(selector + ' does not exist.');
+    else if (typeof window.console.warn !== 'undefined') {
+      window.console.warn(selector + ' does not exist.');
     }
   },
 
@@ -384,7 +394,7 @@ Drupal.dreditor = {
     options = $.extend({ fragment: '' }, options || {});
     var url = window.location.protocol + '//' + window.location.hostname + path;
     // If query is not null, take it; otherwise, use current.
-    url += (typeof options.query != 'undefined' ? options.query : window.location.search);
+    url += (typeof options.query !== 'undefined' ? options.query : window.location.search);
     // Not using current fragment by default.
     if (options.fragment.length) {
       url += options.fragment;
@@ -436,7 +446,7 @@ Drupal.storage.support = {
  * @see Drupal.storage.unserialize()
  */
 Drupal.storage.load = function (key, bin) {
-  if (typeof bin == 'undefined') {
+  if (typeof bin === 'undefined') {
     bin = 'local';
   }
   if (!Drupal.storage.support[bin]) {
@@ -471,7 +481,7 @@ Drupal.storage.load = function (key, bin) {
  * @see Drupal.storage.serialize()
  */
 Drupal.storage.save = function (key, data, bin) {
-  if (typeof bin == 'undefined') {
+  if (typeof bin === 'undefined') {
     bin = 'local';
   }
   if (!Drupal.storage.support[bin]) {
@@ -495,7 +505,7 @@ Drupal.storage.save = function (key, data, bin) {
  * @see Drupal.storage.save()
  */
 Drupal.storage.remove = function (key, bin) {
-  if (typeof bin == 'undefined') {
+  if (typeof bin === 'undefined') {
     bin = 'local';
   }
   if (!Drupal.storage.support[bin]) {
@@ -517,10 +527,10 @@ Drupal.storage.parse = function (val) {
     val = parseFloat(val);
   }
   // Convert booleans.
-  else if (val == 'true') {
+  else if (val === 'true') {
     val = true;
   }
-  else if (val == 'false') {
+  else if (val === 'false') {
     val = false;
   }
   return val;
@@ -544,7 +554,7 @@ Drupal.storage.unserialize = function (str) {
   var obj = {};
   jQuery.each(str.split('&'), function() {
     var splitted = this.split('=');
-    if (splitted.length != 2) {
+    if (splitted.length !== 2) {
       return;
     }
     var key = decodeURIComponent(splitted[0]);
@@ -552,7 +562,7 @@ Drupal.storage.unserialize = function (str) {
     val = Drupal.storage.parse(val);
 
     // Ignore empty values.
-    if (typeof val == 'number' || typeof val == 'boolean' || val.length > 0) {
+    if (typeof val === 'number' || typeof val === 'boolean' || val.length > 0) {
       obj[key] = val;
     }
   });
@@ -574,7 +584,7 @@ Drupal.dreditor.updateCheck = function () {
   var lastUpdateCheck = Drupal.storage.load('lastUpdateCheck');
 
   // Do not check for updates if the user just installed Dreditor.
-  if (lastUpdateCheck == null) {
+  if (lastUpdateCheck === null) {
     Drupal.storage.save('lastUpdateCheck', now.getTime());
     return;
   }
@@ -637,7 +647,7 @@ Drupal.dreditor.form.form = function (form_id) {
   $.extend(true, self, $('<form id="' + form_id + '"></form>'));
 
   // Override the default submit handler.
-  self.submit(function (e) {
+  self.submit(function () {
     // Unless proven wrong, we remove the form after submission.
     self.remove();
     // We never really submit.
@@ -756,7 +766,7 @@ Drupal.behaviors.dreditorPIFT = {
                 }
               });
             }
-          });
+          }); // jshint ignore:line
         }
         if (!tables.new.find('tbody tr').length) {
           tables.new.remove();
@@ -799,7 +809,7 @@ Drupal.behaviors.dreditorPatchReview = {
           var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">Review</a>').click(function () {
             // Load file.
             $.get(this.href, function (content, status) {
-              if (status == 'success') {
+              if (status === 'success') {
                 // Invoke Dreditor.
                 Drupal.dreditor.setup(context, 'patchReview', content);
               }
@@ -828,7 +838,7 @@ Drupal.behaviors.dreditorPatchReview = {
       });
     });
   }
-}
+};
 
 /**
  * @defgroup dreditor_patchreview Dreditor patch reviewer
@@ -901,7 +911,7 @@ Drupal.dreditor.patchReview = {
       var newelement = this, merge = true;
       // Check whether this element is already in the stack.
       $.each(self.data.elements, function () {
-        if (this == newelement) {
+        if (this === newelement) {
           merge = false;
           return;
         }
@@ -923,9 +933,9 @@ Drupal.dreditor.patchReview = {
     $(elements).removeClass('selected');
     $.each(elements, function () {
       var element = this;
-      var newlist = new Array();
+      var newlist = [];
       $.each(self.data.elements, function () {
-        if (this != element) {
+        if (this !== element) {
           newlist.push(this);
         }
       });
@@ -945,7 +955,7 @@ Drupal.dreditor.patchReview = {
       self.$form.append('<h3>Comment selected code:</h3>');
       self.$form.append('<textarea name="comment" class="form-textarea resizable" rows="10"></textarea>');
       // Add comment save button.
-      self.$form.addButton((self.data.id !== undefined ? 'Update' : 'Save'), function ($button) {
+      self.$form.addButton((self.data.id !== undefined ? 'Update' : 'Save'), function () {
         // @todo For any reason, FF 3.5 breaks when trying to access
         //   form.comment.value. Works in FF 3.0.x. WTF?
         var value = this.find('textarea').val();
@@ -964,13 +974,13 @@ Drupal.dreditor.patchReview = {
         self.reset();
       });
       // Add comment cancel button.
-      self.$form.addButton('Cancel', function ($button) {
+      self.$form.addButton('Cancel', function () {
         // Reset pastie.
         self.reset();
       });
       // Add comment delete button for existing comments.
       if (self.data.id !== undefined) {
-        self.$form.addButton('Delete', function ($button) {
+        self.$form.addButton('Delete', function () {
           self.comment.remove(self.data.id);
           // Reset pastie.
           self.reset();
@@ -1032,7 +1042,7 @@ Drupal.dreditor.patchReview = {
           }
         }
         // Add new last hunk, in case a comment spans over multiple hunks.
-        if (lasthunk && lasthunk != $element.prevAll('tr.file').get(0)) {
+        if (lasthunk && lasthunk !== $element.prevAll('tr.file').get(0)) {
           lasthunk = $element.prevAll('tr.file').get(0);
           if (lasthunk) {
             // Only add a newline if there was no new file already.
@@ -1044,7 +1054,7 @@ Drupal.dreditor.patchReview = {
           }
         }
         // Add a delimiter, in case a comment spans over multiple selections.
-        else if (lastline && lastline != $element.get(0).previousSibling) {
+        else if (lastline && lastline !== $element.get(0).previousSibling) {
           markup += '...\n';
         }
         markup += $element.find('.pre').text() + '\n';
@@ -1071,7 +1081,7 @@ Drupal.dreditor.patchReview = {
 
     // Let's get some attention! :)
     function shuffle(array) {
-      for(var j, x, i = array.length; i; j = parseInt(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
+      for(var j, x, i = array.length; i; j = parseInt(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x); // jshint ignore:line
       return array;
     }
     var messages = [
@@ -1079,7 +1089,7 @@ Drupal.dreditor.patchReview = {
     ];
     // Add Drupal core specific messages.
     var daysToCodeFreeze = 0, daysToPointRelease = 0, criticalIssueCount = 0;
-    if ($('#edit-project-info-project-title').val() == 'Drupal core') {
+    if ($('#edit-project-info-project-title').val() === 'Drupal core') {
       // Code freeze specific messages.
       daysToCodeFreeze = parseInt((new Date(2010, 1 - 1, 15) - new Date()) / 1000 / 60 / 60 / 24, 10);
       if (daysToCodeFreeze > 0) {
@@ -1096,14 +1106,14 @@ Drupal.dreditor.patchReview = {
       var dayOfWeek = 3; // 0 is Sunday.
       lastWed.setMonth(lastWed.getMonth() + 1);
       lastWed.setDate(0);
-      lastWed.setDate(lastWed.getDate() - (lastWed.getDay() != 0 ? lastWed.getDay() - dayOfWeek : 7 - dayOfWeek));
+      lastWed.setDate(lastWed.getDate() - (lastWed.getDay() !== 0 ? lastWed.getDay() - dayOfWeek : 7 - dayOfWeek));
       daysToPointRelease = lastWed.getDate() - new Date().getDate();
       messages.push('@point-release-days days to next Drupal core point release.');
       */
 
       // Critical issue queue specific messages.
       // @todo Precondition?
-      criticalIssueCount = $('#block-bingo-0 a:contains("Critical issues")').text();
+      criticalIssueCount = $('#block-bingo-0 a:contains("' + "Critical issues" + '")').text();
       if (criticalIssueCount.length) {
         criticalIssueCount = criticalIssueCount.match(/\s*(\d+)/)[1];
         $.merge(messages, [
@@ -1168,8 +1178,9 @@ Drupal.dreditor.patchReview.comment = {
   },
 
   load: function (id) {
-    if (typeof id !== undefined && typeof this.comments[id] == 'object') {
-      var data = this.comments[id];
+    var data;
+    if (typeof id !== undefined && typeof this.comments[id] === 'object') {
+      data = this.comments[id];
     }
     return data || {};
   },
@@ -1208,7 +1219,7 @@ Drupal.dreditor.patchReview.overlay = {
     if (!this.element) {
       this.setup();
     }
-    if (data !== undefined && typeof data.comment == 'string') {
+    if (data !== undefined && typeof data.comment === 'string') {
       this.data = data;
       this.element.empty();
       // Do some basic text2html processing.
@@ -1275,7 +1286,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   // that may or may not have the same fonts (kerning). Calculate the width of
   // 81 "0" characters (80 character line plus the +/- prefix from the diff)
   // by using an array (82 items joined by "0").
-  var $lineRuler = $('<table id="code"><tbody><tr><td class="ln"></td><td class="ln"></td><td><span class="pre">' + Array(82).join('0') + '</span></td></tr></tbody></table>')
+  var $lineRuler = $('<table id="code"><tbody><tr><td class="ln"></td><td class="ln"></td><td><span class="pre">' + new Array(82).join('0') + '</span></td></tr></tbody></table>')
     .appendTo('#dreditor');
   var lineRulerOffset = $lineRuler.find('span').width();
   var lineRulerStyle = '';
@@ -1301,13 +1312,13 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       $menu.append($lastFile);
       diffstat.files++;
       return match1 + '<a class="file" id="' + id + '">' + match2 + '</a>' + (match3 ? match3 : '');
-    });
+    }); // jshint ignore:line
     // Build hunk menu links for file.
     line = line.replace(/^(@@ .+ @@\s+)([^\s]+\s[^\s\(]*)/, function (full, match1, match2) {
       var id = match2.replace(/[^A-Za-z_-]/g, '');
       $lastFile.append('<li><a href="#' + id + '">' + match2 + '</a></li>');
       return match1 + '<a class="hunk" id="' + id + '">' + match2 + '</a>';
-    });
+    }); // jshint ignore:line
 
     // parse hunk line numbers
     var line_numbers = line.match(/^@@ -([0-9]+),[0-9]+ \+([0-9]+),[0-9]+ @@/);
@@ -1405,19 +1416,19 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   // Colorize rows during selection.
   $('tr', $code).mouseover(function(){
     if (start_row) {
-      end_row = $(this)[0];
+      var end_row = $(this)[0];
       var start = false;
       var end = false;
-      var selection = new Array();
+      var selection = [];
       selection.push(start_row);
       $('tr', $code).each(function(){
-        if ($(this)[0] == start_row) {
+        if ($(this)[0] === start_row) {
           start = true;
         }
         if (start && !end) {
           selection.push($(this)[0]);
         }
-        if ($(this)[0] == end_row) {
+        if ($(this)[0] === end_row) {
           end = true;
         }
       });
@@ -1432,19 +1443,19 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   // Finalize selection.
   $('tr', $code).mouseup(function(){
     if (start_row) {
-      end_row = $(this)[0];
+      var end_row = $(this)[0];
       var start = false;
       var end = false;
-      var selection = new Array();
+      var selection = [];
       selection.push(start_row);
       $('tr', $code).each(function(){
-        if ($(this)[0] == start_row) {
+        if ($(this)[0] === start_row) {
           start = true;
         }
         if (start && !end) {
           selection.push($(this)[0]);
         }
-        if ($(this)[0] == end_row) {
+        if ($(this)[0] === end_row) {
           end = true;
         }
       });
@@ -1561,12 +1572,12 @@ Drupal.dreditor.patchReview.behaviors.toggleDeletions = function (context) {
  * Issue summary AJAX editor.
  */
 Drupal.behaviors.dreditorIssueSummary = {
-  attach: function (context) {
+  attach: function () {
     // Limit to project_issue node view page.
     $('#project-summary-container').once('dreditor-issue-summary', function () {
       // Clone "Edit" link after "Issue summary" title.
       var $edit_wrapper = $('<small class="admin-link"> [ <span></span> ] </small>');
-      var $edit_link = $('#tabs a:contains("Edit")').clone();
+      var $edit_link = $('#tabs a:contains("' + 'Edit' + '")').clone();
       $edit_wrapper.find('span').append($edit_link);
       $edit_wrapper.appendTo($(this).parent().find('h2:first'));
 
@@ -1651,7 +1662,7 @@ Drupal.behaviors.dreditorIssueSummary = {
  * Adds a button to insert the issue summary template.
  */
 Drupal.behaviors.dreditorIssueSummaryTemplate = {
-  attach: function (context) {
+  attach: function () {
     // Add the template button above the issue summary field.
     $('body.logged-in.page-node form.node-project_issue-form textarea[name="body[und][0][value]"]').once('dreditorIssueTemplate', function () {
       var $body = $(this);
@@ -1698,7 +1709,7 @@ Drupal.behaviors.dreditorIssueSummaryTemplate = {
                 $.getJSON(nodePath[0] + '/project-issue/json', function (json){
                   // @todo fix this once JSON data can be extracted again.
                   return;
-                  var $profileLink, $bodyVal = $('<div/>').html($body.val());
+                  var $profileLink, $bodyVal = $('<div/>').html($body.val()); // jshint ignore:line
                   if (!json.authorId || !json.authorName || !json.authorUrl) {
                     $profileLink = $('<a/>').text('Anonymous').attr('href', '#');
                   }
@@ -1859,7 +1870,7 @@ Drupal.behaviors.dreditorFormBackup = {
         if (window.confirm('Reset this form to your last submitted values?')) {
           var values = Drupal.storage.unserialize(Drupal.storage.load('form.backup'));
           $form.find('[name]').not('[type=hidden]').each(function () {
-            if (typeof values[this.name] != 'undefined') {
+            if (typeof values[this.name] !== 'undefined') {
               $(this).val(values[this.name]);
             }
           });
@@ -1914,14 +1925,14 @@ Drupal.behaviors.dreditorPatchNameSuggestion = {
 
         // Build filename suggestion.
         var patchName = '';
-        if (project == 'drupal') {
+        if (project === 'drupal') {
           patchName = project + core + '-' + component;
         }
         else {
           patchName = project + '-' + component;
         }
 
-        if (nid != 0) {
+        if (nid !== 0) {
           var newCommentNumber = Drupal.dreditor.issue.getNewCommentNumber();
 
           patchName += '-' + nid + '-' + newCommentNumber;
@@ -1936,7 +1947,7 @@ Drupal.behaviors.dreditorPatchNameSuggestion = {
   }
 };
 
-Drupal.dreditor.issue = {}
+Drupal.dreditor.issue = {};
 
 /**
  * Gets the issue node id.
@@ -1981,7 +1992,7 @@ Drupal.dreditor.issue.getProjectShortName = function() {
   //   does not expose the project name anywhere else.
   if (project) {
     // The Drupal (core) project breadcrumb does not contain a project page link.
-    if (project == '/project/issues/drupal') {
+    if (project === '/project/issues/drupal') {
       project = 'drupal';
     }
     else {
@@ -2066,7 +2077,7 @@ Drupal.dreditor.issue.getSelectedVersionContrib = function() {
  *   7.x-1.2
  */
 Drupal.dreditor.issue.getSelectedVersionCoreContrib = function() {
-  version = Drupal.dreditor.issue.getSelectedVersion();
+  var version = Drupal.dreditor.issue.getSelectedVersion();
   var matches = version.match(/^(\d+\.x-\d+\.[x\d]+)/);
   if (matches) {
     return matches[0];
@@ -2115,7 +2126,8 @@ Drupal.behaviors.dreditorCommitMessage = {
               return a[0] > b[0];
             });
             // Return the list of values, ordered by counts (descending).
-            var result = [], i = temp.length;
+            var result = [];
+            i = temp.length;
             while (i--) {
               result.push(temp[i][1]);
             }
@@ -2161,7 +2173,7 @@ Drupal.behaviors.dreditorCommitMessage = {
             }
             // Skip already listed contributors.
             for (var i in submitters) {
-              if (submitters[i] == name) {
+              if (submitters[i] === name) {
                 return;
               }
             }
@@ -2202,14 +2214,14 @@ Drupal.behaviors.dreditorCommitMessage = {
 
           default:
             // For anything else, we just ensure proper capitalization.
-            if (title[0].toLowerCase() == title[0]) {
+            if (title[0].toLowerCase() === title[0]) {
               title = title[0].toUpperCase() + title.substring(1);
             }
             break;
         }
 
         // Add a period (full-stop).
-        if (title[title.length - 1] != '.') {
+        if (title[title.length - 1] !== '.') {
           title += '.';
         }
         message += ': ' + title;
@@ -2241,7 +2253,7 @@ Drupal.behaviors.dreditorCommitMessage = {
           var $commandInput = $('<input class="dreditor-input" type="text" autocomplete="off" />')
             .val(self.createShellCommand(message));
           // Add user list as commit attribution choices.
-          for (var user in users) {
+          for (user in users) {
             var $userLink = $('<a href="#' + users[user].href + '/git-attribution" class="choice">' + users[user].name + '</a>')
               .data('user', users[user]);
             $userLink.click(function () {
@@ -2256,7 +2268,7 @@ Drupal.behaviors.dreditorCommitMessage = {
                 $(link).addClass('selected').siblings().removeClass('selected');
               });
               return false;
-            });
+            }); // jshint ignore:line
             $commandContainer.append($userLink);
           }
 
@@ -2374,7 +2386,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keypressHandler = function (event) 
   // If the autocompletion key was pressed and there is a suggestion, perform
   // the text replacement.
   // event.which is 0 in the keypress event, so directly compare with keyCode.
-  if (event.keyCode == self.keyCode && self.suggestion) {
+  if (event.keyCode === self.keyCode && self.suggestion) {
     // Backup the current scroll position within the textarea. Any manipulation
     // of this.value automatically resets this.scrollTop to zero.
     var scrollTop = this.scrollTop;
@@ -2406,7 +2418,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.keypressHandler = function (event) 
  */
 Drupal.dreditor.syntaxAutocomplete.prototype.keyupHandler = function (event) {
   // Don't interfere with text selections.
-  if (this.selectionStart != this.selectionEnd) {
+  if (this.selectionStart !== this.selectionEnd) {
     return;
   }
   // Skip special keystrokes.
@@ -2463,7 +2475,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.checkSuggestion = function (needle)
  */
 Drupal.dreditor.syntaxAutocomplete.prototype.setSuggestion = function (suggestion) {
   var self = this;
-  if (suggestion != self.suggestion) {
+  if (suggestion !== self.suggestion) {
     self.suggestion = suggestion;
     self.$suggestion.text(self.suggestion.replace('^', ''));
     self.$tooltip.css({ display: 'inline-block' });
@@ -2536,7 +2548,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.user = function (needle
   var matches, self = this;
   if (matches = needle.match('^@([a-zA-Z0-9]+)$')) {
     // Performance: Upon first match, setup a username list once.
-    if (typeof self.suggestionUserList == 'undefined') {
+    if (typeof self.suggestionUserList === 'undefined') {
       self.suggestionUserList = {};
       var seen = {};
       // Add issue author to comment authors and build the suggestion list.
@@ -2569,7 +2581,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.comment = function (nee
   var matches, self = this;
   if (matches = needle.match('^#([0-9]+)$')) {
     // Performance: Upon first match, setup a username list once.
-    if (typeof self.suggestionCommentList == 'undefined') {
+    if (typeof self.suggestionCommentList === 'undefined') {
       self.suggestionCommentList = {
         0: 'content'
       };
@@ -2765,7 +2777,6 @@ Drupal.behaviors.dreditorIssuesFilterFormValuesClean = {
   attach: function (context) {
     $('.view-filters form', context).once('dreditor-issues-form-values-clean', function () {
       $(this).submit(function (event) {
-        var $form = $(this);
         $.each(event.target.elements, function (index, element) {
           var $element = $(element);
           var value = $element.val();
@@ -2775,13 +2786,13 @@ Drupal.behaviors.dreditorIssuesFilterFormValuesClean = {
             case 'submitted':
             case 'participant':
             case 'issue_tags':
-              if (value == '') {
+              if (value === '') {
                 element.disabled = true;
               }
               break;
 
             case 'status':
-              if (value == 'Open') {
+              if (value === 'Open') {
                 element.disabled = true;
               }
               break;
@@ -2790,13 +2801,13 @@ Drupal.behaviors.dreditorIssuesFilterFormValuesClean = {
             case 'categories':
             case 'version':
             case 'component':
-              if (value == 'All') {
+              if (value === 'All') {
                 element.disabled = true;
               }
               break;
 
             case 'issue_tags_op':
-              if (value == 'or') {
+              if (value === 'or') {
                 element.disabled = true;
               }
               break;
@@ -2898,140 +2909,138 @@ var styles = document.createElement("style");
 styles.setAttribute('type', 'text/css');
 document.getElementsByTagName('head')[0].appendChild(styles);
 
-styles.innerHTML = " \
-#dreditor-wrapper { position: fixed; z-index: 1000; width: 100%; top: 0; } \
-#dreditor { position: relative; width: 100%; height: 100%; background-color: #fff; border: 1px solid #ccc; } \
-#dreditor #bar, #dreditor-actions { padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; min-width: 230px; } \
-#dreditor #bar { position: absolute; height: 100%; } \
-#dreditor-actions { bottom: 0; left: -5px; padding-top: 5px; padding-bottom: 5px; position: absolute; } \
-.dreditor-button, .dreditor-button:link, .dreditor-button:visited, #content a.dreditor-button { background: rgb(122,188,255); \
-  background: -moz-linear-gradient(top, rgba(122,188,255,1) 0%, rgba(96,171,248,1) 44%, rgba(64,150,238,1) 100%); \
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(122,188,255,1)), color-stop(44%,rgba(96,171,248,1)), color-stop(100%,rgba(64,150,238,1))); \
-  background: -webkit-linear-gradient(top, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); \
-  background: -o-linear-gradient(top, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); \
-  background: -ms-linear-gradient(top, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); \
-  background: linear-gradient(to bottom, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); \
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#4096ee',GradientType=0 ); \
-  border: 1px solid #3598E8; color: #fff; cursor: pointer; font-size: 11px; font-family: sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); } \
-.dreditor-button:hover, #content a.dreditor-button:hover { background: rgb(145,200,255); \
-  background: -moz-linear-gradient(top, rgba(145,200,255,1) 0%, rgba(96,171,248,1) 44%, rgba(94,166,237,1) 100%); \
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(145,200,255,1)), color-stop(44%,rgba(96,171,248,1)), color-stop(100%,rgba(94,166,237,1))); \
-  background: -webkit-linear-gradient(top, rgba(145,200,255,1) 0%,rgba(96,171,248,1) 44%,rgba(94,166,237,1) 100%); \
-  background: -o-linear-gradient(top, rgba(145,200,255,1) 0%,rgba(96,171,248,1) 44%,rgba(94,166,237,1) 100%); \
-  background: -ms-linear-gradient(top, rgba(145,200,255,1) 0%,rgba(96,171,248,1) 44%,rgba(94,166,237,1) 100%); \
-  background: linear-gradient(to bottom, rgba(145,200,255,1) 0%,rgba(96,171,248,1) 44%,rgba(94,166,237,1) 100%); \
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#91c8ff', endColorstr='#5ea6ed',GradientType=0 ); } \
-.dreditor-button:active, #content a.dreditor-button:active { background: rgb(64,150,238); \
-  background: -moz-linear-gradient(top, rgba(64,150,238,1) 0%, rgba(96,171,248,1) 56%, rgba(122,188,255,1) 100%); \
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(64,150,238,1)), color-stop(56%,rgba(96,171,248,1)), color-stop(100%,rgba(122,188,255,1))); \
-  background: -webkit-linear-gradient(top, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%); \
-  background: -o-linear-gradient(top, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%); \
-  background: -ms-linear-gradient(top, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%); \
-  background: linear-gradient(to bottom, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%); \
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4096ee', endColorstr='#7abcff',GradientType=0 ); } \
-.dreditor-button { margin: 0 0.5em 0.5em; } \
-.dreditor-patchreview, .dreditor-patchtest { float: right; line-height: 1.25em; margin: 0 0 0 1em; } \
-#dreditor h3 { margin: 18px 0 0; }\
-#dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; } \
-#dreditor #menu li { list-style: none; margin: 0; white-space: nowrap; } \
-#dreditor #menu li li { padding: 0 0 0 1em; } \
-#dreditor #menu > li > a { display: block; padding: 0 0 0 0.2em; background-color: #f0f0f0; } \
-#dreditor a { text-decoration: none; background: transparent; } \
-#dreditor .form-textarea { width: 100%; height: 12em; font: 13px Consolas, 'Liberation Mono', Courier, monospace; color: #000; } \
-#dreditor .resizable-textarea { margin: 0 0 9px; } \
-#dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; overflow: scroll; height: 100%; } \
-#dreditor-content, #code tr, #code td { font: 13px/18px Consolas, 'Liberation Mono', Courier, monospace; } \
-#dreditor #code { position: relative; width:100%; } \
-#dreditor #code td { overflow: hidden; padding: 0 10px; } \
-#dreditor #code .ln { width: 1px; border-right: 1px solid #e5e5e5; text-align: right; } \
-#dreditor #code .ln:before { content: attr(data-line-number); } \
-#dreditor #code tr { background: transparent; border: 0; color: #aaa; margin: 0; padding: 0; } \
-#dreditor #code .pre { white-space: pre; background: transparent; position: relative; } \
-#dreditor #code .pre .line-ruler { background: #ccc; background: rgba(0,0,0,0.15); position: absolute; bottom: -4px; top: -4px; width: 1px; visibility: hidden; z-index: 1; } \
-#dreditor #code tr:hover .pre .line-ruler { background-color: #E8DAB3; background-color: rgba(154, 124, 41, 0.3); } \
-#dreditor #code .pre span.space { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; } \
-#dreditor #code .pre span.error { background-color: #f99; line-height: 100%; width: auto; height: auto; border: 0; } \
-#dreditor #code .pre span.error.eof { color: #fff; background-color: #f66; } \
-#dreditor #code .pre span.error.tab { background-color: #fdd; } \
-#dreditor #code .pre span.hidden { display: none; } \
-#dreditor #code tr.file { color: #708E9E; background-color: #E8F1F6; } \
-#dreditor #code tr.file a { color: #708E9E; } \
-#dreditor #code tr.file .ln { background-color: #DAEAF3; border-color: #BFD4EE; } \
-#dreditor #code tr.old { background-color: #fdd; color: #CC0000; } \
-#dreditor #code tr.old a { color: #CC0000; } \
-#dreditor #code tr.old .ln { background-color: #f7c8c8; border-color: #e9aeae; } \
-#dreditor #code tr.old .line-ruler { background-color: #B53B3B; background-color: rgba(181, 59, 59, 0.2); } \
-#dreditor #code tr.new { background-color: #dfd; color: #00AA00; float: none; font-size: 100%; font-weight: normal; } \
-#dreditor #code tr.new a { color: #00AA00; } \
-#dreditor #code tr.new .ln { background-color: #ceffce; border-color: #b4e2b4; } \
-#dreditor #code tr.new .line-ruler { background-color: #167A00; background-color: rgba(22, 122, 0, 0.2); } \
-#dreditor #code .comment { color: #070; } \
-\
-tr.selected td { background: transparent; } \
-#dreditor #code tr.has-comment { background: #ffc; } \
-#dreditor #code tr.has-comment .ln { background: #FFF0B8;  border-color: #EEDB91; } \
-#dreditor #code tr.selected, #dreditor #code tr.pre-selected { background: #ffc; cursor: pointer; } \
-#dreditor #code tr.selected .ln, #dreditor #code tr.pre-selected .ln { background: #FFEFB3;  border-color: #ECD784; } \
-\
-#dreditor #code tr:hover, #dreditor #code tr:hover td, #dreditor #code tr:hover td a { background: #FFFFEC !important; border-color: #FCD773 !important; color: #A77E00 !important; cursor: pointer; } \
-#dreditor #code tr:hover td { box-shadow: 0px -1px 0 0px #FCD773 inset, 0px 1px 0 0px #FCD773 inset; } \
-\
-.element-invisible { clip: rect(1px, 1px, 1px, 1px); position: absolute !important; } \
-.admin-link { font-size: 11px; font-weight: normal; text-transform: lowercase; } \
-#dreditor-overlay { margin-top: 18px; font-size: 13px; } \
-#column-left { z-index: 2; /* Required, or issue summary widget would be below site header. */ } \
-#dreditor-widget { position: fixed; bottom: 0; left: 2%; width: 94%; z-index: 10; overflow: auto; padding: 0 1em 1em; background-color: #fff; -moz-box-shadow: 0 0 20px #bbb; box-shadow: 0 0 20px #bbb; -moz-border-radius: 8px 8px 0 0; border-radius: 8px 8px 0 0; } \
- \
-.dreditor-actions { overflow: hidden; position: relative; } \
-a.dreditor-application-toggle { display: inline-block; padding: 0.05em 0.3em; line-height: 150%; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; } \
-a.dreditor-application-toggle.active { border-color: #48e; background-color: #4af; color: #fff; } \
-#content a.dreditor-application-toggle { float: right; margin: 0 0 0 0.5em; } \
-.dreditor-input { border: 1px solid #ccc; padding: 0.2em 0.3em; font-size: 100%; line-height: 150%; -moz-box-sizing: border-box; box-sizing: border-box; width: 100%; } \
-.choice { display: inline-block; margin: 0 0.33em 0.4em 0; padding: 0.2em 0.7em; border: 1px solid #ccc; background-color: #fafcfe; -moz-border-radius: 5px; border-radius: 5px; } \
-.choice.selected { background-color: #2e96d5; border: 1px solid #28d; color: #fff; } \
- \
-div.dreditor-issuecount { line-height: 200%; } \
-.dreditor-issuecount a { padding: 0 0.3em; } \
-.marker.clickable { cursor: pointer; } \
- \
-#content .fieldset-flat { display: block; border: 0; width: auto; padding: 0; } \
-.fieldset-flat > legend { display: none; } \
-#dreditor-issue-data #edit-title-wrapper { margin-top: 0; } \
-#dreditor-issue-data .inline-options .form-item { margin-bottom: 0.3em; } \
-\
-.dreditor-tooltip { display: none; position: fixed; bottom: 0; background-color: #ffffbf; border: 1px solid #000; padding: 0 3px; font-family: sans-serif; font-size: 11px; line-height: 150%; } \
-\
-/* Drupal.org Styling Fixes */\
-\
-#comment-form textarea { min-height: 200px; } \
-.field-name-field-issue-files table, .field-name-field-issue-changes table.nodechanges-file-changes { width: 100%; } \
-.extended-file-field-table-cid, th[name=\"extended-file-field-table-header-cid\"] { width: 100px; word-wrap: break-word; } \
-.field-name-field-issue-changes table td .file { display: block; } \
-td.extended-file-field-table-cid { text-align: right; } \
-td.extended-file-field-table-cid .username { color: #777; display: block; font-size: 10px; } \
-td.extended-file-field-table-filename .file, tr.pift-file-info .file { font-weight: 600; } \
-td.extended-file-field-table-filename .file a, tr.pift-file-info .file a { display: block; overflow: hidden; } \
-td.extended-file-field-table-filename .file .file-icon, tr.pift-file-info .file .file-icon { float: left; margin-right: .5em; } \
-td.extended-file-field-table-filename .file .size, tr.pift-file-info .file .size { color: #999; float: right; font-size: 10px; margin-left: .5em; } \
-tr.extended-file-field-table-row td, .field-name-field-issue-changes table.nodechanges-file-changes td { padding: .75em; } \
-tr.extended-file-field-table-row:not(.pift-test-info) td.pift-pass, tr.extended-file-field-table-row:not(.pift-test-info) td.pift-fail, table.nodechanges-file-changes .pift-file-info td.pift-pass, table.nodechanges-file-changes .pift-file-info td.pift-fail { padding-bottom: 0; } \
-tr.pift-test-info td { font-size: 11px; font-style: italic; padding: 0.5em .75em .75em 2.9em; } \
-div.pift-operations { color: inherit; float: right; font-size: 10px; font-style: normal; font-weight: 600; margin-left: 1em; text-transform: uppercase; } \
-td.pift-pass { background: #DDFFDD; color: #00AA00; } \
-tr.extended-file-field-table-row td.pift-pass { border-color: #87CF87; } \
-tr.extended-file-field-table-row td.pift-fail { border-color: #EEBBBB; } \
-td.pift-fail { background: #FFECEC; color: #CC0000; } \
-td.pift-pass a, td.pift-fail a, td.pift-pass .file .size, td.pift-fail .file .size { color: inherit; } \
-";
+styles.innerHTML = "#dreditor-wrapper { position: fixed; z-index: 1000; width: 100%; top: 0; }" +
+"#dreditor { position: relative; width: 100%; height: 100%; background-color: #fff; border: 1px solid #ccc; }" +
+"#dreditor #bar, #dreditor-actions { padding: 0 10px; font: 10px/18px sans-serif, verdana, tahoma, arial; min-width: 230px; }" +
+"#dreditor #bar { position: absolute; height: 100%; }" +
+"#dreditor-actions { bottom: 0; left: -5px; padding-top: 5px; padding-bottom: 5px; position: absolute; }" +
+".dreditor-button, .dreditor-button:link, .dreditor-button:visited, #content a.dreditor-button { background: rgb(122,188,255);" +
+  "background: -moz-linear-gradient(top, rgba(122,188,255,1) 0%, rgba(96,171,248,1) 44%, rgba(64,150,238,1) 100%);" +
+  "background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(122,188,255,1)), color-stop(44%,rgba(96,171,248,1)), color-stop(100%,rgba(64,150,238,1)));" +
+  "background: -webkit-linear-gradient(top, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%);" +
+  "background: -o-linear-gradient(top, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%);" +
+  "background: -ms-linear-gradient(top, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%);" +
+  "background: linear-gradient(to bottom, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%);" +
+  "filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#4096ee',GradientType=0 );" +
+  "border: 1px solid #3598E8; color: #fff; cursor: pointer; font-size: 11px; font-family: sans-serif, verdana, tahoma, arial; font-weight: bold; padding: 0.1em 0.8em; text-transform: uppercase; text-decoration: none; -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }" +
+".dreditor-button:hover, #content a.dreditor-button:hover { background: rgb(145,200,255);" +
+  " background: -moz-linear-gradient(top, rgba(145,200,255,1) 0%, rgba(96,171,248,1) 44%, rgba(94,166,237,1) 100%);" +
+  " background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(145,200,255,1)), color-stop(44%,rgba(96,171,248,1)), color-stop(100%,rgba(94,166,237,1)));" +
+  " background: -webkit-linear-gradient(top, rgba(145,200,255,1) 0%,rgba(96,171,248,1) 44%,rgba(94,166,237,1) 100%);" +
+  " background: -o-linear-gradient(top, rgba(145,200,255,1) 0%,rgba(96,171,248,1) 44%,rgba(94,166,237,1) 100%);" +
+  " background: -ms-linear-gradient(top, rgba(145,200,255,1) 0%,rgba(96,171,248,1) 44%,rgba(94,166,237,1) 100%);" +
+  " background: linear-gradient(to bottom, rgba(145,200,255,1) 0%,rgba(96,171,248,1) 44%,rgba(94,166,237,1) 100%);" +
+  " filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#91c8ff', endColorstr='#5ea6ed',GradientType=0 ); }" +
+  ".dreditor-button:active, #content a.dreditor-button:active { background: rgb(64,150,238);" +
+  " background: -moz-linear-gradient(top, rgba(64,150,238,1) 0%, rgba(96,171,248,1) 56%, rgba(122,188,255,1) 100%);" +
+  " background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(64,150,238,1)), color-stop(56%,rgba(96,171,248,1)), color-stop(100%,rgba(122,188,255,1)));" +
+  " background: -webkit-linear-gradient(top, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%);" +
+  " background: -o-linear-gradient(top, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%);" +
+  " background: -ms-linear-gradient(top, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%);" +
+  " background: linear-gradient(to bottom, rgba(64,150,238,1) 0%,rgba(96,171,248,1) 56%,rgba(122,188,255,1) 100%);" +
+  " filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4096ee', endColorstr='#7abcff',GradientType=0 ); }" +
+".dreditor-button { margin: 0 0.5em 0.5em; }" +
+".dreditor-patchreview, .dreditor-patchtest { float: right; line-height: 1.25em; margin: 0 0 0 1em; }" +
+"#dreditor h3 { margin: 18px 0 0; }" +
+"#dreditor #menu { margin: 0; max-height: 30%; overflow-y: scroll; padding: 0; }" +
+"#dreditor #menu li { list-style: none; margin: 0; white-space: nowrap; }" +
+"#dreditor #menu li li { padding: 0 0 0 1em; }" +
+"#dreditor #menu > li > a { display: block; padding: 0 0 0 0.2em; background-color: #f0f0f0; }" +
+"#dreditor a { text-decoration: none; background: transparent; }" +
+"#dreditor .form-textarea { width: 100%; height: 12em; font: 13px Consolas, 'Liberation Mono', Courier, monospace; color: #000; }" +
+"#dreditor .resizable-textarea { margin: 0 0 9px; }" +
+"#dreditor-content { margin-left: 250px; border-left: 1px solid #ccc; overflow: scroll; height: 100%; }" +
+"#dreditor-content, #code tr, #code td { font: 13px/18px Consolas, 'Liberation Mono', Courier, monospace; }" +
+"#dreditor #code { position: relative; width:100%; }" +
+"#dreditor #code td { overflow: hidden; padding: 0 10px; }" +
+"#dreditor #code .ln { width: 1px; border-right: 1px solid #e5e5e5; text-align: right; }" +
+"#dreditor #code .ln:before { content: attr(data-line-number); }" +
+"#dreditor #code tr { background: transparent; border: 0; color: #aaa; margin: 0; padding: 0; }" +
+"#dreditor #code .pre { white-space: pre; background: transparent; position: relative; }" +
+"#dreditor #code .pre .line-ruler { background: #ccc; background: rgba(0,0,0,0.15); position: absolute; bottom: -4px; top: -4px; width: 1px; visibility: hidden; z-index: 1; }" +
+"#dreditor #code tr:hover .pre .line-ruler { background-color: #E8DAB3; background-color: rgba(154, 124, 41, 0.3); }" +
+"#dreditor #code .pre span.space { display: inline-block; margin-left: 1px; width: 2px; height: 7px; background-color: #ddd; }" +
+"#dreditor #code .pre span.error { background-color: #f99; line-height: 100%; width: auto; height: auto; border: 0; }" +
+"#dreditor #code .pre span.error.eof { color: #fff; background-color: #f66; }" +
+"#dreditor #code .pre span.error.tab { background-color: #fdd; }" +
+"#dreditor #code .pre span.hidden { display: none; }" +
+"#dreditor #code tr.file { color: #708E9E; background-color: #E8F1F6; }" +
+"#dreditor #code tr.file a { color: #708E9E; }" +
+"#dreditor #code tr.file .ln { background-color: #DAEAF3; border-color: #BFD4EE; }" +
+"#dreditor #code tr.old { background-color: #fdd; color: #CC0000; }" +
+"#dreditor #code tr.old a { color: #CC0000; }" +
+"#dreditor #code tr.old .ln { background-color: #f7c8c8; border-color: #e9aeae; }" +
+"#dreditor #code tr.old .line-ruler { background-color: #B53B3B; background-color: rgba(181, 59, 59, 0.2); }" +
+"#dreditor #code tr.new { background-color: #dfd; color: #00AA00; float: none; font-size: 100%; font-weight: normal; }" +
+"#dreditor #code tr.new a { color: #00AA00; }" +
+"#dreditor #code tr.new .ln { background-color: #ceffce; border-color: #b4e2b4; }" +
+"#dreditor #code tr.new .line-ruler { background-color: #167A00; background-color: rgba(22, 122, 0, 0.2); }" +
+"#dreditor #code .comment { color: #070; }" +
+
+"tr.selected td { background: transparent; }" +
+"#dreditor #code tr.has-comment { background: #ffc; }" +
+"#dreditor #code tr.has-comment .ln { background: #FFF0B8;  border-color: #EEDB91; }" +
+"#dreditor #code tr.selected, #dreditor #code tr.pre-selected { background: #ffc; cursor: pointer; }" +
+"#dreditor #code tr.selected .ln, #dreditor #code tr.pre-selected .ln { background: #FFEFB3;  border-color: #ECD784; }" +
+
+"#dreditor #code tr:hover, #dreditor #code tr:hover td, #dreditor #code tr:hover td a { background: #FFFFEC !important; border-color: #FCD773 !important; color: #A77E00 !important; cursor: pointer; }" +
+"#dreditor #code tr:hover td { box-shadow: 0px -1px 0 0px #FCD773 inset, 0px 1px 0 0px #FCD773 inset; }" +
+
+".element-invisible { clip: rect(1px, 1px, 1px, 1px); position: absolute !important; }" +
+".admin-link { font-size: 11px; font-weight: normal; text-transform: lowercase; }" +
+"#dreditor-overlay { margin-top: 18px; font-size: 13px; }" +
+"#column-left { z-index: 2; /* Required, or issue summary widget would be below site header. */ }" +
+"#dreditor-widget { position: fixed; bottom: 0; left: 2%; width: 94%; z-index: 10; overflow: auto; padding: 0 1em 1em; background-color: #fff; -moz-box-shadow: 0 0 20px #bbb; box-shadow: 0 0 20px #bbb; -moz-border-radius: 8px 8px 0 0; border-radius: 8px 8px 0 0; }" +
+
+".dreditor-actions { overflow: hidden; position: relative; }" +
+"a.dreditor-application-toggle { display: inline-block; padding: 0.05em 0.3em; line-height: 150%; border: 1px solid #ccc; background-color: #fafcfe; font-weight: normal; text-decoration: none; }" +
+"a.dreditor-application-toggle.active { border-color: #48e; background-color: #4af; color: #fff; }" +
+"#content a.dreditor-application-toggle { float: right; margin: 0 0 0 0.5em; }" +
+".dreditor-input { border: 1px solid #ccc; padding: 0.2em 0.3em; font-size: 100%; line-height: 150%; -moz-box-sizing: border-box; box-sizing: border-box; width: 100%; }" +
+".choice { display: inline-block; margin: 0 0.33em 0.4em 0; padding: 0.2em 0.7em; border: 1px solid #ccc; background-color: #fafcfe; -moz-border-radius: 5px; border-radius: 5px; }" +
+".choice.selected { background-color: #2e96d5; border: 1px solid #28d; color: #fff; }" +
+
+"div.dreditor-issuecount { line-height: 200%; }" +
+".dreditor-issuecount a { padding: 0 0.3em; }" +
+".marker.clickable { cursor: pointer; }" +
+
+"#content .fieldset-flat { display: block; border: 0; width: auto; padding: 0; }" +
+".fieldset-flat > legend { display: none; }" +
+"#dreditor-issue-data #edit-title-wrapper { margin-top: 0; }" +
+"#dreditor-issue-data .inline-options .form-item { margin-bottom: 0.3em; }" +
+
+".dreditor-tooltip { display: none; position: fixed; bottom: 0; background-color: #ffffbf; border: 1px solid #000; padding: 0 3px; font-family: sans-serif; font-size: 11px; line-height: 150%; }" +
+
+/* Drupal.org Styling Fixes */
+"#comment-form textarea { min-height: 200px; }" +
+".field-name-field-issue-files table, .field-name-field-issue-changes table.nodechanges-file-changes { width: 100%; }" +
+".extended-file-field-table-cid, th[name=\"extended-file-field-table-header-cid\"] { width: 100px; word-wrap: break-word; }" +
+".field-name-field-issue-changes table td .file { display: block; }" +
+"td.extended-file-field-table-cid { text-align: right; }" +
+"td.extended-file-field-table-cid .username { color: #777; display: block; font-size: 10px; }" +
+"td.extended-file-field-table-filename .file, tr.pift-file-info .file { font-weight: 600; }" +
+"td.extended-file-field-table-filename .file a, tr.pift-file-info .file a { display: block; overflow: hidden; }" +
+"td.extended-file-field-table-filename .file .file-icon, tr.pift-file-info .file .file-icon { float: left; margin-right: .5em; }" +
+"td.extended-file-field-table-filename .file .size, tr.pift-file-info .file .size { color: #999; float: right; font-size: 10px; margin-left: .5em; }" +
+"tr.extended-file-field-table-row td, .field-name-field-issue-changes table.nodechanges-file-changes td { padding: .75em; }" +
+"tr.extended-file-field-table-row:not(.pift-test-info) td.pift-pass, tr.extended-file-field-table-row:not(.pift-test-info) td.pift-fail, table.nodechanges-file-changes .pift-file-info td.pift-pass, table.nodechanges-file-changes .pift-file-info td.pift-fail { padding-bottom: 0; }" +
+"tr.pift-test-info td { font-size: 11px; font-style: italic; padding: 0.5em .75em .75em 2.9em; }" +
+"div.pift-operations { color: inherit; float: right; font-size: 10px; font-style: normal; font-weight: 600; margin-left: 1em; text-transform: uppercase; }" +
+"td.pift-pass { background: #DDFFDD; color: #00AA00; }" +
+"tr.extended-file-field-table-row td.pift-pass { border-color: #87CF87; }" +
+"tr.extended-file-field-table-row td.pift-fail { border-color: #EEBBBB; }" +
+"td.pift-fail { background: #FFECEC; color: #CC0000; }" +
+"td.pift-pass a, td.pift-fail a, td.pift-pass .file .size, td.pift-fail .file .size { color: inherit; }"
+;
 
 // Invoke Dreditor update check once.
 Drupal.dreditor.updateCheck();
 
 // End of Content Scope Runner.
-}
+};
 
 // If not already running in the page, inject this script into the page.
-if (typeof __PAGE_SCOPE_RUN__ == 'undefined') {
+if (typeof __PAGE_SCOPE_RUN__ === 'undefined') {
   // Define a closure/function in the global scope in order to reference the
   // function caller (the function that executes the user script itself).
   (function page_scope_runner() {
@@ -3057,7 +3066,7 @@ if (typeof __PAGE_SCOPE_RUN__ == 'undefined') {
   // script needs to be wrapped in a condition.
 }
 // Drupal is undefined when drupal.org is down.
-else if (typeof Drupal == 'undefined') {
+else if (typeof Drupal === 'undefined') {
 }
 // Execute the script as part of the content page.
 else {

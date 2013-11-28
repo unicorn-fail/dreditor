@@ -1,0 +1,41 @@
+{
+  "name": "dreditor",
+  "title": "Dreditor",
+  "description": "A Drupal.org browser extension for improving user experience and functionality.",
+  "version": "1.2.3",
+  "homepage": "http://dreditor.org",
+  "contributors": [
+    {
+      "name": "Mark Carver",
+      "url": "https://drupal.org/user/501638"
+    },
+    {
+      "name": "Scott Reeves (Cottser)",
+      "url": "https://drupal.org/user/1167326"
+    },
+    {
+      "name": "Daniel F. Kudwien (sun)",
+      "url": "https://drupal.org/user/54136"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:dreditor/dreditor.git"
+  },
+  "bugs": "https://github.com/dreditor/dreditor/issues",
+  "licenses": [
+    {
+      "type": "GPL-2.0",
+      "url": "https://github.com/dreditor/dreditor/blob/2.x/LICENSE-GPL-2.0"
+    }
+  ],
+  "keywords": [],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.6.5",
+    "grunt-contrib-watch": "~0.4.4",
+    "grunt": "~0.4.2"
+  }
+}
