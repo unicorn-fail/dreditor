@@ -4,8 +4,9 @@ We changed development workflow by using the grunt toolset. This meant splitting
 
 ## Important notes
 
-1. When you start coding make sure to only edit within the _src_ tree as other directories are managed by grunt.
-1. To have a continues build of packaged version dreditor.js make sure to start ```grunt watch``` in root dir.
+1. You'll find source code in the `src` directory.
+1. When `grunt`-ing this project, it will generate an additional `build` and possibly a `release` directory. These have both been added to `.gitignore` and should never be included with any pull requests.
+1. To continuously build a packaged version Dreditor, you can run `grunt watch` in root of the project. It will automatically detect changes made to any file and compile the source code for you.
 
 ### Code style
 Regarding code style like indentation and whitespace, **follow the conventions you see used in the source already.**
