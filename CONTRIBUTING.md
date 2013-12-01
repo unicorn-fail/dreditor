@@ -29,3 +29,8 @@ Assuming that you don't see any red, you're ready to go. Just be sure to run `gr
 3. Run `grunt` to ensure code compiles properly.
 4. Update the documentation to reflect any changes.
 5. Push to your fork's new branch and submit a pull request.
+
+## Writing tests
+
+[grunt and qunit](http://jordankasper.com/blog/2013/04/automated-javascript-tests-using-grunt-phantomjs-and-qunit/)
+

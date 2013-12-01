@@ -234,6 +234,9 @@ module.exports = function(grunt) {
           dist_dir: "release"
         }
       }
+    },
+    'qunit' : {
+      all: "tests/*.html"
     }
   });
 
@@ -249,9 +252,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-css2js');
   grunt.loadNpmTasks('grunt-mozilla-addon-sdk');
   grunt.loadNpmTasks('grunt-sed');
+  grunt.loadNpmTasks('grunt-contrib-qunit');
 
   // Default tasks.
-  grunt.registerTask('default', ['clean', 'less', 'css2js', 'jshint', 'concat', 'uglify', 'copy', 'sed']);
+  grunt.registerTask('default', ['clean', 'less', 'css2js', 'jshint', 'qunit', 'concat', 'uglify', 'copy', 'sed']);
 
   // Build extensions.
   grunt.registerTask('build:chrome', ['compress:chrome']);
@@ -270,6 +274,7 @@ module.exports = function(grunt) {
   });
   grunt.registerTask('build:safari', ['build-safari-ext']);
   grunt.registerTask('build', ['compress:chrome', 'mozilla-cfx-xpi', 'build-safari-ext']);
+  grunt.registerTask('test', ['clean', 'qunit']);
 
   // Release tasks.
   grunt.loadNpmTasks('grunt-release');

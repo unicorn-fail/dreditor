@@ -55,6 +55,7 @@
     "grunt-release": "~0.6.0",
     "grunt-sed": "~0.1.1",
     "clean-css": "~2.0.2",
-    "grunt-contrib-compress": "~0.5.3"
+    "grunt-contrib-compress": "~0.5.3",
+    "grunt-contrib-qunit": ">=0.2.1"
   }
 }
