@@ -1,7 +1,11 @@
 # Contributing
 
+We changed development workflow by using the grunt toolset. This meant splitting up the dreditor.js file into several parts to make better use of extentions and plugins. This allows us to add unit tests later on.
+
 ## Important notes
-You'll find source code in the `src` subdirectory. When `grunt`-ing this project, it will generate an additional `build` and possible a `release` directory. These are both added to `.gitignore` and should not be included with any pull requests.
+
+1. When you start coding make sure to only edit within the _src_ tree as other directories are managed by grunt.
+1. To have a continues build of packaged version dreditor.js make sure to start ```grunt watch``` in root dir.
 
 ### Code style
 Regarding code style like indentation and whitespace, **follow the conventions you see used in the source already.**
