@@ -1,7 +1,7 @@
 # Contributing
 
 ## Important notes
-Please don't edit files in the `dist` subdirectory as they are generated via Grunt. You'll find source code in the `src` subdirectory!
+You'll find source code in the `src` subdirectory. When `grunt`-ing this project, it will generate an additional `build` and possible a `release` directory. These are both added to `.gitignore` and should not be included with any pull requests.
 
 ### Code style
 Regarding code style like indentation and whitespace, **follow the conventions you see used in the source already.**
