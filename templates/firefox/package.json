@@ -1,0 +1,11 @@
+{
+  "name": "%PKG.NAME%",
+  "fullName": "%PKG.TITLE%",
+  "id": "%PKG.NAME%@%PKG.NAME%.org",
+  "homepage": "%PKG.HOMEPAGE%",
+  "description": "%PKG.DESCRIPTION%",
+  "author": "%PKG.AUTHOR%",
+  "icon": "%PKG.ICON%",
+  "license": "%PKG.LICENSE%",
+  "version": "%PKG.VERSION%"
+}

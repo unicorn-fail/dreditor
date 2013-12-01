@@ -1,0 +1,24 @@
+{
+  "manifest_version": 2,
+  "name": "%PKG.TITLE%",
+  "homepage_url": "%PKG.HOMEPAGE%",
+  "version": "%PKG.VERSION%",
+  "description": "%PKG.DESCRIPTION%",
+  "author": "%PKG.AUTHOR%",
+  "icons": { "128": "%PKG.ICON%" },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.drupal.org/*",
+        "*://*.dreditor.org/*",
+        "*://*.devdrupal.org/*"
+      ],
+      "js": ["%PKG.NAME%.min.js"]
+    }
+  ],
+  "permissions": [
+    "*://*.drupal.org/*",
+    "*://*.dreditor.org/*",
+    "*://*.devdrupal.org/*"
+  ]
+}

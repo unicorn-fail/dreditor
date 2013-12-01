@@ -1,10 +1,15 @@
 {
   "name": "dreditor",
   "title": "Dreditor",
-  "description": "A Drupal.org browser extension for improving user experience and functionality.",
+  "description": "An extension for Drupal.org that enhances user experience and functionality. Original author: Daniel F. Kudwien (sun).",
   "version": "1.2.3",
-  "homepage": "http://dreditor.org",
-  "contributors": [
+  "homepage": "https://dreditor.org",
+  "author": {
+    "name": "Mark Carver",
+    "url": "https://drupal.org/user/501638"
+  },
+  "icon": "icon.png",
+  "maintainers": [
     {
       "name": "Mark Carver",
       "url": "https://drupal.org/user/501638"
@@ -34,8 +39,19 @@
     "node": ">= 0.8.0"
   },
   "devDependencies": {
-    "grunt-contrib-jshint": "~0.6.5",
-    "grunt-contrib-watch": "~0.4.4",
-    "grunt": "~0.4.2"
+    "grunt": "~0.4.2",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-jshint": "~0.7.2",
+    "grunt-contrib-less": "~0.8.2",
+    "grunt-contrib-uglify": "~0.2.7",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-css2js": "~0.2.4",
+    "grunt-mozilla-addon-sdk": "~0.3.2",
+    "grunt-release": "~0.6.0",
+    "grunt-sed": "~0.1.1",
+    "clean-css": "~2.0.2",
+    "grunt-contrib-compress": "~0.5.3"
   }
 }

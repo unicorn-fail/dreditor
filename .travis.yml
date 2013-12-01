@@ -1,9 +1,21 @@
-# blacklist
-branches:
-  except:
-    - /^[^2].*$/
-
-# whitelist
-branches:
-  only:
-    - /^2/
+language: node_js
+node_js:
+  - 0.10
+before_script:
+  - npm install -g grunt-cli
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#dreditor"
+    template:
+      - "Build #%{build_number} (%{repository}/%{branch}):"
+      - "  - %{message} (%{build_url})"
+    on_success: always
+    on_failure: always
+    use_notice: true
+    skip_join: true
+  email:
+    recipients:
+      - mark.carver@me.com
+    on_success: never
+    on_failure: always

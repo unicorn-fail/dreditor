@@ -17,14 +17,14 @@ Additional labels for pre-release and build metadata are available as extensions
 
 ## Release Process
 
-Ultimately this will be automated in the future. However, for now, follow these
-steps to ensure we create a solid release:
-
-1. Bump the version, which is in `dreditor.user.js` on lines `8` and `137`.
+1. `grunt release` the project. This is very similar to simply running `grunt`,
+   however it will increase the `PATCH` version through out the code before
+   compiling it.
+    * To create a `MINOR` release, run: `grunt release:minor`
+    * To create a `MAJOR` release, run: `grunt release:major`
 2. Make a commit with just the version bump. Something like `git commit -m
    'Dreditor vMAJOR.MINOR.PATCH'`.
 3. Tag that commit, ensuring that you provide a message so we get an annotated
    tag. Like this: `git tag -m MAJOR.MINOR.PATCH MAJOR.MINOR.PATCH`
 4. Push the commit and the tag: `git push --follow-tags`
-5. Notify Mark Carver of this tag so he can create the Chrome and Safari
-   browser extensions.
+5. Notify Mark Carver of this tag so he can create the necessary extensions.

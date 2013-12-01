@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Author</key>
+	<string>%PKG.AUTHOR%</string>
+	<key>Builder Version</key>
+	<string>9537.71</string>
+	<key>CFBundleDisplayName</key>
+	<string>%PKG.TITLE%</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.%PKG.NAME%.%PKG.NAME%</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>%PKG.VERSION%</string>
+	<key>CFBundleVersion</key>
+	<string>%PKG.VERSION%</string>
+	<key>Chrome</key>
+	<dict>
+		<key>Database Quota</key>
+		<real>5242880</real>
+	</dict>
+	<key>Content</key>
+	<dict>
+		<key>Scripts</key>
+		<dict>
+			<key>End</key>
+			<array>
+				<string>%PKG.NAME%.min.js</string>
+			</array>
+		</dict>
+	</dict>
+	<key>Description</key>
+	<string>%PKG.DESCRIPTION%</string>
+	<key>ExtensionInfoDictionaryVersion</key>
+	<string>1.0</string>
+	<key>Permissions</key>
+	<dict>
+		<key>Website Access</key>
+		<dict>
+			<key>Allowed Domains</key>
+			<array>
+				<string>*.dreditor.org</string>
+				<string>*.drupal.org</string>
+				<string>*.devdrupal.org</string>
+			</array>
+			<key>Include Secure Pages</key>
+			<true/>
+			<key>Level</key>
+			<string>Some</string>
+		</dict>
+	</dict>
+	<key>Update Manifest URL</key>
+	<string>%PKG.HOMEPAGE%/update.plist</string>
+	<key>Website</key>
+	<string>%PKG.HOMEPAGE%</string>
+</dict>
+</plist>
