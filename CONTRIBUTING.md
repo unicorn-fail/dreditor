@@ -2,6 +2,8 @@
 
 Testing PR webhook
 
+Again.
+
 We changed development workflow by using the grunt toolset. This meant splitting up the dreditor.js file into several parts to make better use of extentions and plugins. This allows us to add unit tests later on.
 
 ## Important notes
