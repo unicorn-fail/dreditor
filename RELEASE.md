@@ -19,7 +19,7 @@ Additional labels for pre-release and build metadata are available as extensions
 
 1. `grunt release` the project. This is very similar to simply running `grunt`,
    however it will increase the `PATCH` version through out the code before
-   compiling it.
+   compiling it and then build the extensions (if you have supplemental commands installed).
     * To create a `MINOR` release, run: `grunt release:minor`
     * To create a `MAJOR` release, run: `grunt release:major`
 2. Make a commit with just the version bump. Something like `git commit -m
