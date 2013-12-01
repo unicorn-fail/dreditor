@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+      <meta charset='UTF-8' />
+      <meta http-equiv='content-type' content='text/html; charset=utf-8' />
+
+      <title>jQuery.simpleFAQ QUnit Test Runner</title>
+
+      <link rel='stylesheet' href='lib/qunit-1.12.0.css'>
+
+      <!-- add any external libraries your code needs -->
+      <script src='lib/jquery-1.7.2.min.js'></script>
+
+      <script src='lib/qunit-1.12.0.js'></script>
+
+      <script>
+        Drupal = {};
+      </script>
+      <script src='../src/js/extensions/storage.js'></script>
+
+      <!-- your tests, any and all to run with the given fixtures below -->
+      <script>
+        module("Storage");
+
+        test("bins", function() {
+          ok(Drupal.storage.isSupported('local'), "Local storage bin is supported");
+        });
+      </script>
+  </head>
+  <body>
+    <div id="qunit"></div> <!-- QUnit fills this with results, etc -->
+    <div id='qunit-fixture'>
+
+      <!-- any HTML you want to be present in each test (will be reset for each test) -->
+
+    </div>
+  </body>
+</html>
+
