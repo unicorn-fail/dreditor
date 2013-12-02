@@ -33,4 +33,5 @@ Assuming that you don't see any red, you're ready to go. Just be sure to run `gr
 ## Writing tests
 
 More information coming soon.
+
 [grunt and qunit](http://jordankasper.com/blog/2013/04/automated-javascript-tests-using-grunt-phantomjs-and-qunit/)
