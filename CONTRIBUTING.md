@@ -8,29 +8,29 @@ As of versions after 1.2.3 (Nov 30 2013) we introduced a new source tree layout 
 
 The following directories are important for patch writing:
 
-- src/js : dreditor code split into smaller parts like extensions and plugins
-- src/less : dreditor styling files.
-- package.json : contains version number apart from others
-- tests/ : contains unit tests
-- build/ : contains generated items by running ```grunt```. See Developer workflow below.
+- `src/js` : dreditor code split into smaller parts like extensions and plugins
+- `src/less` : dreditor styling files.
+- `package.json` : contains version number apart from others
+- `tests/` : contains unit tests
+- `build/` : contains generated items by running `grunt`. See Developer workflow below.
 
 The following directories are important for distributing Dreditor:
 
-- templates/ : used for generating the browser extensions
-- release/ : contains the generated packages Dreditor browser extensions.
+- `templates/` : used for generating the browser extensions
+- `release/` : contains the generated packages Dreditor browser extensions.
 
-Both build/ and release/ are added to ```.gitignore``` so make sure these are not added to any PR.
+Both `build/` and `release/` are added to `.gitignore` so make sure these are not added to any PR.
 
 ## Developer workflow
 
 ### Modifying the code
 
 1. Make sure you have Grunt configured correctly as described below.
-1. Run ```grunt watch``` to continues rebuild your changes into the build directory or just ```grunt``` when ready
+1. Run `grunt watch` to continues rebuild your changes into the build directory or just `grunt` when ready
 1. Configure your browser to use the correct build as described below.
 1. Start coding by
   1. Create a (new) feature branch. Please don't work in the `1.x` branch directly.
-  1. Fix the code
+  1. Fix the code. When debugging use `$.debug()` or 'globals' like `window.console` and `window.alert`.
   1. Write a test for the new code
   1. Check the watched output for failing tasks like jslint or tests.
 1. Run `grunt` to ensure code compiles properly. Assuming that you don't see any red, you're ready to go.
@@ -43,7 +43,7 @@ Regarding code style like indentation and whitespace, **follow the conventions y
 
 ### Writing tests
 
-The ```tests/``` directory contains *.html files with are configured to belong to the test and qunit tasks.
+The `tests/` directory contains *.html files with are configured to belong to the test and qunit tasks.
 
 More information coming soon.
 
@@ -53,9 +53,10 @@ More information coming soon.
 
 ### Chrome
 
-1. Navigate to ```chrome://extensions/```
-1. Click on ```Load unpacked extention...```
-1. Browser to the ```build/chrome``` directory and click ```Select```
+1. Navigate to `chrome://extensions/`
+1. Click on `Load unpacked extention...`
+1. Browser to the `build/chrome` directory and click `Select`
+1. Make sure you refresh the extensions page after each code change
 
 ### Firefox
 
