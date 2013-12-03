@@ -193,7 +193,13 @@ module.exports = function(grunt) {
     },
     watch: {
       default: {
-        files: ['<%= jshint.package.src %>', '<%= jshint.gruntfile.src %>', '<%= jshint.js.src %>', 'src/less/**/*.less'],
+        files: [
+          '<%= jshint.package.src %>',
+          '<%= jshint.gruntfile.src %>',
+          '<%= jshint.js.src %>',
+          'src/less/**/*.less',
+          '<%= qunit.all %>'
+        ],
         tasks: ['default']
       }
     },
@@ -236,7 +242,7 @@ module.exports = function(grunt) {
       }
     },
     'qunit' : {
-      all: "tests/*.html"
+      all: "tests/**/*.html"
     }
   });
 
