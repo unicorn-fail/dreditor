@@ -2,23 +2,22 @@
 
 ## Important notes
 
-As of version > 1.2.3 (Nov 30 2013) we introduced a new source tree layout and developer workflow by using the grunt toolset. This meant splitting up the dreditor.js file into several parts to make better use of extentions and plugins. This allows us to add unit tests later on.
+As of versions after 1.2.3 (Nov 30 2013) we introduced a new source tree layout and developer workflow by using the grunt toolset. This meant splitting up the dreditor.js file into several parts to make better use of extentions and plugins. This allows us to add unit tests later on.
 
 ## Directory structure
 
 The following directories are important for patch writing:
 
-src/js : dreditor code split into smaller parts like extensions and plugins
-src/less : dreditor styling files.
-package.json : contains version number apart from others
-tests/ : contains unit tests
-build/ : contains generated items by running ```grunt```. See Developer workflow below.
+- src/js : dreditor code split into smaller parts like extensions and plugins
+- src/less : dreditor styling files.
+- package.json : contains version number apart from others
+- tests/ : contains unit tests
+- build/ : contains generated items by running ```grunt```. See Developer workflow below.
 
 The following directories are important for distributing Dreditor:
 
-templates/ : used for generating the browser extensions
-release/ : contains the generated packages Dreditor browser extensions.
-build/ : see above
+- templates/ : used for generating the browser extensions
+- release/ : contains the generated packages Dreditor browser extensions.
 
 Both build/ and release/ are added to ```.gitignore``` so make sure these are not added to any PR.
 
@@ -50,23 +49,25 @@ More information coming soon.
 
 [grunt and qunit](http://jordankasper.com/blog/2013/04/automated-javascript-tests-using-grunt-phantomjs-and-qunit/)
 
-# Configure your browser
+## Configure your browser
 
-## Chrome
+### Chrome
 
 1. Navigate to ```chrome://extensions/```
 1. Click on ```Load unpacked extention...```
 1. Browser to the ```build/chrome``` directory and click ```Select```
 
-## Firefox
+### Firefox
 
 (to be defined)
 
-## Safari
+### Safari
 
 (to be defined)
 
-# Grunt
+## Grunt
+
+Grunt helps to continuesly test our code and build the browser packages.
 
 First, ensure that you have the latest [Node.js](http://nodejs.org/) and [npm](http://npmjs.org/) installed.
 
