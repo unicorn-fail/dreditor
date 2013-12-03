@@ -17,6 +17,7 @@
     "Drupal": true,
     "sortOrder": true,
     "dreditor_loader": true,
+    "alert": true,
     "console": true
   }
 }
