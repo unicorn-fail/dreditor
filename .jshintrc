@@ -16,6 +16,7 @@
     "jQuery": true,
     "Drupal": true,
     "sortOrder": true,
-    "dreditor_loader": true
+    "dreditor_loader": true,
+    "console": true
   }
 }
