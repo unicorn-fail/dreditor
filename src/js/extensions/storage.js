@@ -47,7 +47,11 @@ Drupal.storage.load = function (key, bin) {
     return false;
   }
   key = 'Dreditor.' + key;
-  return Drupal.storage.parse(window[bin + 'Storage'].getItem(key));
+  var item = window[bin + 'Storage'].getItem(key);
+  if (item) {
+    return window.JSON.parse(item);
+  }
+  return null;
 };
 
 /**
@@ -82,7 +86,7 @@ Drupal.storage.save = function (key, data, bin) {
     return false;
   }
   key = 'Dreditor.' + key;
-  window[bin + 'Storage'].setItem(key, data);
+  window[bin + 'Storage'].setItem(key, window.JSON.stringify(data));
   return true;
 };
 

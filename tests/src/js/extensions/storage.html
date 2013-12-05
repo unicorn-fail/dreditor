@@ -50,6 +50,49 @@
           }
         });
       });
+
+      module('storage');
+      test("Type checks", function() {
+        console.log("=========");
+        var id;
+        var value;
+        var result;
+
+        // We cannot test here for 'array' or 'object'
+        // using qunit equal() so these are separate tests
+        var items = {
+          'number': 42,
+          'string': "Fourtytwo",
+        };
+        jQuery.each(items, function(kind, value) {
+          var id = "QUnit_" + kind;
+          equal(typeof value, kind, "Storing " + kind);
+          Drupal.storage.save(id, value);
+          var result = Drupal.storage.load(id);
+          equal(result, value, "Same value " + kind);
+          ok(result === value, "Identical value " + kind);
+        });
+
+        // Test for array
+        id = "QUnit_array";
+        value = [42];
+        // Array isa Object
+        equal(typeof value, 'object', "Storing array");
+        Drupal.storage.save(id, value);
+        result = Drupal.storage.load(id);
+        console.log(result);
+        // test for first value
+        equal(result[0], value[0], "Retrieved array.");
+
+        id = "QUnit_object";
+        value = {x: 1, y: 2, z: 3};
+        equal(typeof value, 'object', "Storing object");
+        Drupal.storage.save(id, value);
+        result = Drupal.storage.load(id);
+        // equal does not understand objects so test for .x
+        equal(result.x, value.x, "Retrieved object.");
+      });
+
     </script>
   </head>
   <body>
