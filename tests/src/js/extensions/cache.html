@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    <meta http-equiv='content-type' content='text/html; charset=utf-8' />
+
+    <title>storage tests</title>
+
+    <script src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+
+    <script type="text/javascript" src="http://code.jquery.com/qunit/qunit-1.12.0.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.12.0.css" type="text/css" media="screen">
+
+    <script>
+      Drupal = {};
+    </script>
+    <script src='../../../../src/js/extensions/storage.js'></script>
+    <script src='../../../../src/js/extensions/cache.js'></script>
+
+    <script>
+      module("Cache support");
+
+      test("Cache clear", function() {
+        var key = "x";
+        var value = 'value-x';
+        var result;
+
+        // Set and Get key using default cache
+        Drupal.storage.cache.set(key, value);
+        equal(Drupal.storage.cache.get(key), value, "Value found.");
+
+        // Clear cache and make sure key is not found
+        Drupal.storage.cache.clear();
+        ok(true, "Default cache cleared");
+        equal(Drupal.storage.cache.get(key), null, "Value not found.");
+
+        // Use a custom cache
+        var cache = 'node';
+
+        // Set and Get key using custom cache
+        Drupal.storage.cache.set(key, value, cache);
+        equal(Drupal.storage.cache.get(key, cache), value, "Value found in cache: " + cache);
+
+        // Clear default cache and make sure key still exists
+        Drupal.storage.cache.clear();
+        equal(Drupal.storage.cache.get(key, cache), value, "Value found in cache: " + cache);
+
+        // Clear custom cache and make sure key is not found
+        Drupal.storage.cache.clear(cache);
+        equal(Drupal.storage.cache.get(key, cache), null, "Value not found.");
+
+      });
+
+      module("Cache expire");
+
+      test("Cache expire test", function() {
+        var id = "expire";
+        var value = "100 milliseconds";
+        var expire = Date.now();
+
+        // Expire item in the past.
+        Drupal.storage.cache.set(id, value, null, expire - 100);
+        equal(Drupal.storage.cache.get(id), null, 'Expired');
+
+        // Never expire item.
+        Drupal.storage.cache.set(id, value, null, 0);
+        equal(Drupal.storage.cache.get(id), value, 'Expired');
+
+        // Expire item in 100 milliseconds.
+        Drupal.storage.cache.set(id, value, null, expire + 100);
+        equal(Drupal.storage.cache.get(id), value, 'Not expired yet');
+        stop();
+        setTimeout(function() {
+          equal(Drupal.storage.cache.get(id), null, 'Expired');
+          start();
+        }, 150);
+
+      });
+
+    </script>
+  </head>
+  <body>
+    <div id="qunit"></div> <!-- QUnit fills this with results, etc -->
+    <div id='qunit-fixture'>
+
+      <!-- any HTML you want to be present in each test (will be reset for each test) -->
+
+    </div>
+  </body>
+</html>
+

@@ -36,8 +36,10 @@ Drupal.storage.support = {
  *   (optional) A string denoting the storage space to read from. Defaults to
  *   'local'. See Drupal.storage.save() for details.
  *
+ * @return {any}
+ *   The data stored or null.
+ *
  * @see Drupal.storage.save()
- * @see Drupal.storage.unserialize()
  */
 Drupal.storage.load = function (key, bin) {
   if (typeof bin === 'undefined') {
@@ -47,7 +49,11 @@ Drupal.storage.load = function (key, bin) {
     return false;
   }
   key = 'Dreditor.' + key;
-  return Drupal.storage.parse(window[bin + 'Storage'].getItem(key));
+  var item = window[bin + 'Storage'].getItem(key);
+  if (item) {
+    return window.JSON.parse(item);
+  }
+  return null;
 };
 
 /**
@@ -58,10 +64,7 @@ Drupal.storage.load = function (key, bin) {
  *   Should be further namespaced by module; e.g., for
  *   "Dreditor.moduleName.settingName" you pass "moduleName.settingName".
  * @param data
- *   The data to store. Note that window storage only supports strings, so data
- *   should be a scalar value (integer, float, string, or Boolean). For
- *   non-scalar values, use Drupal.storage.serialize() before saving and
- *   Drupal.storage.unserialize() after loading data.
+ *   The data to store.
  * @param bin
  *   (optional) A string denoting the storage space to store data in:
  *   - session: Reads from window.sessionStorage. Persists for currently opened
@@ -71,8 +74,9 @@ Drupal.storage.load = function (key, bin) {
  *   - global: Reads from window.globalStorage.
  *   Defaults to 'local'.
  *
+ * @return {Boolean}
+ *   Indicates saving succeded or not.
  * @see Drupal.storage.load()
- * @see Drupal.storage.serialize()
  */
 Drupal.storage.save = function (key, data, bin) {
   if (typeof bin === 'undefined') {
@@ -82,7 +86,7 @@ Drupal.storage.save = function (key, data, bin) {
     return false;
   }
   key = 'Dreditor.' + key;
-  window[bin + 'Storage'].setItem(key, data);
+  window[bin + 'Storage'].setItem(key, window.JSON.stringify(data));
   return true;
 };
 
