@@ -532,7 +532,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       prettify_line = false;
     }
     // Colorize old code, but skip file diff lines.
-    else if (line.match(/^((?!\-\-\-|\-\-)\-.*)$/)) {
+    else if (line.match(/^((?!\-\-\-$|\-\-$)\-.*)$/)) {
       classes.push('old');
       diffstat.deletions++;
       if (ln1) {
