@@ -11,9 +11,7 @@
     <script type="text/javascript" src="http://code.jquery.com/qunit/qunit-1.12.0.js"></script>
     <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.12.0.css" type="text/css" media="screen">
 
-    <script>
-      Drupal = {};
-    </script>
+    <script>Drupal = {};</script>
     <script src='../../../../src/js/extensions/storage.js'></script>
     <script src='../../../../src/js/extensions/cache.js'></script>
 
@@ -26,28 +24,28 @@
         var result;
 
         // Set and Get key using default cache
-        Drupal.storage.cache.set(key, value);
-        equal(Drupal.storage.cache.get(key), value, "Value found.");
+        Drupal.cache.set(key, value);
+        equal(Drupal.cache.get(key), value, "Value found.");
 
         // Clear cache and make sure key is not found
-        Drupal.storage.cache.clear();
+        Drupal.cache.clear();
         ok(true, "Default cache cleared");
-        equal(Drupal.storage.cache.get(key), null, "Value not found.");
+        equal(Drupal.cache.get(key), null, "Value not found.");
 
         // Use a custom cache
         var cache = 'node';
 
         // Set and Get key using custom cache
-        Drupal.storage.cache.set(key, value, cache);
-        equal(Drupal.storage.cache.get(key, cache), value, "Value found in cache: " + cache);
+        Drupal.cache.set(key, value, cache);
+        equal(Drupal.cache.get(key, cache), value, "Value found in cache: " + cache);
 
         // Clear default cache and make sure key still exists
-        Drupal.storage.cache.clear();
-        equal(Drupal.storage.cache.get(key, cache), value, "Value found in cache: " + cache);
+        Drupal.cache.clear();
+        equal(Drupal.cache.get(key, cache), value, "Value found in cache: " + cache);
 
         // Clear custom cache and make sure key is not found
-        Drupal.storage.cache.clear(cache);
-        equal(Drupal.storage.cache.get(key, cache), null, "Value not found.");
+        Drupal.cache.clear(cache);
+        equal(Drupal.cache.get(key, cache), null, "Value not found.");
 
       });
 
@@ -59,19 +57,19 @@
         var expire = Date.now();
 
         // Expire item in the past.
-        Drupal.storage.cache.set(id, value, null, expire - 100);
-        equal(Drupal.storage.cache.get(id), null, 'Expired');
+        Drupal.cache.set(id, value, null, expire - 100);
+        equal(Drupal.cache.get(id), null, 'Expired');
 
         // Never expire item.
-        Drupal.storage.cache.set(id, value, null, 0);
-        equal(Drupal.storage.cache.get(id), value, 'Expired');
+        Drupal.cache.set(id, value, null, 0);
+        equal(Drupal.cache.get(id), value, 'Expired');
 
         // Expire item in 100 milliseconds.
-        Drupal.storage.cache.set(id, value, null, expire + 100);
-        equal(Drupal.storage.cache.get(id), value, 'Not expired yet');
+        Drupal.cache.set(id, value, null, expire + 100);
+        equal(Drupal.cache.get(id), value, 'Not expired yet');
         stop();
         setTimeout(function() {
-          equal(Drupal.storage.cache.get(id), null, 'Expired');
+          equal(Drupal.cache.get(id), null, 'Expired');
           start();
         }, 150);
 

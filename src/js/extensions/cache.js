@@ -5,7 +5,7 @@
  * We store each key/value pair prepending it's key with the cache id.
  * - cache_node/1 for node id in the default cache
  */
-Drupal.storage.cache = {
+Drupal.cache = {
   /**
    * Provide a default value if needed
    *
@@ -34,7 +34,7 @@ Drupal.storage.cache = {
    * @returns {Array}
    */
   getKeys : function(cache) {
-    cache = Drupal.storage.cache.getCache(cache);
+    cache = this.getCache(cache);
     var keys = Drupal.storage.load(cache);
     return keys ? keys : [];
   },
@@ -53,16 +53,16 @@ Drupal.storage.cache = {
    * @see https://api.drupal.org/api/drupal/includes!cache.inc/function/cache_set/7
    */
   set : function(id, data, cache, expire) {
-    cache = Drupal.storage.cache.getCache(cache);
+    cache = this.getCache(cache);
     expire = expire || 0;
     // Prepend key with it's cache
-    var key = Drupal.storage.cache.getKey(cache, id);
+    var key = this.getKey(cache, id);
     // Grab lookup for comparing keys
-    var keys = Drupal.storage.cache.getKeys(cache);
+    var keys = this.getKeys(cache);
     if (keys.indexOf(key) === -1) {
       keys.push(key);
     }
-    // Save both cachekeys and cachable data @see Drupal.storage.cache
+    // Save both cachekeys and cachable data @see Drupal.cache
     var item = {data: data, expire: expire};
     Drupal.storage.save(key, item);
     Drupal.storage.save(cache, keys);
@@ -75,9 +75,9 @@ Drupal.storage.cache = {
    * @returns {any|null}
    */
   get : function(id, cache) {
-    cache = Drupal.storage.cache.getCache(cache);
-    var keys = Drupal.storage.cache.getKeys(cache);
-    var key = Drupal.storage.cache.getKey(cache, id);
+    cache = this.getCache(cache);
+    var keys = this.getKeys(cache);
+    var key = this.getKey(cache, id);
     if (keys.indexOf(key) > -1) {
       var item = Drupal.storage.load(key);
       if (item.expire === 0 || item.expire > Date.now()) {
@@ -92,8 +92,8 @@ Drupal.storage.cache = {
    * @param {String|null} cache
    */
   clear : function(cache) {
-    cache = Drupal.storage.cache.getCache(cache);
-    var keys = Drupal.storage.cache.getKeys(cache);
+    cache = this.getCache(cache);
+    var keys = this.getKeys(cache);
     // Delete data.
     $.each(keys, function(i, value) {
       Drupal.storage.remove(value);
@@ -101,5 +101,4 @@ Drupal.storage.cache = {
     // Remove the cache itself.
     Drupal.storage.remove(cache);
   }
-}
-;
+};
