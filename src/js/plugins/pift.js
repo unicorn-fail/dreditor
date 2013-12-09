@@ -40,26 +40,24 @@ Drupal.behaviors.dreditorPIFT = {
       });
     });
 
-    $context.find('.field-name-field-issue-changes table.nodechanges-file-changes').each(function() {
+    $context.find('.field-name-field-issue-changes table.nodechanges-file-changes').once('dreditor-pift', function() {
       var $table = $(this);
-      $table.once('dreditor-pift', function () {
-        $table.find('th:last').remove();
-        $table.find('tbody tr').each(function() {
-          var $row = $(this);
-          // File row.
-          if ($row.is('.pift-file-info')) {
-            var $file = $row.find('.nodechanges-file-link .file');
-            var $size = $row.find('.nodechanges-file-size');
-            $file.prepend('<span class="size">' + $size.text() + '</span>');
-            $size.remove();
-          }
-          // PIFT row.
-          else if ($row.is('.pift-test-info')) {
-            var $cell = $row.find('td');
-            $row.prev().find('td').addClass($cell.attr('class'));
-            $cell.find('.pift-operations').prependTo($cell);
-          }
-        });
+      $table.find('th:last').remove();
+      $table.find('tbody tr').each(function() {
+        var $row = $(this);
+        // PIFT row.
+        if ($row.is('.pift-test-info')) {
+          var $cell = $row.find('td');
+          $row.prev().find('td').addClass($cell.attr('class'));
+          $cell.find('.pift-operations').prependTo($cell);
+        }
+        // File row.
+        else {
+          var $file = $row.find('.nodechanges-file-link .file');
+          var $size = $row.find('.nodechanges-file-size');
+          $file.prepend('<span class="size">' + $size.text() + '</span>');
+          $size.remove();
+        }
       });
     });
   }

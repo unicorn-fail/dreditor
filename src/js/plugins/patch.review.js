@@ -7,10 +7,11 @@ Drupal.behaviors.dreditorPatchReview = {
     if (!$(context).find('#comment-form').length) {
       return;
     }
-    $('.field-type-file, .nodechanges-file-changes', context).once('dreditor-patchreview', function () {
+    $('.field-type-file, table.nodechanges-file-changes', context).once('dreditor-patchreview', function () {
       $('a', this).each(function () {
         if (this.href.match(/\.(patch|diff|txt)$/)) {
           // Generate review link.
+          var $file = $(this).closest('tr').find('.file');
           var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">Review</a>').click(function () {
             // Load file.
             $.get(this.href, function (content, status) {
@@ -22,7 +23,7 @@ Drupal.behaviors.dreditorPatchReview = {
             return false;
           });
           // Append review link to parent table cell.
-          $link.prependTo($(this).parents('tr').find('.file'));
+          $link.prependTo($file);
 
           // Generate simplytest.me links only for patches and diffs.
           if (this.href.substr(-6) === '.patch' || this.href.substr(-5) === '.diff') {
@@ -35,7 +36,7 @@ Drupal.behaviors.dreditorPatchReview = {
                   class: 'dreditor-button dreditor-patchtest',
                   href: 'http://simplytest.me/project/' + project + '/' + version + '?patch[]=' + this.href,
                   target: '_blank'
-                }).prependTo(this.parentNode);
+                }).prependTo($file);
               }
             }
           }
