@@ -73,7 +73,7 @@ Drupal.behaviors.dreditorPIFT = {
               }
             });
           }
-        }); // jshint ignore:line
+        });
       });
     });
   }
