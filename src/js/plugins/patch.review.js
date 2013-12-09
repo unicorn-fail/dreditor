@@ -119,8 +119,7 @@ Drupal.dreditor.patchReview = {
         self.data.elements.push(newelement);
       }
     });
-    // Re-order elements by their actual DOM position.
-    self.data.elements.sort(sortOrder);
+    // @todo add sort based on element position back.
     return elements;
   },
 
@@ -194,20 +193,10 @@ Drupal.dreditor.patchReview = {
     }
   },
 
-  /**
-   * Wrapper around jQuery's sortOrder() to sort review comments.
-   */
-  sort: function (a, b) {
-    if (!a || !b) {
-      return 0;
-    }
-    return sortOrder(a.elements[0], b.elements[0]);
-  },
-
   paste: function () {
     var html = '';
     var comments = [];
-    this.comment.comments.sort(this.sort);
+    // @todo add sort based on element position back.
     $.each(this.comment.comments, function (index, comment) {
       // Skip deleted (undefined) comments; this would return window here.
       if (!comment) {
@@ -470,7 +459,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   code = code.replace(/^\# .+\n|^\? .+\n/mg, '');
 
   // Setup code container.
-  var $code = $('<table id="code" unselectable="on"></table>');
+  var $code = $('<table id="code"></table>');
   var $menu = $('#menu', context);
   var $lastFile = $('<li>Parse error</li>');
 
