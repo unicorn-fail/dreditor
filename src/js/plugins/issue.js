@@ -15,7 +15,9 @@ Drupal.dreditor.issue.getNid = function() {
  */
 Drupal.dreditor.issue.getNewCommentNumber = function() {
   // Get comment count.
-  return parseInt($('#comment-form .comment-inner > h3').text().match(/\d+$/)[0], 10);
+  // TODO find a D7 replacement
+  return 0;
+  //return parseInt($('#comment-form .comment-inner > h3').text().match(/\d+$/)[0], 10);
 };
 
 /**
