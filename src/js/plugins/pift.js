@@ -35,14 +35,7 @@ Drupal.behaviors.dreditorPIFT = {
         else if ($row.is('.pift-test-info')) {
           var $cell = $row.find('td');
           $row.prev().find('td:not(.extended-file-field-table-cid)').addClass($cell.attr('class'));
-          $cell.find('.pift-operations').prependTo($cell).find('a').each(function () {
-            if (this.innerText === 'View') {
-              this.innerText = Drupal.t('View Results');
-            }
-            else if (this.innerText === 'Retest') {
-              this.innerText = Drupal.t('Re-test');
-            }
-          });
+          $cell.find('.pift-operations').prependTo($cell);
         }
       });
     });
@@ -64,14 +57,7 @@ Drupal.behaviors.dreditorPIFT = {
           else if ($row.is('.pift-test-info')) {
             var $cell = $row.find('td');
             $row.prev().find('td').addClass($cell.attr('class'));
-            $cell.find('.pift-operations').prependTo($cell).find('a').each(function () {
-              if (this.innerText === 'View') {
-                this.innerText = Drupal.t('View Results');
-              }
-              else if (this.innerText === 'Retest') {
-                this.innerText = Drupal.t('Re-test');
-              }
-            });
+            $cell.find('.pift-operations').prependTo($cell);
           }
         });
       });
