@@ -8,6 +8,7 @@ Drupal.behaviors.dreditorPIFT = {
     $context.find('.field-name-field-issue-files table').once('dreditor-pift', function () {
       var $table = $(this);
       $table.find('th[name*="size"], th[name*="uid"]').remove();
+      var comments = 0;
       $table.find('tbody tr').each(function() {
         var $row = $(this);
         // File row.
@@ -17,18 +18,31 @@ Drupal.behaviors.dreditorPIFT = {
           var $size = $row.find('.extended-file-field-table-filesize');
           var $name = $row.find('.extended-file-field-table-uid');
           var comment = parseInt($cid.text().replace('#', ''), 10) || 0;
-          $file.prepend('<span class="size">' + $size.text() + '</span>');
+          $file.find('a:not(.dreditor-button)').before('<span class="size">' + $size.text() + '</span>');
           $size.remove();
           $cid.append($name.html());
           $name.remove();
-          var $prevCid = $table.find('tr[data-comment="' + comment +'"] .extended-file-field-table-cid');
+          var $parentComment = $table.find('tr[data-comment="' + comment +'"]');
+          var zebra = $parentComment.data('zebra');
+          if (zebra) {
+            $row.removeClass('odd even').addClass(zebra);
+          }
+          var $prevCid = $parentComment.find('.extended-file-field-table-cid');
           if ($prevCid.length) {
             var rowspan = $cid.attr('rowspan');
             $prevCid.attr('rowspan', ($prevCid.attr('rowspan') + rowspan));
             $cid.remove();
           }
           else {
-            $row.attr('data-comment', comment);
+            comments++;
+            zebra = comments % 2 ? 'odd' : 'even';
+            $row
+              .attr({
+                'data-comment': comment,
+                'data-zebra': zebra
+              })
+              .removeClass('odd even')
+              .addClass(zebra);
           }
         }
         // PIFT row.
@@ -55,7 +69,7 @@ Drupal.behaviors.dreditorPIFT = {
         else {
           var $file = $row.find('.nodechanges-file-link .file');
           var $size = $row.find('.nodechanges-file-size');
-          $file.prepend('<span class="size">' + $size.text() + '</span>');
+          $file.find('a:not(.dreditor-button)').before('<span class="size">' + $size.text() + '</span>');
           $size.remove();
         }
       });

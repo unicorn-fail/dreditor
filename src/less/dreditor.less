@@ -140,7 +140,7 @@
 #dreditor #code tr {
   background: transparent;
   border: 0;
-  color: #aaa;
+  color: #888;
   margin: 0;
   padding: 0;
 }
@@ -188,11 +188,11 @@
   display: none;
 }
 #dreditor #code tr.file {
-  color: #708E9E;
+  color: #064A6F;
   background-color: #E8F1F6;
 }
 #dreditor #code tr.file a {
-  color: #708E9E;
+  color: #064A6F;
 }
 #dreditor #code tr.file .ln {
   background-color: #DAEAF3;
@@ -215,13 +215,13 @@
 }
 #dreditor #code tr.new {
   background-color: #dfd;
-  color: #00AA00;
+  color: #008503;
   float: none;
   font-size: 100%;
   font-weight: normal;
 }
 #dreditor #code tr.new a {
-  color: #00AA00;
+  color: #008503;
 }
 #dreditor #code tr.new .ln {
   background-color: #ceffce;
@@ -237,26 +237,26 @@
 tr.selected td {
   background: transparent;
 }
-#dreditor #code tr.has-comment {
-  background: #ffc;
-}
-#dreditor #code tr.has-comment .ln {
-  background: #FFF0B8;
-  border-color: #EEDB91;
-}
-#dreditor #code tr.selected, #dreditor #code tr.pre-selected {
-  background: #ffc;
-  cursor: pointer;
-}
-#dreditor #code tr.selected .ln, #dreditor #code tr.pre-selected .ln {
-  background: #FFEFB3;
-  border-color: #ECD784;
-}
 #dreditor #code tr:hover, #dreditor #code tr:hover td, #dreditor #code tr:hover td a {
-  background: #FFFFEC !important;
-  border-color: #FCD773 !important;
-  color: #A77E00 !important;
+  background: #FFF4CE !important;
+  border-color: #F3D670 !important;
+  color: #BB7306 !important;
   cursor: pointer;
+}
+#dreditor #code tr.selected,
+#dreditor #code tr.pre-selected,
+#dreditor #code tr.has-comment {
+  background: #FFF4CE;
+  cursor: pointer;
+  .ln {
+    background: #FFECAB;
+    border-color: #EBD17B;
+  }
+  &:hover {
+    &, td, td a {
+      background: #fff !important;
+    }
+  }
 }
 #dreditor #code tr:hover td {
   box-shadow: 0px -1px 0 0px #FCD773 inset, 0px 1px 0 0px #FCD773 inset;
@@ -423,7 +423,6 @@ tr.pift-test-info td {
   padding: 0.5em .75em .75em 2.9em;
 }
 div.pift-operations {
-  color: inherit;
   float: right;
   font-size: 10px;
   font-style: normal;
@@ -431,20 +430,32 @@ div.pift-operations {
   margin-left: 1em;
   text-transform: uppercase;
 }
-td.pift-pass {
+tr.pift-pass, tr.pift-pass td, td.pift-pass {
   background: #DDFFDD;
-  color: #00AA00;
+  border-color: #A6E2A6;
+  color: #008503;
 }
 tr.extended-file-field-table-row td.pift-pass {
   border-color: #87CF87;
 }
+tr.fail, tr.pift-fail td, td.pift-fail {
+  background: #FFECEC;
+  border-color: #F5C8C8;
+  color: #CC0000;
+}
 tr.extended-file-field-table-row td.pift-fail {
   border-color: #EEBBBB;
 }
-td.pift-fail {
-  background: #FFECEC;
-  color: #CC0000;
+tr.retest, tr.pift-retest td, td.pift-retest {
+  background: #FFF4CE;
+  border-color: #F3D670;
+  color: #BB7306;
 }
-td.pift-pass a, td.pift-fail a, td.pift-pass .file .size, td.pift-fail .file .size {
-  color: inherit;
+tr.extended-file-field-table-row td.pift-retest {
+  border-color: #eebf7b;
+}
+td.pift-pass, td.pift-fail, td.pift-retest {
+  a, .file .size, .pift-operations, .pift-previous {
+    color: inherit;
+  }
 }
