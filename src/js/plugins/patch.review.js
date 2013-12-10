@@ -12,15 +12,24 @@ Drupal.behaviors.dreditorPatchReview = {
         if (this.href.match(/\.(patch|diff|txt)$/)) {
           // Generate review link.
           var $file = $(this).closest('tr').find('.file');
-          var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">Review</a>').click(function () {
-            // Load file.
-            $.get(this.href, function (content, status) {
-              if (status === 'success') {
-                // Invoke Dreditor.
-                Drupal.dreditor.setup(context, 'patchReview', content);
-              }
-            });
-            return false;
+          var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">Review</a>').click(function (e) {
+            if (Drupal.dreditor.link !== this && Drupal.dreditor.$wrapper) {
+              Drupal.dreditor.tearDown(false);
+            }
+            if (Drupal.dreditor.link === this && Drupal.dreditor.$wrapper) {
+              Drupal.dreditor.show();
+            }
+            else {
+              Drupal.dreditor.link = this;
+              // Load file.
+              $.get(this.href, function (content, status) {
+                if (status === 'success') {
+                  // Invoke Dreditor.
+                  Drupal.dreditor.setup(context, 'patchReview', content);
+                }
+              });
+            }
+            e.preventDefault();
           });
           // Append review link to parent table cell.
           $link.prependTo($file);

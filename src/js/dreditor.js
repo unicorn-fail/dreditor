@@ -1,7 +1,7 @@
 Drupal.dreditor = {
   version: '%PKG.VERSION%',
   behaviors: {},
-  setup: function (context) {
+  setup: function () {
     var self = this;
 
     // Reset scroll position.
@@ -68,7 +68,7 @@ Drupal.dreditor = {
     $('<input id="dreditor-cancel" class="dreditor-button" type="button" value="Cancel" />')
       .click(function () {
         if (Drupal.dreditor.patchReview.comment.comments.length === 0 || window.confirm('Do you really want to cancel Dreditor and discard your changes?')) {
-          Drupal.dreditor.tearDown(context);
+          Drupal.dreditor.tearDown();
         }
         return;
       })
@@ -90,21 +90,28 @@ Drupal.dreditor = {
     self.show();
   },
 
-  tearDown: function (context) {
+  tearDown: function (animate) {
+    animate = typeof animate !== 'undefined' ? animate : true;
     var self = this;
 
     // Remove the ESC keyup event handler that was bound in self.setup().
     $(document).unbind('keyup', self.escapeKeyHandler);
-
-    self.$wrapper.animate({ height: 0 }, 300, function(){
-      $(this).hide();
-      $('body', context).css({ overflow: 'auto' });
-    });
-    setTimeout(function(){
-      self.$wrapper.stop(true, true).css('height', 0).remove();
+    if (animate) {
+      self.$wrapper.animate({ height: 0 }, 300, function(){
+        $(this).hide();
+        $('body').css({ overflow: 'auto' });
+      });
+      setTimeout(function(){
+        self.$wrapper.stop(true, true).css('height', 0).remove();
+        delete self.$dreditor;
+        delete self.$wrapper;
+      }, 500);
+    }
+    else {
+      self.$wrapper.remove();
       delete self.$dreditor;
       delete self.$wrapper;
-    }, 500);
+    }
   },
 
   /**
