@@ -1,10 +1,9 @@
 /*global module:false*/
 /*global __dirname:false*/
 module.exports = function(grunt) {
-  var pkg = grunt.file.readJSON('package.json');
   grunt.initConfig({
     // Metadata.
-    pkg: pkg,
+    pkg: grunt.file.readJSON('package.json'),
     banner: '/**\n' +
       ' * <%= pkg.title || pkg.name %> <%= pkg.version %>\n' +
       '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
@@ -203,7 +202,7 @@ module.exports = function(grunt) {
         tasks: ['default']
       }
     },
-    _release: {
+    release: {
       options: {
         add: false,
         commit: false,
@@ -259,6 +258,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mozilla-addon-sdk');
   grunt.loadNpmTasks('grunt-sed');
   grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-release');
 
   // Default tasks.
   grunt.registerTask('default', ['clean', 'less', 'css2js', 'jshint', 'qunit', 'concat', 'uglify', 'copy', 'sed']);
@@ -281,12 +281,5 @@ module.exports = function(grunt) {
   grunt.registerTask('build:safari', ['build-safari-ext']);
   grunt.registerTask('build', ['compress:chrome', 'mozilla-cfx-xpi', 'build-safari-ext']);
   grunt.registerTask('test', ['clean', 'qunit']);
-
-  // Release tasks.
-  grunt.loadNpmTasks('grunt-release');
-  grunt.task.renameTask('release', '_release');
-  grunt.registerTask('release', ['_release:patch', 'default', 'build']);
-  grunt.registerTask('release:minor', ['_release:minor', 'default', 'build']);
-  grunt.registerTask('release:major', ['_release:major', 'default', 'build']);
 
 };
