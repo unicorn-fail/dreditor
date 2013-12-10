@@ -51,6 +51,8 @@ More information coming soon.
 
 ## Configure your browser
 
+Make sure to run `grunt build` once before continue.
+
 ### Chrome
 
 1. Navigate to `chrome://extensions/`
@@ -60,7 +62,11 @@ More information coming soon.
 
 ### Firefox
 
-(to be defined)
+(quick and dirty)
+
+1. Check the current Dreditor greasemonkey location (about:addons)
+2. Right click Dreditor for install location
+3. Replace dreditor.user.js with a symlink to your development versions grunt build artifact `ln -s path-to-dreditor-dir/build/dreditor.js dreditor.user.js`
 
 ### Safari
 
