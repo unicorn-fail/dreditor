@@ -172,8 +172,14 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: 'templates/safari/',
-            src: ['**'],
+            src: ['Info.plist', 'Settings.plist'],
             dest: 'build/<%= pkg.name %>.safariextension/'
+          },
+          {
+            expand: true,
+            cwd: 'templates/safari/',
+            src: ['update.plist'],
+            dest: 'build/'
           },
           {
             expand: true,
