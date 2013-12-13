@@ -62,7 +62,7 @@ Make sure to run `grunt build` once before continue.
 
 ### Firefox
 
-(quick and dirty)
+#### Using Grease Monkey (deprecated?)
 
 1. Check the current Dreditor greasemonkey location (about:addons)
 2. Right click Dreditor for install location
