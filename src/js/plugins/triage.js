@@ -1,6 +1,3 @@
-Drupal = Drupal || {};
-Drupal.dreditor = Drupal.dreditor || {};
-
 //    //    // Prepend commit message button to comment form.
 //    // @todo Generalize this setup. Somehow.
 //    if (!$container.length) {
