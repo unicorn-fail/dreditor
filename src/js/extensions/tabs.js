@@ -1,6 +1,3 @@
-Drupal = Drupal || {};
-Drupal.dreditor = Drupal.dreditor || {};
-
 /**
  * @defgroup User Experience
  * @{
