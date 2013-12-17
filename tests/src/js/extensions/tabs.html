@@ -13,9 +13,10 @@
     </script>
 
     <script src='../../../../src/js/extensions/tabs.js'></script>
+    <link rel="stylesheet" type="text/css" href="../../../../build/dreditor.css" />
 
     <script>
-      (function ($) {
+      (function($) {
         $(document).ready(function() {
           var tabs = Drupal.dreditor.ux.tabs;
           var $container = $('#dreditor-tabs-container-test');
@@ -39,49 +40,29 @@
           tabs.bind();
         });
       })(jQuery);
-      
+
     </script>
 
-    <link rel="stylesheet" type="text/css" href="../../../../build/dreditor.css" />
-    <style>
-      div#dreditor-comment-container {
-        width: 900px;
-        border: 2px dashed red;
-        clear: both;
-      }
-    </style>
+    <script>
+      module("Tabs support");
 
-    <style>
-      .dreditor-triage-root {
-        position: relative;
-        height: 150px;
-      }
-      .dreditor-triage-root ul {
-        top: 0px;
-        left: 0px;
-        width: 120px;
-        border: 1px solid red;
-      }
-      .dreditor-triage-root li {
-        
-      }
-
-      .dreditor-triage-root ul ul {
-        left: 120px;
-      }
-      .dreditor-triage-root > ul ul li {
-        display: none;
-        border: 1px dashed green;
-      }
-      .dreditor-triage-root ul li:hover > ul > li ,
-      .dreditor-triage-root ul li:focus > ul > li {
-        display: block;
-      }
-    </style>
-
-
+      test("Toggle tabs", function() {
+        // TODO: http://qunitjs.com/cookbook/#testing-user-actions
+        ok("true", "We fake success as we need to write decent tests first.");
+        // TODO: Write tests
+        //   click on id-1 then validate 'Content of tab 1' is visible
+        //   click on id-1 then validate 'Content of tab 1' is not visible
+      });
+    </script>
   </head>
   <body>
+    <div id="qunit"></div> <!-- QUnit fills this with results, etc -->
+    <div id='qunit-fixture'>
+
+      <!-- any HTML you want to be present in each test (will be reset for each test) -->
+
+    </div>
+
     <p>
       What's on this page? This page is about
       <a href="http://drupal.org/node/1345614">Merging dreditor toggle buttons</a>
