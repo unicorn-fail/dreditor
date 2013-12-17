@@ -119,4 +119,3 @@ Drupal.dreditor.ux = {
 /**
  * @} End of "defgroup User Experience".
  */
-
