@@ -1,3 +1,6 @@
+Drupal = Drupal || {};
+Drupal.dreditor = Drupal.dreditor || {};
+
 //    //    // Prepend commit message button to comment form.
 //    // @todo Generalize this setup. Somehow.
 //    if (!$container.length) {
@@ -59,7 +62,7 @@ Drupal.dreditor.triage = {
    *
    * This is usefull when having a lot of issue state change options.
    * Not all options are relavant with respect to the current state.
-   * 
+   *
    * @param {type} toggle
    * @returns {any|Boolean|Drupal.dreditor.triage.getHideIrrelevant.current|Drupal.dreditor.triage.hideIrrelevant.current}
    */
@@ -210,7 +213,7 @@ Drupal.dreditor.triage = {
    * Add the tabs for different triage sources / nodes
    *
    * All except the custom node are supposed to come from the triage root nodes
-   * 
+   *
    * @param {type} sources
    * @returns {undefined}
    */
