@@ -1,3 +1,6 @@
+Drupal = Drupal || {};
+Drupal.dreditor = Drupal.dreditor || {};
+
 /**
  * @defgroup User Experience
  * @{
@@ -18,6 +21,9 @@ Drupal.dreditor.ux = {
      *
      * <div class="dreditor-tabs-container">
      *   <div class="dreditor-tabs">
+     *
+     * @param {jQuery} $container
+     * @returns {nothing}
      */
     createTabContainer : function($container) {
       $container.empty();
@@ -61,7 +67,7 @@ Drupal.dreditor.ux = {
         var $this = $(this);
         // It this a sub tab container?
         var depth = $this.parents('.dreditor-tabs-container').size();
-        var odd = ((depth % 2) == 1);
+        var odd = ((depth % 2) === 1);
         if (odd) {
           $this.addClass('odd');
           $('> .dreditor-tabs', $this).addClass('odd');
@@ -73,7 +79,7 @@ Drupal.dreditor.ux = {
           $('> .dreditor-tab-content', $this).removeClass('odd');
         }
         // Preserve screenspace
-        if (depth == 0) {
+        if (depth === 0) {
           $this.removeClass('active');
           $('> .dreditor-tabs', $this).removeClass('active');
           $('> .dreditor-tabs > .dreditor-tab', $this).removeClass('active');
@@ -111,7 +117,7 @@ Drupal.dreditor.ux = {
       });
     }
   }
-}
+};
 
 /**
  * @} End of "defgroup User Experience".
