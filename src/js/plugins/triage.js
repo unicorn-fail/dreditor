@@ -231,7 +231,7 @@ Drupal.dreditor.triage = {
    */
   tabs : function(sources) {
     // Get the current project title to decide to show its stock responses.
-    var currentProject = Drupal.dreditor.macro.getCurrent('project_title');
+    var currentProject = Drupal.dreditor.issue.getCurrent('project_title');
     var $ul = $('<ul>').addClass('dreditor-triage-full-list');
     $ul.appendTo('#dreditor-triage-list');
 
