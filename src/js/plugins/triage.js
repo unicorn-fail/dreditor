@@ -34,18 +34,6 @@
  */
 Drupal.dreditor.triage = {
   /**
-   * We need some CSS injected into the current page
-   *
-   * Colors are based on bluecheese http://groups.drupal.org/node/56698 colors
-   * - Dark blue  : #0678be
-   * - Light blue : #53b0eb
-   * - White      : #eee?
-   */
-  injectCSS : function() {
-    window.alert('css not injected');
-    $('head').append();
-  },
-  /**
    * Getter for hideIrrelevant
    */
   getHideIrrelevant : function() {
