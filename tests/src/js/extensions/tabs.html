@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>dreditor tabs test page</title>
+    <script src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+
+    <script type="text/javascript" src="http://code.jquery.com/qunit/qunit-1.12.0.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.12.0.css" type="text/css" media="screen">
+
+    <script>Drupal = {};</script>
+    <script src='../../../../src/js/extensions/tabs.js'></script>
+
+    <script>
+      (function ($) {
+        $(document).ready(function() {
+          var tabs = Drupal.dreditor.ux.tabs;
+          var $container = $('#dreditor-tabs-container-test');
+          tabs.createTabContainer($container);
+          tabs.addTab($container, 'Test tab 1', 'id-1', $('<p>').text('Content of tab 1'));
+          tabs.addTab($container, 'Test tab 2', 'id-2', $('<p>').text('Content of tab 2'));
+          tabs.addTab($container, 'Test tab 3', 'id-3', $('<p>').text('Replaced by sub tabs'));
+
+          var $container = $('.dreditor-tab-content.id-3');
+          tabs.createTabContainer($container);
+          tabs.addTab($container, 'Test sub tab 1', 'id-4', $('<p>').text('Content of sub tab 1'));
+          tabs.addTab($container, 'Test sub tab 2', 'id-5', $('<p>').text('Content of sub tab 2'));
+          tabs.addTab($container, 'Test sub tab 3', 'id-6', $('<p>').text('Content of sub tab 3'));
+          var $container = $('.dreditor-tab-content.id-6');
+          tabs.createTabContainer($container);
+          tabs.addTab($container, 'Test sub sub tab 1', 'id-7', $('<p>').text('Toggle color scheme depending on tab depth.'));
+          var $container = $('.dreditor-tab-content.id-2 > p');
+
+          // We are done adding tabs ... now initialise the odd/even
+          tabs.init();
+          tabs.bind();
+        });
+      })(jQuery);
+      
+    </script>
+
+    <link rel="stylesheet" type="text/css" href="../../../../build/dreditor.css" />
+    <style>
+      div#dreditor-comment-container {
+        width: 900px;
+        border: 2px dashed red;
+        clear: both;
+      }
+    </style>
+
+    <style>
+      .dreditor-triage-root {
+        position: relative;
+        height: 150px;
+      }
+      .dreditor-triage-root ul {
+        top: 0px;
+        left: 0px;
+        width: 120px;
+        border: 1px solid red;
+      }
+      .dreditor-triage-root li {
+        
+      }
+
+      .dreditor-triage-root ul ul {
+        left: 120px;
+      }
+      .dreditor-triage-root > ul ul li {
+        display: none;
+        border: 1px dashed green;
+      }
+      .dreditor-triage-root ul li:hover > ul > li ,
+      .dreditor-triage-root ul li:focus > ul > li {
+        display: block;
+      }
+    </style>
+
+
+  </head>
+  <body>
+    <p>
+      What's on this page? This page is about
+      <a href="http://drupal.org/node/1345614">Merging dreditor toggle buttons</a>
+      for making a better UX for <a href="http://drupal.org/node/1115636">Macros &amp; Templates</a>
+    </p>
+    <ul>
+      <li>First there is a test tab strip with a sub tab under #3</li>
+      <li>You can 'close' a tab by clicking it again. This is to preserve space.</li>
+      <li>Things to solve are:
+        <ul>
+          <li>Styling concerning borders around tabs, around tab content, closing all tabs</li>
+          <li>Is closing a tab good UX?</li>
+          <li>?</li>
+        </ul>
+      </li>
+    </ul>
+
+    <div style="width: 400px;">
+      The next tabs container is filled by code.
+      <div id="dreditor-tabs-container-test">This dreditor-tabs-container is initial empty</div>
+      This is after the container.
+    </div>
+
+    <div style="clear:both">&nbsp</div>
+    <div>
+      <p>Intended mockup of <a href="http://drupal.org/node/1345614">dreditor comment tabs</a>
+      </p>
+      <img src="http://drupal.org/files/replies.png" />
+    </div>
+  </body>
+</html>
