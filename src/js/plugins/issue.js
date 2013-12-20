@@ -117,7 +117,8 @@ Drupal.dreditor.issue.getNewCommentNumber = function() {
  * Gets the issue title.
  */
 Drupal.dreditor.issue.getIssueTitle = function() {
-  return Drupal.dreditor.issue.getCurrent('title');
+  var title = $('#page-subtitle').text() || '';
+  return title;
 };
 
 /**
