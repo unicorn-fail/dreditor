@@ -314,25 +314,15 @@ Drupal.dreditor.triage = {
     $container.css('overflow', 'visible');
     // Add margin from tags field
     $container.css('margin-top', '20px');
-    var tabs = Drupal.dreditor.ux.tabs;
-    tabs.createTabContainer($container);
-//    $link.wrap('<p>').css('float', 'none');
-//    var $commit = $link.parent();
-//    $commit.css('text-align', 'right');
-//    tabs.addTab($container, 'Commit message', 'id-1', $commit);
-    tabs.addTab($container, 'Macro &amp; Templates', 'dreditor-triage-root', $('<p>').text('Replaced by sub tabs'));
-
-    $('.dreditor-tab-content.dreditor-triage-root').empty();
-//    Drupal.dreditor.triage.setup($content);
-    tabs.init();
-    tabs.bind();
+    // Zap the div
+    var $root = $('.dreditor-tab-content.dreditor-triage-root').empty();
 
     var $triage = $('#dreditor-triage');
     if ($triage.length === 0) {
       // First time call so setup
       $triage = $('<div id="dreditor-triage" style="width: 95%">');
       //$triage.prependTo($container.parent());
-      $triage.appendTo($container);
+      $triage.appendTo($root);
       $triage.css('overflow', 'initial');
     }
     // We rebuild the container
