@@ -93,7 +93,7 @@ Drupal.dreditor.macro = {
       type: 'select'
     },
     comment: {
-      id: "edit-comment-body-und-0-value",
+      id: "#edit-comment-body-und-0-value, #edit-nodechanges-comment-body-value",
       type: 'textarea'
     },
     tags: {
@@ -164,7 +164,7 @@ Drupal.dreditor.macro = {
       if (typeof f.readonly !== 'undefined' && f.readonly) {
         return;
       }
-      var $f = jQuery('#' + f.id);
+      var $f = jQuery(f.id);
       // bail out if not defined
       if ($f.length === 0) {
         return;
