@@ -223,9 +223,6 @@ Drupal.behaviors.dreditorCommitMessage = {
         return false;
       });
 
-      // Add margin from tags field
-      $container.css('margin-top', '20px');
-
       var tabs = Drupal.dreditor.ux.tabs;
       tabs.createTabContainer($container);
       tabs.addTab($container, 'Macro &amp; Templates', 'dreditor-triage-root', $('<p>').text('Replaced by sub tabs'));
