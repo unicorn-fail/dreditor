@@ -136,9 +136,9 @@ Drupal.dreditor.triage = {
     var $ul = $('<ul id="dreditor-triage-menu">');
 
     // TODO: remove next lines when committing to dreditor
-    var $li = $('<li><strong><a href="http://drupal.org/sandbox/clemenstolboom/1125712">Using sandboxed version</a></strong></li>');
+    var $li = $('<li><strong><a href="https://github.com/dreditor/dreditor/pull/93">Using PR version</a></strong></li>');
     $li.appendTo($ul);
-    $li = $('<li><strong><a href="http://drupalcode.org/project/dreditor.git/blob_plain/HEAD:/dreditor.user.js">Use original dreditor</a></strong></li>');
+    $li = $('<li><strong><a href="https://dreditor.org/">Switch back to original dreditor</a></strong></li>');
     $li.appendTo($ul);
     // TODO: END remove above lines
 
