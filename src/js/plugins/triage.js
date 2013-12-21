@@ -312,8 +312,6 @@ Drupal.dreditor.triage = {
    */
   setup : function($container) {
     $container.css('overflow', 'visible');
-    // Add margin from tags field
-    $container.css('margin-top', '20px');
     // Zap the div
     var $root = $('.dreditor-tab-content.dreditor-triage-root').empty();
 

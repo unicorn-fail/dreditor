@@ -165,7 +165,7 @@ Drupal.behaviors.dreditorCommitMessage = {
             return command;
           };
           var $commandContainer = $('<div id="dreditor-commitmessage-command" style="clear: both; padding: 1em 0;" />')
-            .appendTo($container);
+            .appendTo($root);
           var $commandInput = $('<input class="dreditor-input" type="text" autocomplete="off" />')
             .val(self.createShellCommand(message));
 
@@ -222,6 +222,10 @@ Drupal.behaviors.dreditorCommitMessage = {
         }
         return false;
       });
+
+      // Add margin from tags field
+      $container.css('margin-top', '20px');
+
       var tabs = Drupal.dreditor.ux.tabs;
       tabs.createTabContainer($container);
       tabs.addTab($container, 'Macro &amp; Templates', 'dreditor-triage-root', $('<p>').text('Replaced by sub tabs'));

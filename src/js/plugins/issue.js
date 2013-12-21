@@ -64,7 +64,7 @@ Drupal.dreditor.issue = {
       type : 'tags'
     },
     comment : {
-      id : "edit-comment-body-und-0-value",
+      id : "edit-comment-body-und-0-value, #edit-nodechanges-comment-body-value",
       type : 'textarea'
     }
   },
