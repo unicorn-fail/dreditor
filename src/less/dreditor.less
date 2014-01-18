@@ -149,19 +149,16 @@
   background: transparent;
   position: relative;
 }
-#dreditor #code .pre .line-ruler {
+#dreditor #code tbody:after {
+  content: "";
   background: #ccc;
   background: rgba(0,0,0,0.15);
   position: absolute;
-  bottom: -4px;
-  top: -4px;
+  height: 100%;
   width: 1px;
+  display: block;
+  top: 0;
   visibility: hidden;
-  z-index: 1;
-}
-#dreditor #code tr:hover .pre .line-ruler {
-  background-color: #E8DAB3;
-  background-color: rgba(154, 124, 41, 0.3);
 }
 #dreditor #code .pre span.space {
   display: inline-block;
@@ -209,10 +206,6 @@
   background-color: #f7c8c8;
   border-color: #e9aeae;
 }
-#dreditor #code tr.old .line-ruler {
-  background-color: #B53B3B;
-  background-color: rgba(181, 59, 59, 0.2);
-}
 #dreditor #code tr.new {
   background-color: #dfd;
   color: #008503;
@@ -226,10 +219,6 @@
 #dreditor #code tr.new .ln {
   background-color: #ceffce;
   border-color: #b4e2b4;
-}
-#dreditor #code tr.new .line-ruler {
-  background-color: #167A00;
-  background-color: rgba(22, 122, 0, 0.2);
 }
 #dreditor #code .comment {
   color: #070;

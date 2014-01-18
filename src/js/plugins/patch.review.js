@@ -426,23 +426,13 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   var $diffstat = $('<div id="diffstat"></div>').appendTo('#dreditor #bar');
   var diffstat = { files: 0, insertions: 0, deletions: 0 };
 
-  // The line ruler must be displayed consistently across all browsers and OS
-  // that may or may not have the same fonts (kerning). Calculate the width of
-  // 81 "0" characters (80 character line plus the +/- prefix from the diff)
-  // by using an array (82 items joined by "0").
-  var $lineRuler = $('<table id="code"><tbody><tr><td class="ln"></td><td class="ln"></td><td><span class="pre">' + new Array(82).join('0') + '</span></td></tr></tbody></table>')
-    .appendTo('#dreditor');
-  var lineRulerOffset = $lineRuler.find('span').width();
-  var lineRulerStyle = '';
-  // Check for a reasonable value for the ruler offset.
-  if (lineRulerOffset > 100) {
-    lineRulerStyle = 'visibility: visible; left: ' + lineRulerOffset + 'px;';
-  }
-  $lineRuler.remove();
-
   code = code.split('\n');
   var ln1 = '';
   var ln2 = '';
+  var ln1content = '';
+  var ln2content = '';
+  var maxGutter = 0;
+  var gutter, maxln1, maxln2;
   for (var n in code) {
     var ln1o = true;
     var ln2o = true;
@@ -538,12 +528,60 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     }
 
     // Wrap all lines in PREs for copy/pasting and add the 80 character ruler.
+    ln1content = (ln1o ? ln1 : '');
+    ln2content = (ln2o ? ln2 : '');
     classes = (classes.length ? ' class="' + classes.join(' ') + '"' : '');
-    line = '<tr' + classes + '><td class="ln" data-line-number="' + (ln1o ? ln1 : '') + '"></td><td class="ln" data-line-number="' + (ln2o ? ln2 : '') + '"></td><td><span class="pre"><div class="line-ruler" style="' + lineRulerStyle + '"></div>' + line + '</span></td></tr>';
+    line = '<tr' + classes + '><td class="ln" data-line-number="' + ln1content + '"></td><td class="ln" data-line-number="' + ln2content + '"></td><td><span class="pre">' + line + '</span></td></tr>';
+
+    // Calculate the longest combination of line numbers in the gutter, used
+    // for determining the position of the 80 character ruler.
+    gutter = ("" + ln1content + ln2content);
+    if (gutter.length > maxGutter) {
+      maxln1 = ln1content;
+      maxln2 = ln2content;
+      maxGutter = gutter.length;
+    }
 
     // Append line to parsed code.
     $code.append(line);
   }
+
+  // The line ruler must be displayed consistently across all browsers and OS
+  // that may or may not have the same fonts (kerning). Calculate the width of
+  // 81 "0" characters (80 character line plus the +/- prefix from the diff)
+  // by using an array (82 items joined by "0").
+  //
+  // We also calculate the width of the gutter (line numbers) by using the
+  // largest combination of line numbers calculated above.
+  var $lineRuler = $('<table id="code"><tbody><tr><td class="ln ln-1" data-line-number="' + maxln1 + '"></td><td class="ln ln-2" data-line-number="' + maxln2 + '"></td><td><span class="pre">' + new Array(82).join('0') + '</span></td></tr></tbody></table>')
+    .appendTo('#dreditor');
+  var ln1gutter = $lineRuler.find('.ln-1').outerWidth();
+  var ln2gutter = $lineRuler.find('.ln-2').outerWidth();
+  var lineWidth = $lineRuler.find('.pre').width();
+  // Add 10px for padding (the td that contains span.pre).
+  var lineRulerOffset = ln1gutter + ln2gutter + lineWidth + 10;
+  var lineRulerStyle = '';
+  // Check for a reasonable value for the ruler offset.
+  if (lineRulerOffset > 100) {
+    lineRulerStyle = '#dreditor #code tbody:after { visibility: visible; left: ' + lineRulerOffset + 'px; }';
+  }
+  $lineRuler.remove();
+
+  // Add a style tag containing the CSS for the line ruler.
+  var styleEl = document.createElement("style");
+  document.getElementsByTagName("head")[0].appendChild(styleEl);
+  if (styleEl.styleSheet) {
+    if (!styleEl.styleSheet.disabled) {
+      styleEl.styleSheet.cssText = lineRulerStyle;
+    }
+  } else {
+    try {
+      styleEl.innerHTML = lineRulerStyle;
+    } catch(e) {
+      styleEl.innerText = lineRulerStyle;
+    }
+  }
+
   // Append to body...
   $('#dreditor-content', context)
     // the parsed code.
