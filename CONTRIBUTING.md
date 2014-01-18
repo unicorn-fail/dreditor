@@ -53,6 +53,8 @@ More information coming soon.
 
 ### Chrome
 
+Make sure you only have one version of the Dreditor extension enabled at one time.
+
 1. Navigate to `chrome://extensions`
 1. Enable Developer mode if you haven't already
 1. Click on `Load unpacked extension...`
