@@ -53,9 +53,10 @@ More information coming soon.
 
 ### Chrome
 
-1. Navigate to `chrome://extensions/`
-1. Click on `Load unpacked extention...`
-1. Browser to the `build/chrome` directory and click `Select`
+1. Navigate to `chrome://extensions`
+1. Enable Developer mode if you haven't already
+1. Click on `Load unpacked extension...`
+1. Browse to the `build/chrome` directory and click `Select`
 1. Make sure you refresh the extensions page after each code change
 
 ### Firefox
