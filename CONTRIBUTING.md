@@ -65,10 +65,15 @@ Make sure you only have one version of the Dreditor extension enabled at one tim
 
 Note that installing a development version of Dreditor will replace a copy of the Add-on installed from dreditor.org.
 
-1. Install the [Firefox Add-on SDK](https://developer.mozilla.org/en-US/Add-ons/SDK/Tutorials/Installation) somewhere.
-1. `cd` to the location where you untarred or unzipped the SDK and run `source bin/activate`.
-1. `cd` to the `build/firefox` directory and run `cfx xpi`. This will create `dreditor.xpi` in the `build/firefox` directory.
+1. Run `grunt mozilla-addon-sdk` to download the Firefox Add-on SDK.
+1. Run `grunt build:firefox` to create the .xpi at `release/dreditor.xpi`.
 1. From the `Tools` menu, choose `Add-ons` and drag the .xpi file in or use the gear menu and choose `Install Add-on From File…` and browse to the .xpi file and click `Select`.
+
+Instead of going through the Add-on UI (and the associated delay) after each change, you can also install the [Extension Auto-Installer Add-on](https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/) and run a command to POST the extension to the browser after building the .xpi. For example:
+
+```
+grunt build:firefox; wget --post-file=release/dreditor.xpi http://localhost:8888/ 2>/dev/null
+```
 
 ### Safari
 
