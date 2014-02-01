@@ -63,7 +63,12 @@ Make sure you only have one version of the Dreditor extension enabled at one tim
 
 ### Firefox
 
-(to be defined)
+Note that installing a development version of Dreditor will replace a copy of the Add-on installed from dreditor.org.
+
+1. Install the [Firefox Add-on SDK](https://developer.mozilla.org/en-US/Add-ons/SDK/Tutorials/Installation) somewhere.
+1. `cd` to the location where you untarred or unzipped the SDK and run `source bin/activate`.
+1. `cd` to the `build/firefox` directory and run `cfx xpi`. This will create `dreditor.xpi` in the `build/firefox` directory.
+1. From the `Tools` menu, choose `Add-ons` and drag the .xpi file in or use the gear menu and choose `Install Add-on From File…` and browse to the .xpi file and click `Select`.
 
 ### Safari
 
