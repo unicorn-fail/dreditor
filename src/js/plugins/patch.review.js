@@ -419,6 +419,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
 
   // Setup code container.
   var $code = $('<table id="code"></table>');
+  $code.append('<thead><tr><th class="line-ruler" colspan="3"></th></tr></thead>');
   var $menu = $('#menu', context);
   var $lastFile = $('<li>Parse error</li>');
 
@@ -553,39 +554,30 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   //
   // We also calculate the width of the gutter (line numbers) by using the
   // largest combination of line numbers calculated above.
-  var $lineRuler = $('<table id="code"><tbody><tr><td class="ln ln-1" data-line-number="' + maxln1 + '"></td><td class="ln ln-2" data-line-number="' + maxln2 + '"></td><td><span class="pre">' + new Array(82).join('0') + '</span></td></tr></tbody></table>')
+  var $lineRuler = $('<table id="code"><thead><tr><th class="line-ruler" colspan="3"></th></tr></thead><tbody><tr><td class="ln ln-1" data-line-number="' + maxln1 + '"></td><td class="ln ln-2" data-line-number="' + maxln2 + '"></td><td><span class="pre">' + new Array(82).join('0') + '</span></td></tr></tbody></table>')
     .appendTo('#dreditor');
   var ln1gutter = $lineRuler.find('.ln-1').outerWidth();
   var ln2gutter = $lineRuler.find('.ln-2').outerWidth();
   var lineWidth = $lineRuler.find('.pre').width();
   // Add 10px for padding (the td that contains span.pre).
   var lineRulerOffset = ln1gutter + ln2gutter + lineWidth + 10;
-  var lineRulerStyle = '';
+  var lineRulerStyle = {};
   // Check for a reasonable value for the ruler offset.
   if (lineRulerOffset > 100) {
-    lineRulerStyle = '#dreditor #code tbody:after { visibility: visible; left: ' + lineRulerOffset + 'px; }';
+    lineRulerStyle = {
+      'visibility': 'visible',
+      'left': lineRulerOffset + 'px'
+    };
   }
   $lineRuler.remove();
-
-  // Add a style tag containing the CSS for the line ruler.
-  var styleEl = document.createElement("style");
-  document.getElementsByTagName("head")[0].appendChild(styleEl);
-  if (styleEl.styleSheet) {
-    if (!styleEl.styleSheet.disabled) {
-      styleEl.styleSheet.cssText = lineRulerStyle;
-    }
-  } else {
-    try {
-      styleEl.innerHTML = lineRulerStyle;
-    } catch(e) {
-      styleEl.innerText = lineRulerStyle;
-    }
-  }
 
   // Append to body...
   $('#dreditor-content', context)
     // the parsed code.
     .append($code);
+
+  // Set the position of the 80-character ruler.
+  $('thead .line-ruler').css(lineRulerStyle);
 
   // Append diffstat to sidebar.
   $diffstat.html(diffstat.files + '&nbsp;files changed, ' + diffstat.insertions + '&nbsp;insertions, ' + diffstat.deletions + '&nbsp;deletions.');
