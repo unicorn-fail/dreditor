@@ -72,7 +72,7 @@ Note that installing a development version of Dreditor will replace a copy of th
 
 ### Safari
 
-You'll need a [Safari Developer Certificate](https://developer.apple.com/register/index.action) (free) in order to build/install the Safari extension.
+You'll need a [Safari Developer Certificate](https://developer.apple.com/register/index.action) (free) in order to build/install the Safari extension. Make sure you only have one version of the Dreditor extension enabled at one time.
 
 1. Enable the `Develop` menu. Open Preferences in the Safari menu, choose the Advanced tab, and check the box marked `Show Develop menu in menu bar`.
 1. From the `Develop` menu, choose `Show Extension Builder`. Click the Plus button in the bottom left corner of the window and choose `Add Extension…`.
