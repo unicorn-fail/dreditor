@@ -55,11 +55,11 @@ More information coming soon.
 
 Make sure you only have one version of the Dreditor extension enabled at one time.
 
-1. Navigate to `chrome://extensions`
-1. Enable Developer mode if you haven't already
-1. Click on `Load unpacked extension...`
-1. Browse to the `build/chrome` directory and click `Select`
-1. Make sure you refresh the extensions page after each code change
+1. Navigate to `chrome://extensions`.
+1. Enable Developer mode if you haven't already.
+1. Click on `Load unpacked extension...`.
+1. Browse to the `build/chrome` directory and click `Select`.
+1. Make sure you refresh the extensions page after each code change.
 
 ### Firefox
 
@@ -69,11 +69,11 @@ Make sure you only have one version of the Dreditor extension enabled at one tim
 
 You'll need a [Safari Developer Certificate](https://developer.apple.com/register/index.action) (free) in order to build/install the Safari extension.
 
-1. Enable the `Develop` menu. Open Preferences in the Safari menu, choose the Advanced tab, and check the box marked `Show Develop menu in menu bar`
-1. From the `Develop` menu, choose `Show Extension Builder`. Click the Plus button in the bottom left corner of the window and choose `Add Extension…`
-1. Browser to the `build/dreditor.safariextension` directory and click `Select`
-1. Once the extension has been loaded and assuming you have set up a Safari Developer Certificate, you should see an `Install` button on the top right. If this is the first time using your Safari Developer Certificate you will be asked to grant access
-1. Make sure you click the `Reload` button in the Extension Builder window after each code change
+1. Enable the `Develop` menu. Open Preferences in the Safari menu, choose the Advanced tab, and check the box marked `Show Develop menu in menu bar`.
+1. From the `Develop` menu, choose `Show Extension Builder`. Click the Plus button in the bottom left corner of the window and choose `Add Extension…`.
+1. Browser to the `build/dreditor.safariextension` directory and click `Select`.
+1. Once the extension has been loaded and assuming you have set up a Safari Developer Certificate, you should see an `Install` button on the top right. If this is the first time using your Safari Developer Certificate you will be asked to grant access.
+1. Make sure you click the `Reload` button in the Extension Builder window after each code change.
 
 ## Grunt
 
