@@ -8,11 +8,13 @@
 var sortOrder, hasDuplicate;
 if ( document.documentElement.compareDocumentPosition ) {
   sortOrder = function( a, b ) {
-    var ret = a.compareDocumentPosition(b) & 4 ? -1 : a === b ? 0 : 1;
-    if ( ret === 0 ) {
-      hasDuplicate = true;
+    if (a.compareDocumentPosition) {
+      var ret = a.compareDocumentPosition(b) & 4 ? -1 : a === b ? 0 : 1;
+      if ( ret === 0 ) {
+        hasDuplicate = true;
+      }
+      return ret;
     }
-    return ret;
   };
 } else if ( "sourceIndex" in document.documentElement ) {
   sortOrder = function( a, b ) {
