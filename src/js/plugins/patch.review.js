@@ -8,7 +8,8 @@ Drupal.behaviors.dreditorPatchReview = {
     if (!$context.find('#project-issue-ajax-form').length) {
       return;
     }
-    $context.find('.file > a').once('dreditor-patchreview', function () {
+    var $elements = $context.find('.file').once('dreditor-patchreview').find('> a');
+    $elements.each(function () {
       if (this.href.match(/\.(patch|diff|txt)$/)) {
         // Generate review link.
         var $file = $(this).closest('tr').find('.file');
