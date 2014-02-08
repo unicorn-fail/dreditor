@@ -206,6 +206,15 @@ module.exports = function(grunt) {
           '<%= qunit.all %>'
         ],
         tasks: ['default']
+      },
+      dev: {
+        files: [
+          '<%= jshint.package.src %>',
+          '<%= jshint.gruntfile.src %>',
+          '<%= jshint.js.src %>',
+          'src/less/**/*.less'
+        ],
+        tasks: ['dev']
       }
     },
     release: {
@@ -268,6 +277,7 @@ module.exports = function(grunt) {
 
   // Default tasks.
   grunt.registerTask('default', ['clean', 'less', 'css2js', 'jshint', 'qunit', 'concat', 'uglify', 'copy', 'sed']);
+  grunt.registerTask('dev', ['less', 'css2js', 'concat']);
 
   // Build extensions.
   grunt.registerTask('build:chrome', ['compress:chrome']);
