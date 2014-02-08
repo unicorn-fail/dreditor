@@ -3,24 +3,30 @@
  */
 Drupal.behaviors.dreditorInlineImage = {
   attach: function (context) {
-    $('#upload-attachments, #comment-upload-attachments', context).once('dreditor-inlineimage', function () {
-      $(this).find('div.description').each(function () {
-        var url = $(this).text();
-        // Only process image attachments.
-        if (!url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
-          return;
-        }
-        // Generate inline image button.
-        var $button = $('<a class="dreditor-button dreditor-inlineimage" href="javascript:void(0);">Embed</a>').click(function () {
-          var desc = $(this).parent().siblings('input').val();
-          var image = '<img src="' + url + '" alt="' + desc + '" />';
-          // Append image to issue comment textarea (context is AHAH content here).
-          $('#edit-body, #edit-comment').val($('#edit-body, #edit-comment').val() + "\n" + image + "\n");
-          return false;
+    var $context = $(context);
+    var $comment = $(':input[name="nodechanges_comment_body[value]"]');
+    $context.find('.file > a').once('dreditor-inlineimage', function () {
+      var $link = $(this);
+      var url = $link.attr('href');
+      // Only process image attachments.
+      if (!$comment.length || !url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
+        return;
+      }
+      // Generate inline image button (cannot be <a>, other scripts bind links).
+      var $button = $('<span class="dreditor-button dreditor-inlineimage">Embed</span>');
+      // Append inline image button to attachment.
+      $link.parent().parent().append($button);
+      // Override click event.
+      $button
+        .bind('click', function (e) {
+          // Focus comment textarea.
+          $('html, body').animate({
+            scrollTop: $comment.offset().top
+          }, 300);
+          // Insert image tag to URL in comment textarea.
+          $comment.focus().val($comment.val() + "\n<img src=\"" + url + "\" alt=\"\" />\n");
+          e.preventDefault();
         });
-        // Append inline image button to attachment.
-        $button.appendTo(this);
-      });
     });
   }
 };

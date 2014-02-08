@@ -15,7 +15,9 @@ Drupal.dreditor.issue.getNid = function() {
  */
 Drupal.dreditor.issue.getNewCommentNumber = function() {
   // Get comment count.
-  return parseInt($('#comment-form .comment-inner > h3').text().match(/\d+$/)[0], 10);
+  // @todo replace with JSON data.
+  var $comments = $('.comments .comment > a');
+  return $comments.length ? parseInt($comments.text().match(/\d+$/)[0], 10) : undefined;
 };
 
 /**
@@ -58,7 +60,7 @@ Drupal.dreditor.issue.getProjectShortName = function() {
 
 Drupal.dreditor.issue.getSelectedComponent = function() {
   // Retrieve component from the comment form selected option label.
-  var version = $('#edit-project-info-component option:selected').text();
+  var version = $(':input[name*="issue_component"] :selected').text();
   return version;
 };
 
@@ -79,7 +81,7 @@ Drupal.dreditor.issue.getSelectedComponent = function() {
  */
 Drupal.dreditor.issue.getSelectedVersion = function() {
   // Retrieve version from the comment form selected option label.
-  var version = $('.field-name-field-issue-version .field-item').text();
+  var version = $(':input[name*="issue_version"] :selected').text();
   return version;
 };
 

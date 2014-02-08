@@ -3,54 +3,53 @@
  */
 Drupal.behaviors.dreditorPatchReview = {
   attach: function (context) {
+    var $context = $(context);
     // Prevent users from starting to review patches when not logged in.
-    if (!$(context).find('#comment-form').length) {
+    if (!$context.find('#project-issue-ajax-form').length) {
       return;
     }
-    $('.field-type-file, table.nodechanges-file-changes', context).once('dreditor-patchreview', function () {
-      $('a', this).each(function () {
-        if (this.href.match(/\.(patch|diff|txt)$/)) {
-          // Generate review link.
-          var $file = $(this).closest('tr').find('.file');
-          var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">Review</a>').click(function (e) {
-            if (Drupal.dreditor.link !== this && Drupal.dreditor.$wrapper) {
-              Drupal.dreditor.tearDown(false);
-            }
-            if (Drupal.dreditor.link === this && Drupal.dreditor.$wrapper) {
-              Drupal.dreditor.show();
-            }
-            else {
-              Drupal.dreditor.link = this;
-              // Load file.
-              $.get(this.href, function (content, status) {
-                if (status === 'success') {
-                  // Invoke Dreditor.
-                  Drupal.dreditor.setup(context, 'patchReview', content);
-                }
-              });
-            }
-            e.preventDefault();
-          });
-          // Append review link to parent table cell.
-          $link.prependTo($file);
-
-          // Generate simplytest.me links only for patches and diffs.
-          if (this.href.substr(-6) === '.patch' || this.href.substr(-5) === '.diff') {
-            // Retrieve project shortname.
-            var project = Drupal.dreditor.issue.getProjectShortName();
-            if (project) {
-              var version = Drupal.dreditor.issue.getSelectedVersion().replace('-dev', '');
-              if (version) {
-                $('<a/>').text('simplytest.me').attr({
-                  class: 'dreditor-button dreditor-patchtest',
-                  href: 'http://simplytest.me/project/' + project + '/' + version + '?patch[]=' + this.href,
-                  target: '_blank'
-                }).prependTo($file);
+    $context.find('.file > a').once('dreditor-patchreview', function () {
+      if (this.href.match(/\.(patch|diff|txt)$/)) {
+        // Generate review link.
+        var $file = $(this).closest('tr').find('.file');
+        var $link = $('<a class="dreditor-button dreditor-patchreview" href="' + this.href + '">Review</a>').click(function (e) {
+          if (Drupal.dreditor.link !== this && Drupal.dreditor.$wrapper) {
+            Drupal.dreditor.tearDown(false);
+          }
+          if (Drupal.dreditor.link === this && Drupal.dreditor.$wrapper) {
+            Drupal.dreditor.show();
+          }
+          else {
+            Drupal.dreditor.link = this;
+            // Load file.
+            $.get(this.href, function (content, status) {
+              if (status === 'success') {
+                // Invoke Dreditor.
+                Drupal.dreditor.setup(context, 'patchReview', content);
               }
+            });
+          }
+          e.preventDefault();
+        });
+        // Append review link to parent table cell.
+        $link.prependTo($file);
+
+        // Generate simplytest.me links only for patches and diffs.
+        if (this.href.substr(-6) === '.patch' || this.href.substr(-5) === '.diff') {
+          // Retrieve project shortname.
+          var project = Drupal.dreditor.issue.getProjectShortName();
+          if (project) {
+            var version = Drupal.dreditor.issue.getSelectedVersion().replace('-dev', '');
+            if (version) {
+              $('<a/>').text('simplytest.me').attr({
+                class: 'dreditor-button dreditor-patchtest',
+                href: 'http://simplytest.me/project/' + project + '/' + version + '?patch[]=' + this.href,
+                target: '_blank'
+              }).prependTo($file);
             }
           }
         }
-      });
+      }
     });
   }
 };
@@ -278,7 +277,7 @@ Drupal.dreditor.patchReview = {
     }
 
     // Paste comment into issue comment textarea.
-    var $commentField = $('#comment-form textarea[name^="comment_body"]');
+    var $commentField = $('#project-issue-ajax-form :input[name="nodechanges_comment_body[value]');
     $commentField.val($commentField.val() + html);
     // Flush posted comments.
     this.comment.comments = [];
@@ -286,7 +285,7 @@ Drupal.dreditor.patchReview = {
     // @todo Prevent unintended/inappropriate status changes.
     //$('#edit-sid').val(13);
     // Jump to the issue comment textarea after pasting.
-    Drupal.dreditor.goto('#comment-form');
+    Drupal.dreditor.goto('#project-issue-ajax-form');
     // Close Dreditor.
     Drupal.dreditor.tearDown();
   }

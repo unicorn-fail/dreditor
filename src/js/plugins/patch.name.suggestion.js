@@ -11,38 +11,32 @@ Drupal.behaviors.dreditorPatchNameSuggestion = {
       return;
     }
 
-    $('#comment-form #edit-upload-wrapper, #node-form #edit-upload-wrapper', context).once('dreditor-patchsuggestion', function () {
-      var $container = $('#edit-upload-wrapper > label');
+    $('#project-issue-ajax-form .form-item-field-issue-files-und-1', context).once('dreditor-patchsuggestion', function () {
+      var $container = $('> label', this);
       var $link = $('<a class="dreditor-application-toggle dreditor-patchsuggestion" href="#">Patchname suggestion</a>');
       $link.prependTo($container);
       $link.click(function() {
-        var title = Drupal.dreditor.issue.getIssueTitle() || 'title';
-        title = title.replace(/[^a-zA-Z0-9]+/g, '_');
-        // Truncate and remove a heading/trailing undescore.
-        title = title.substr(0, 60);
-        title = title.replace(/(^_|_$)/, '');
+        var patchName = '';
+
+        function truncateString (str, n,useWordBoundary){
+          var toLong = str.length>n,
+          s_ = toLong ? str.substr(0,n-1) : str;
+          return useWordBoundary && toLong ? s_.substr(0,s_.lastIndexOf(' ')) : s_;
+        }
+
+        var title = truncateString(Drupal.dreditor.issue.getIssueTitle() || '', 25, true);
+
+        // Truncate and remove a heading/trailing underscore.
+        patchName += title.replace(/[^a-zA-Z0-9]+/g, '_').replace(/(^_|_$)/, '').toLowerCase();
 
         var nid = Drupal.dreditor.issue.getNid() || 0;
-        var project = Drupal.dreditor.issue.getProjectShortName() || 'unknownProject';
-        var component = Drupal.dreditor.issue.getSelectedComponent() || 'component';
-        component = component.replace(/[^a-zA-Z0-9]+/, '-').toLowerCase();
-
-        var core = Drupal.dreditor.issue.getSelectedVersionCore() || '';
-        core = core.substring(0, 1);
-
-        // Build filename suggestion.
-        var patchName = '';
-        if (project === 'drupal') {
-          patchName = project + core + '-' + component;
-        }
-        else {
-          patchName = project + '-' + component;
-        }
-
         if (nid !== 0) {
-          var newCommentNumber = Drupal.dreditor.issue.getNewCommentNumber();
+          patchName += (patchName.length ? '-' : '') + nid;
+        }
 
-          patchName += '-' + nid + '-' + newCommentNumber;
+        var newCommentNumber = Drupal.dreditor.issue.getNewCommentNumber();
+        if (typeof newCommentNumber !== 'undefined') {
+          patchName += '-' + newCommentNumber;
         }
 
         patchName += '.patch';
