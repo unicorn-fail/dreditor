@@ -296,6 +296,13 @@ module.exports = function(grunt) {
   });
   grunt.registerTask('build:safari', ['build-safari-ext']);
   grunt.registerTask('build', ['compress:chrome', 'mozilla-cfx-xpi', 'build-safari-ext']);
+
+  // Test tasks.
   grunt.registerTask('test', ['clean', 'qunit']);
+
+  // Default tasks.
+  grunt.registerTask('default', ['clean', 'less', 'css2js', 'jshint', 'qunit', 'concat', 'uglify', 'copy', 'sed']);
+  grunt.registerTask('dev', ['clean', 'less', 'css2js', 'jshint', 'concat', 'uglify', 'copy', 'sed', 'build']);
+  grunt.registerTask('dev-lite', ['less', 'css2js', 'jshint', 'concat']);
 
 };
