@@ -4,7 +4,21 @@ module.exports = function(grunt) {
   grunt.initConfig({
     // Metadata.
     pkg: grunt.file.readJSON('package.json'),
-    banner: '/**\n' +
+    banner: '// ==UserScript==' + '\n' +
+      '// @name           <%= pkg.title || pkg.name %>' + '\n' +
+      '// @namespace      http://dreditor.org' + '\n' +
+      '// @description    <%= pkg.description %>' + '\n' +
+      '// @icon           https://drupal.org/misc/druplicon.png' + '\n' +
+      '// @version        <%= pkg.version %>' + '\n' +
+      '// @grant          none' + '\n' +
+      '// @include        *://dreditor.org/*' + '\n' +
+      '// @include        *://*.dreditor.org/*' + '\n' +
+      '// @include        *://drupal.org/*' + '\n' +
+      '// @include        *://*.drupal.org/*' + '\n' +
+      '// @include        *://devdrupal.org/*' + '\n' +
+      '// @include        *://*.devdrupal.org/*' + '\n' +
+      '// ==/UserScript==' + '\n\n' +
+      '/**\n' +
       ' * <%= pkg.title || pkg.name %> <%= pkg.version %>\n' +
       '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
       ' * <%= pkg.description %>\n' +
