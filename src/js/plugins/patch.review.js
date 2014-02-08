@@ -288,7 +288,7 @@ Drupal.dreditor.patchReview = {
     }
 
     // Paste comment into issue comment textarea.
-    var $commentField = $('#project-issue-ajax-form :input[name="nodechanges_comment_body[value]');
+    var $commentField = $('#project-issue-ajax-form :input[name*="comment_body"]');
     $commentField.val($commentField.val() + html);
     // Flush posted comments.
     this.comment.comments = [];
