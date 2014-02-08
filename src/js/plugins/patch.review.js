@@ -128,7 +128,8 @@ Drupal.dreditor.patchReview = {
         self.data.elements.push(newelement);
       }
     });
-    // @todo add sort based on element position back.
+    // Re-order elements by their actual DOM position.
+    self.data.elements.sort(sortOrder);
     return elements;
   },
 
@@ -202,10 +203,20 @@ Drupal.dreditor.patchReview = {
     }
   },
 
+  /**
+   * Wrapper around jQuery's sortOrder() to sort review comments.
+   */
+  sort: function (a, b) {
+    if (!a || !b) {
+      return 0;
+    }
+    return sortOrder(a.elements[0], b.elements[0]);
+  },
+
   paste: function () {
     var html = '';
     var comments = [];
-    // @todo add sort based on element position back.
+    this.comment.comments.sort(this.sort);
     $.each(this.comment.comments, function (index, comment) {
       // Skip deleted (undefined) comments; this would return window here.
       if (!comment) {
