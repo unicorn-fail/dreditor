@@ -277,7 +277,7 @@ module.exports = function(grunt) {
 
   // Default tasks.
   grunt.registerTask('default', ['clean', 'less', 'css2js', 'jshint', 'qunit', 'concat', 'uglify', 'copy', 'sed']);
-  grunt.registerTask('dev', ['less', 'css2js', 'concat']);
+  grunt.registerTask('dev', ['less', 'css2js', 'jshint:js', 'concat']);
 
   // Build extensions.
   grunt.registerTask('build:chrome', ['compress:chrome']);
