@@ -21,6 +21,7 @@ Drupal.dreditor.syntaxAutocomplete = function (element) {
 
   this.$suggestion = $('<span></span>');
   this.$tooltip = $('<div class="dreditor-tooltip">TAB: </div>')
+    .hide()
     .insertAfter(this.$element)
     .append(this.$suggestion);
 
@@ -135,7 +136,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.setSuggestion = function (suggestio
   if (suggestion !== self.suggestion) {
     self.suggestion = suggestion;
     self.$suggestion.text(self.suggestion.replace('^', ''));
-    self.$tooltip.css({ display: 'inline-block' });
+    self.$tooltip.show();
   }
 };
 
