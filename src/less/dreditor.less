@@ -279,6 +279,12 @@ tr.selected td {
   moz-border-radius: 8px 8px 0 0;
   border-radius: 8px 8px 0 0;
 }
+/* Prevent the sticky cancel button from being located outside of the visible viewport. */
+#dreditor-widget .sticky-cancel {
+  bottom: 0;
+  position: absolute;
+  right: 1em;
+}
 .dreditor-actions {
   overflow: hidden;
   position: relative;
