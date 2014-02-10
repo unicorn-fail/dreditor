@@ -62,6 +62,7 @@ Make sure you only have one version of the Dreditor extension enabled at one tim
 Note that installing a development version of Dreditor will replace a copy of the Add-on installed from dreditor.org.
 
 **Requirements**
+
 1. The [Firefox Add-on SDK](https://developer.mozilla.org/en-US/Add-ons/SDK) must be installed, run `grunt mozilla-addon-sdk`.
 1. The [Extension Auto-Installer Add-on](https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/) Firefox add-on must be installed. This extension requires the `wget` command to be installed (for OSX, `brew|port install wget`).
 
@@ -71,8 +72,7 @@ After all requirements have been met, a Firefox extension will be built and auto
 * `grunt watch:dev`
 * `grunt build` (also builds chrome and safari)
 
-If, for whatever reason, the Firefox extension has not automatically loaded in Firefox you may manually install `release/dreditor-<version>.xpi`:
-1. From the `Tools` menu, choose `Add-ons` and drag the .xpi file in or use the gear menu and choose `Install Add-on From File…` and browse to the .xpi file and click `Select`.
+If, for whatever reason, the Firefox extension has not automatically loaded in Firefox you may manually install `release/dreditor-<version>.xpi`. From the `Tools` menu, choose `Add-ons` and drag the .xpi file in or use the gear menu and choose `Install Add-on From File…` and browse to the .xpi file and click `Select`.
 
 ### Safari
 
