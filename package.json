@@ -39,7 +39,7 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "grunt"
+    "test": "grunt travis-ci --verbose"
   },
   "devDependencies": {
     "grunt": "~0.4.2",

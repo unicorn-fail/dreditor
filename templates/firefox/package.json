@@ -1,6 +1,6 @@
 {
   "name": "%PKG.NAME%",
-  "fullName": "%PKG.TITLE%",
+  "title": "%PKG.TITLE%",
   "id": "%PKG.NAME%@%PKG.NAME%.org",
   "homepage": "%PKG.HOMEPAGE%",
   "description": "%PKG.DESCRIPTION%",

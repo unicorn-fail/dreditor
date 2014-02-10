@@ -6,5 +6,5 @@ pageMod.PageMod({
     "*.dreditor.org",
     "*.devdrupal.org"
   ],
-  contentScriptFile: data.url("%PKG.NAME%.min.js")
+  contentScriptFile: data.url("%PKG.NAME%.js")
 });

@@ -1,12 +1,8 @@
 # Contributing
 
-## Important notes
-
-As of versions after 1.2.3 (Nov 30 2013) we introduced a new source tree layout and developer workflow by using the grunt toolset. This meant splitting up the dreditor.js file into several parts to make better use of extentions and plugins. This allows us to add unit tests later on.
-
 ## Directory structure
 
-The following directories are important for patch writing:
+The following directories are important for developing and submitting pull requests:
 
 - `src/js` : dreditor code split into smaller parts like extensions and plugins
 - `src/less` : dreditor styling files.
@@ -65,15 +61,18 @@ Make sure you only have one version of the Dreditor extension enabled at one tim
 
 Note that installing a development version of Dreditor will replace a copy of the Add-on installed from dreditor.org.
 
-1. Run `grunt mozilla-addon-sdk` to download the Firefox Add-on SDK.
-1. Run `grunt build:firefox` to create the .xpi at `release/dreditor.xpi`.
+**Requirements**
+1. The [Firefox Add-on SDK](https://developer.mozilla.org/en-US/Add-ons/SDK) must be installed, run `grunt mozilla-addon-sdk`.
+1. The [Extension Auto-Installer Add-on](https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/) Firefox add-on must be installed. This extension requires the `wget` command to be installed (for OSX, `brew|port install wget`).
+
+After all requirements have been met, a Firefox extension will be built and auto-loaded by running one of the following commands:
+* `grunt build:firefox`
+* `grunt dev`
+* `grunt watch:dev`
+* `grunt build` (also builds chrome and safari)
+
+If, for whatever reason, the Firefox extension has not automatically loaded in Firefox you may manually install `release/dreditor-<version>.xpi`:
 1. From the `Tools` menu, choose `Add-ons` and drag the .xpi file in or use the gear menu and choose `Install Add-on From File…` and browse to the .xpi file and click `Select`.
-
-Instead of going through the Add-on UI (and the associated delay) after each change, you can also install the [Extension Auto-Installer Add-on](https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/) and run a command to POST the extension to the browser after building the .xpi. For example:
-
-```
-grunt build:firefox; wget --post-file=release/dreditor.xpi http://localhost:8888/ 2>/dev/null
-```
 
 ### Safari
 
@@ -87,7 +86,7 @@ You'll need a [Safari Developer Certificate](https://developer.apple.com/registe
 
 ## Grunt
 
-Grunt helps to continuesly test our code and build the browser packages.
+Grunt helps to continuously test our code and build the browser packages.
 
 First, ensure that you have the latest [Node.js](http://nodejs.org/) and [npm](http://npmjs.org/) installed.
 

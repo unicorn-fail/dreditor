@@ -27,7 +27,7 @@
 		<dict>
 			<key>End</key>
 			<array>
-				<string>%PKG.NAME%.min.js</string>
+				<string>%PKG.NAME%.js</string>
 			</array>
 		</dict>
 	</dict>
