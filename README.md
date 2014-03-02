@@ -1,6 +1,6 @@
 Dreditor
 ========
-[![build](https://travis-ci.org/dreditor/dreditor.png?branch=1.x)](https://travis-ci.org/dreditor/dreditor)
+[![build](https://travis-ci.org/dreditor/dreditor.png?branch=master)](https://travis-ci.org/dreditor/dreditor)
 
 An extension for Drupal.org that enhances user experience and functionality.
 
