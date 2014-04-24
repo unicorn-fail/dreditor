@@ -6,9 +6,9 @@
  * @see Drupal.dreditor.patchReview.sort()
  */
 var sortOrder, hasDuplicate;
-if ( document.documentElement.compareDocumentPosition ) {
+if ( document.documentElement && document.documentElement.compareDocumentPosition ) {
   sortOrder = function( a, b ) {
-    if (a.compareDocumentPosition) {
+    if (a && b && a.compareDocumentPosition) {
       var ret = a.compareDocumentPosition(b) & 4 ? -1 : a === b ? 0 : 1;
       if ( ret === 0 ) {
         hasDuplicate = true;
