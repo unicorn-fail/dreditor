@@ -24,6 +24,8 @@ Drupal.behaviors.dreditorInlineImage = {
           $('html, body').animate({
             scrollTop: $comment.offset().top
           }, 300);
+          // Remove protocol + drupal.org
+          url = url.replace(/^https\:\/\/drupal\.org/, '');
           // Insert image tag to URL in comment textarea.
           $comment.focus().val($comment.val() + "\n<img src=\"" + url + "\" alt=\"\" />\n");
           e.preventDefault();
