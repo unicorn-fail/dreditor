@@ -26,10 +26,6 @@ Drupal.behaviors.dreditorFormSticky = {
       });
       $wrapper.prepend($toggle);
     }
-    // Full issue update form.
-    $(context).find('#project-issue-node-form > div').once('dreditor-form-sticky', function () {
-      addButton($(this));
-    });
     // Comment form textarea.
     $(context).find('[class*="comment-body"]').once('dreditor-form-sticky', function () {
       addButton($(this).find('.form-textarea-wrapper'));
