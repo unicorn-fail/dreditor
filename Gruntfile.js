@@ -1,6 +1,6 @@
 /*global module:false*/
 /*global require:false*/
-/*global __dirname:false*/
+/*global process:false*/
 module.exports = function(grunt) {
   grunt.initConfig({
     // Metadata.
@@ -296,7 +296,7 @@ module.exports = function(grunt) {
   grunt.registerTask('build:safari', 'Builds the safari extension', function () {
     grunt.util.spawn({
       cmd:'build-safari-ext',
-      args:[grunt.template.process('<%= pkg.name %>-<%= pkg.version %>'), grunt.template.process(__dirname + '/build/<%= pkg.name %>.safariextension'), __dirname + '/release'],
+      args:[grunt.template.process('<%= pkg.name %>-<%= pkg.version %>'), grunt.template.process(process.cwd() + '/build/<%= pkg.name %>.safariextension'), process.cwd() + '/release'],
       fallback:-255
     }, function (error, result, code) {
       if (0 !== code) {
