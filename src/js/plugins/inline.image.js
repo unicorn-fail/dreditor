@@ -3,18 +3,14 @@
  */
 Drupal.behaviors.dreditorInlineImage = {
   attach: function (context) {
-    var
-      $context = $(context),
-      $comment = $(':input[name="nodechanges_comment_body[value]"]'),
-      $elements = $context.find('.file').once('dreditor-inlineimage');
+    var $context = $(context);
+    var $comment = $(':input[name="nodechanges_comment_body[value]"]');
 
-    $elements.find('> a').each(function () {
-      var
-        $link = $(this),
-        // Generate inline image button (cannot be <a>, other scripts bind links).
-        $button = $('<span class="dreditor-button dreditor-inlineimage">Embed</span>'),
-        // Remove protocol + drupal.org
-        url = $link.attr('href').replace(/^https\:\/\/drupal\.org/, '');
+    $context.find('.file').once('dreditor-inlineimage').find('> a').each(function () {
+      var $link = $(this);
+
+      // Remove protocol + drupal.org
+      var url = $link.attr('href').replace(/^https\:\/\/drupal\.org/, '');
 
       // Only process image attachments.
       if (!$comment.length || !url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
@@ -22,6 +18,9 @@ Drupal.behaviors.dreditorInlineImage = {
       }
 
       // Append inline image button to attachment.
+      // Generate inline image button (cannot be <a>, other scripts bind links).
+      var $button = $('<span class="dreditor-button dreditor-inlineimage">Embed</span>');
+
       $link.parent().prepend($button);
 
       // Override click event.
