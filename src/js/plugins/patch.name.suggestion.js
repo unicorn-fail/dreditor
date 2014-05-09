@@ -11,7 +11,7 @@ Drupal.behaviors.dreditorPatchNameSuggestion = {
       return;
     }
 
-    $('#project-issue-ajax-form .form-item-field-issue-files-und-1', context).once('dreditor-patchsuggestion', function () {
+    $('#project-issue-ajax-form .field-name-field-issue-files .form-type-managed-file', context).once('dreditor-patchsuggestion', function () {
       var $container = $('> label', this);
       var $link = $('<a class="dreditor-application-toggle dreditor-patchsuggestion" href="#">Patchname suggestion</a>');
       $link.prependTo($container);
