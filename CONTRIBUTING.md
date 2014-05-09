@@ -25,7 +25,7 @@ Both `build/` and `release/` are added to `.gitignore` so make sure these are no
 1. Run `grunt watch` to continues rebuild your changes into the build directory or just `grunt` when ready
 1. Configure your browser to use the correct build as described below.
 1. Start coding by
-  1. Create a (new) feature branch. Please don't work in the `1.x` branch directly.
+  1. Create a (new) feature branch. Please don't work in the `master` branch directly.
   1. Fix the code. When debugging use `$.debug()` or 'globals' like `window.console` and `window.alert`.
   1. Write a test for the new code
   1. Check the watched output for failing tasks like jslint or tests.
