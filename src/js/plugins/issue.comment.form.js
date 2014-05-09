@@ -10,8 +10,8 @@
  */
 Drupal.behaviors.dreditorIssueCommentFormSticky = {
   attach: function (context) {
-    $(context).find('[class*="comment-body"] .resizable-textarea').once('dreditor-issue-comment-form-sticky', function () {
-      var $wrapper = $(this);
+    $(context).find('[class*="comment-body"]').once('dreditor-issue-comment-form-sticky', function () {
+      var $wrapper = $(this).find('.resizable-textarea');
       var $toggle = $('<a href="javascript:void(0);" class="dreditor-application-toggle">Make sticky</a>');
       $toggle.click(function () {
         if ($wrapper.attr('id')) {
