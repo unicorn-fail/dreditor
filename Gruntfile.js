@@ -1,4 +1,5 @@
 /*global module:false*/
+/*global require:false*/
 /*global __dirname:false*/
 module.exports = function(grunt) {
   grunt.initConfig({
@@ -44,6 +45,9 @@ module.exports = function(grunt) {
       }
     },
     jshint: {
+      options: {
+        reporter: require('jshint-stylish')
+      },
       package: {
         options: {
           jshintrc: '.jshintrc'
@@ -188,33 +192,16 @@ module.exports = function(grunt) {
       }
     },
     watch: {
-      default: {
-        files: [
-          '<%= jshint.package.src %>',
-          '<%= jshint.gruntfile.src %>',
-          '<%= jshint.js.src %>',
-          'src/less/**/*.less',
-          '<%= qunit.all %>'
-        ],
-        tasks: ['default']
-      },
-      ext: {
-        files: [
-          '<%= jshint.package.src %>',
-          '<%= jshint.gruntfile.src %>',
-          '<%= jshint.js.src %>',
-          'src/less/**/*.less'
-        ],
-        tasks: ['ext']
-      },
-      dev: {
-        files: [
-          '<%= jshint.package.src %>',
-          '<%= jshint.gruntfile.src %>',
-          '<%= jshint.js.src %>',
-          'src/less/**/*.less'
-        ],
-        tasks: ['dev']
+      files: [
+        '<%= jshint.package.src %>',
+        '<%= jshint.gruntfile.src %>',
+        '<%= jshint.js.src %>',
+        '<%= less.files.src %>',
+        '<%= qunit.all %>'
+      ],
+      tasks: ['default'],
+      options: {
+        interrupt: true
       }
     },
     release: {
@@ -318,10 +305,5 @@ module.exports = function(grunt) {
       }
     });
   });
-
-  // Development tasks.
-  grunt.registerTask('dev',   ['default', 'build:firefox']);
   grunt.registerTask('build', ['default', 'compress:chrome', 'build:firefox', 'build:safari']);
-  grunt.registerTask('gm',    ['clean', 'less', 'css2js', 'jshint:js', 'concat', 'copy', 'sed']);
-
 };
