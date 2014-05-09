@@ -17,10 +17,10 @@ Drupal.behaviors.dreditorInlineImage = {
         return;
       }
 
-      // Append inline image button to attachment.
       // Generate inline image button (cannot be <a>, other scripts bind links).
       var $button = $('<span class="dreditor-button dreditor-inlineimage">Embed</span>');
 
+      // Append inline image button to attachment.
       $link.parent().prepend($button);
 
       // Override click event.
