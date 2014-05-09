@@ -16,7 +16,7 @@ module.exports = function(grunt) {
       ' */\n',
     // Task configuration.
     clean: {
-      files: ['build', 'release']
+      files: ['build', 'release/<%= pkg.name %>-<%= pkg.version %>*']
     },
     less: {
       options: {
@@ -217,7 +217,7 @@ module.exports = function(grunt) {
     compress: {
       chrome: {
         options: {
-          archive: 'release/chrome-<%= pkg.version %>.zip',
+          archive: 'release/<%= pkg.name %>-<%= pkg.version %>.zip',
           mode: 'zip'
         },
         expand: true,
@@ -263,6 +263,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-release');
 
+  // Install tasks.
+  grunt.registerTask('install', ['mozilla-addon-sdk']);
+
   // Default tasks.
   grunt.registerTask('default', ['clean', 'less', 'css2js', 'jshint', 'concat', 'copy', 'sed']);
 
@@ -270,29 +273,9 @@ module.exports = function(grunt) {
   grunt.registerTask('test', ['qunit']);
   grunt.registerTask('travis-ci', ['default', 'test']);
 
-  // Autoload Firefox extension.
-  // @see https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/
-  grunt.registerTask('autoload:ff', "Autoload new XPI extension in Firefox", function() {
-    var done = this.async();
-    grunt.util.spawn({
-      cmd: 'wget',
-      args: [
-        '--post-file=release/' + grunt.template.process('<%= pkg.name %>-<%= pkg.version %>.xpi'),
-        'http://localhost:8888'
-      ],
-      opts: grunt.option('debug') ? {stdio: 'inherit'} : {}
-    }, function (error, result, code) {
-      if(code !== 8) {
-        return grunt.warn('Auto-loading Firefox extension failed: (' + code + ') ' + error);
-      }
-      grunt.log.ok('Auto-loaded "' + grunt.template.process('<%= pkg.name %>-<%= pkg.version %>.xpi') + '" into Firefox...');
-      done();
-    });
-  });
-
   // Build tasks.
   grunt.registerTask('build:chrome', ['compress:chrome']);
-  grunt.registerTask('build:firefox', ['mozilla-cfx-xpi', 'autoload:ff']);
+  grunt.registerTask('build:firefox', ['mozilla-cfx-xpi']);
   grunt.registerTask('build:safari', 'Builds the safari extension', function () {
     grunt.util.spawn({
       cmd:'build-safari-ext',
@@ -305,5 +288,5 @@ module.exports = function(grunt) {
       }
     });
   });
-  grunt.registerTask('build', ['default', 'compress:chrome', 'build:firefox', 'build:safari']);
+  grunt.registerTask('build', ['default', 'build:chrome', 'build:firefox', 'build:safari']);
 };
