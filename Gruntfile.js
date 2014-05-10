@@ -239,8 +239,7 @@ module.exports = function(grunt) {
         options: {
           "mozilla-addon-sdk": "master",
           extension_dir: "build/firefox",
-          dist_dir: "release",
-          arguments: "--output-file=<%= pkg.name %>-<%= pkg.version %>.xpi"
+          dist_dir: "release"
         }
       }
     },
@@ -272,20 +271,21 @@ module.exports = function(grunt) {
 
   // Autoload Firefox extension.
   // @see https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/
-  grunt.registerTask('autoload:ff', "Autoload new XPI extension in Firefox", function() {
+  grunt.registerTask('autoload:ff', "Autoload new XPI extension in Firefox", function () {
     var done = this.async();
     grunt.util.spawn({
       cmd: 'wget',
       args: [
-        '--post-file=release/' + grunt.template.process('<%= pkg.name %>-<%= pkg.version %>.xpi'),
+        '--post-file=release/' + grunt.template.process('<%= pkg.name %>.xpi'),
         'http://localhost:8888'
       ],
-      opts: grunt.option('debug') ? {stdio: 'inherit'} : {}
-    }, function (error, result, code) {
+      opts: grunt.option('debug') ? { stdio: 'inherit' } : {}
+    },
+    function (error, result, code) {
       if(code !== 8) {
         return grunt.warn('Auto-loading Firefox extension failed: (' + code + ') ' + error);
       }
-      grunt.log.ok('Auto-loaded "' + grunt.template.process('<%= pkg.name %>-<%= pkg.version %>.xpi') + '" into Firefox...');
+      grunt.log.ok('Auto-loaded "' + grunt.template.process('<%= pkg.name %>.xpi') + '" into Firefox.');
       done();
     });
   });
