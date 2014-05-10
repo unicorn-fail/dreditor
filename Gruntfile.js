@@ -64,7 +64,7 @@ module.exports = function(grunt) {
         options: {
           jshintrc: '.jshintrc'
         },
-        src: ['src/js/**/*.js']
+        src: 'src/js/**/*.js'
       }
     },
     sed: {
@@ -193,6 +193,17 @@ module.exports = function(grunt) {
     },
     watch: {
       files: [
+        // Force-exclude artifacts.
+        // Despite not being included in the list of files, the watch task can
+        // be intermittently interrupted by a build:* task with:
+        // >> File "release" added.
+        // which may even cause an infinite loop. Seemingly a bug in watch;
+        // possibly limited to Windows/NTFS/msys. Exclusions must be defined
+        // first; all arguments are processed/merged sequentially.
+        '!build',
+        '!build/**',
+        '!release',
+        '!release/**',
         '<%= jshint.package.src %>',
         '<%= jshint.gruntfile.src %>',
         '<%= jshint.js.src %>',
@@ -271,33 +282,35 @@ module.exports = function(grunt) {
   // Default tasks.
   grunt.registerTask('default', ['clean', 'less', 'css2js', 'jshint', 'concat', 'copy', 'sed']);
 
+  // Realtime development tasks.
+  // Enjoy: `grunt watch:ff`
+  // These tasks are highly tailored subsets of the default task having the goal
+  // of *instant* reloading of a newly built extension into a particular browser.
+  // The performance target is ~500ms; i.e., the time it takes a human to switch
+  // from the code editor to the browser.
+  // Note that grunt watch is not a multi-task; it supports multiple targets,
+  // but it does not support multiple tasks/sets; when running `grunt watch`,
+  // all targets are watched, and all tasks of all matching targets are executed
+  // upon a change. We do not want to tamper with the default `grunt watch` task,
+  // nor do we want to build all extensions at once (for performance reasons).
+  // The recommended informal workaround is to dynamically swap out the default
+  // config of the watch task ad-hoc.
+  // @see https://github.com/gruntjs/grunt-contrib-watch/issues/71#issuecomment-26152333
+  // Firefox.
+  grunt.registerTask('dev:ff',  ['less', 'css2js', 'jshint:js', 'concat', 'copy:firefox', 'sed']);
+  grunt.registerTask('watch:ff', function () {
+    var config = grunt.config('watch');
+    config.tasks = ['dev:ff', 'build:firefox', 'autoload:ff'];
+    // Auto-run once upon invocation.
+    config.options.atBegin = true;
+    config.options.spawn = false;
+    grunt.config('watch', config);
+    grunt.task.run('watch');
+  });
+
   // Test tasks.
   grunt.registerTask('test', ['qunit']);
   grunt.registerTask('travis-ci', ['default', 'test']);
-
-  // Autoload Firefox extension.
-  // @see https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/
-  grunt.registerTask('autoload:ff', "Autoload new XPI extension in Firefox", function () {
-    var done = this.async();
-    var xpi = 'release/firefox/' + grunt.template.process('<%= pkg.name %>.xpi');
-    grunt.util.spawn({
-      cmd: 'wget',
-      args: [
-        '--post-file=' + xpi,
-        'http://localhost:8888'
-      ],
-      opts: !grunt.option('debug') ? {} : {
-        stdio: 'inherit'
-      }
-    },
-    function (error, result, code) {
-      if (code !== 8) {
-        return grunt.warn('Auto-loading ' + xpi + ' failed: (' + code + ') ' + error);
-      }
-      grunt.log.ok('Auto-loaded ' + xpi + ' into Firefox.');
-      done();
-    });
-  });
 
   // Build tasks.
   grunt.registerTask('build:chrome', ['compress:chrome']);
@@ -320,4 +333,30 @@ module.exports = function(grunt) {
     });
   });
   grunt.registerTask('build', ['default', 'compress:chrome', 'build:firefox', 'build:safari']);
+
+  // Autoload tasks.
+  // Firefox.
+  // @see https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/
+  grunt.registerTask('autoload:ff', "Load XPI extension into Firefox", function () {
+    var done = this.async();
+    var xpi = 'release/firefox/' + grunt.template.process('<%= pkg.name %>.xpi');
+    grunt.util.spawn({
+      cmd: 'wget',
+      args: [
+        '--post-file=' + xpi,
+        'http://localhost:8888'
+      ],
+      opts: !grunt.option('debug') ? {} : {
+        stdio: 'inherit'
+      }
+    },
+    function (error, result, code) {
+      if (code !== 8) {
+        return grunt.warn('Auto-loading ' + xpi + ' failed: (' + code + ') ' + error);
+      }
+      grunt.log.ok('Auto-loaded ' + xpi + ' into Firefox.');
+      done();
+    });
+  });
+
 };
