@@ -265,6 +265,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-release');
 
+  // Install tasks.
+  grunt.registerTask('install', ['mozilla-addon-sdk']);
+
   // Default tasks.
   grunt.registerTask('default', ['clean', 'less', 'css2js', 'jshint', 'concat', 'copy', 'sed']);
 
@@ -298,7 +301,7 @@ module.exports = function(grunt) {
 
   // Build tasks.
   grunt.registerTask('build:chrome', ['compress:chrome']);
-  grunt.registerTask('build:firefox', ['mozilla-cfx-xpi', 'autoload:ff']);
+  grunt.registerTask('build:firefox', ['mozilla-cfx-xpi']);
   grunt.registerTask('build:safari', 'Builds the safari extension', function () {
     grunt.util.spawn({
       cmd: 'build-safari-ext',
