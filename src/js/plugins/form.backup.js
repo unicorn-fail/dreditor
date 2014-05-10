@@ -9,7 +9,7 @@
  */
 Drupal.behaviors.dreditorFormBackup = {
   attach: function (context) {
-    $(context).find('#comment-form:has(#edit-category)').once('dreditor-form-backup', function () {
+    $(context).find('#project-issue-node-form').once('dreditor-form-backup', function () {
       var $form = $(this);
 
       var $restore = $('<a href="javascript:void()" class="dreditor-application-toggle">Restore previously entered data</a>').click(function () {
