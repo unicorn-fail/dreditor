@@ -277,10 +277,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-release');
 
   // Install tasks.
-  grunt.registerTask('install', ['mozilla-addon-sdk']);
+  grunt.registerTask('install', 'Installs dependencies.',
+    ['mozilla-addon-sdk']);
 
   // Default tasks.
-  grunt.registerTask('default', ['clean', 'less', 'css2js', 'jshint', 'concat', 'copy', 'sed']);
+  grunt.registerTask('default', 'Compiles code.',
+    ['clean', 'less', 'css2js', 'jshint', 'concat', 'copy', 'sed']);
 
   // Realtime development tasks.
   // Enjoy: `grunt watch:ff`
@@ -297,8 +299,9 @@ module.exports = function(grunt) {
   // config of the watch task ad-hoc.
   // @see https://github.com/gruntjs/grunt-contrib-watch/issues/71#issuecomment-26152333
   // Firefox.
-  grunt.registerTask('dev:ff',  ['less', 'css2js', 'jshint:js', 'concat', 'copy:firefox', 'sed']);
-  grunt.registerTask('watch:ff', function () {
+  grunt.registerTask('dev:ff', 'Compiles code to build a Firefox extension. (see watch:ff)',
+    ['less', 'css2js', 'jshint:js', 'concat', 'copy:firefox', 'sed']);
+  grunt.registerTask('watch:ff', 'Enables real-time development for Firefox.', function () {
     var config = grunt.config('watch');
     config.tasks = ['dev:ff', 'build:firefox', 'autoload:ff'];
     // Auto-run once upon invocation.
@@ -309,13 +312,19 @@ module.exports = function(grunt) {
   });
 
   // Test tasks.
-  grunt.registerTask('test', ['qunit']);
-  grunt.registerTask('travis-ci', ['default', 'test']);
+  grunt.registerTask('test', 'Runs tests.',
+    ['qunit']);
+  grunt.registerTask('travis-ci', 'Compiles code and runs tests.',
+    ['default', 'test']);
 
   // Build tasks.
-  grunt.registerTask('build:chrome', ['compress:chrome']);
-  grunt.registerTask('build:firefox', ['mozilla-cfx-xpi']);
-  grunt.registerTask('build:safari', 'Builds the safari extension', function () {
+  grunt.registerTask('build', 'Compiles code and builds all extensions.',
+    ['default', 'build:chrome', 'build:firefox', 'build:safari']);
+  grunt.registerTask('build:chrome', 'Builds the Chrome extension.',
+    ['compress:chrome']);
+  grunt.registerTask('build:firefox', 'Builds the Firefox extension.',
+    ['mozilla-cfx-xpi']);
+  grunt.registerTask('build:safari', 'Builds the Safari extension.', function () {
     grunt.util.spawn({
       cmd: 'build-safari-ext',
       args: [
@@ -332,12 +341,11 @@ module.exports = function(grunt) {
       }
     });
   });
-  grunt.registerTask('build', ['default', 'compress:chrome', 'build:firefox', 'build:safari']);
 
   // Autoload tasks.
   // Firefox.
   // @see https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/
-  grunt.registerTask('autoload:ff', "Load XPI extension into Firefox", function () {
+  grunt.registerTask('autoload:ff', 'Loads the XPI extension into Firefox.', function () {
     var done = this.async();
     var xpi = 'release/firefox/' + grunt.template.process('<%= pkg.name %>.xpi');
     grunt.util.spawn({
