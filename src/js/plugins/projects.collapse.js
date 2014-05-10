@@ -3,7 +3,7 @@
  */
 Drupal.behaviors.dreditorProjectsCollapse = {
   attach: function (context) {
-    var $tables = $('table.projects', context);
+    var $tables = $(context).find('.view-project-issue-user-projects table');
     if (!$tables.length) {
       return;
     }
@@ -18,26 +18,20 @@ Drupal.behaviors.dreditorProjectsCollapse = {
         window.location.href = window.location.href;
         return false;
       })
-      .insertBefore('table.projects:first');
+      .insertBefore($tables.eq(0));
 
     if (!enabled) {
       return;
     }
-
-    // First table does not have a heading.
-    var $heading = $('h2#sandboxes').clone();
-    $heading.html($heading.html().replace('Sandbox p', 'P'))
-      .removeAttr('id')
-      .insertBefore('table.projects:first');
-
     $tables.once('dreditor-projectscollapse', function () {
-      var $table = $(this);
-      $heading = $table.prevAll('h2').eq(0);
-      $heading.css({ cursor: 'pointer' })
+      var $elements = $(this).children(':not(caption)');
+      $(this).css('width', '100%')
+        .find('> caption')
+        .css({ cursor: 'pointer' })
         .bind('click.projectscollapse', function () {
           // .slideToggle() forgets about table width in d.o's outdated jQuery
           // version.
-          $table.toggle();
+          $elements.toggle();
         })
         .triggerHandler('click');
     });
