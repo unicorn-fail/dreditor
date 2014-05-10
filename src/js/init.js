@@ -24,6 +24,3 @@ if (window.jQuery !== undefined && window.jQuery.fn.jquery >= '1.4.4' && window.
 jQuery(document).ready(function () {
   Drupal.attachBehaviors(this);
 });
-
-// Invoke Dreditor update check once.
-Drupal.dreditor.updateCheck();
