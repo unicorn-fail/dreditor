@@ -273,6 +273,26 @@ module.exports = function(grunt) {
   grunt.registerTask('test', ['qunit']);
   grunt.registerTask('travis-ci', ['default', 'test']);
 
+  // Autoload Firefox extension.
+  // @see https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/
+  grunt.registerTask('autoload:ff', "Autoload new XPI extension in Firefox", function() {
+    var done = this.async();
+    grunt.util.spawn({
+      cmd: 'wget',
+      args: [
+        '--post-file=release/' + grunt.template.process('<%= pkg.name %>-<%= pkg.version %>.xpi'),
+        'http://localhost:8888'
+      ],
+      opts: grunt.option('debug') ? {stdio: 'inherit'} : {}
+    }, function (error, result, code) {
+      if(code !== 8) {
+        return grunt.warn('Auto-loading Firefox extension failed: (' + code + ') ' + error);
+      }
+      grunt.log.ok('Auto-loaded "' + grunt.template.process('<%= pkg.name %>-<%= pkg.version %>.xpi') + '" into Firefox...');
+      done();
+    });
+  });
+
   // Build tasks.
   grunt.registerTask('build:chrome', ['compress:chrome']);
   grunt.registerTask('build:firefox', ['mozilla-cfx-xpi']);
