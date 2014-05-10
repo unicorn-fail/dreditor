@@ -295,10 +295,15 @@ module.exports = function(grunt) {
   grunt.registerTask('build:firefox', ['mozilla-cfx-xpi', 'autoload:ff']);
   grunt.registerTask('build:safari', 'Builds the safari extension', function () {
     grunt.util.spawn({
-      cmd:'build-safari-ext',
-      args:[grunt.template.process('<%= pkg.name %>-<%= pkg.version %>'), grunt.template.process(process.cwd() + '/build/<%= pkg.name %>.safariextension'), process.cwd() + '/release'],
-      fallback:-255
-    }, function (error, result, code) {
+      cmd: 'build-safari-ext',
+      args: [
+        grunt.template.process('<%= pkg.name %>-<%= pkg.version %>'),
+        grunt.template.process(process.cwd() + '/build/<%= pkg.name %>.safariextension'),
+        process.cwd() + '/release'
+      ],
+      fallback: -255
+    },
+    function (error, result, code) {
       if (0 !== code) {
         grunt.log.errorlns(result.stdout);
         grunt.log.errorlns(result.stderr);
