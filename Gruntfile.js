@@ -193,7 +193,13 @@ module.exports = function(grunt) {
     },
     watch: {
       files: [
-        // Force-ignore artifacts.
+        // Force-exclude artifacts.
+        // Despite not being included in the list of files, the watch task can
+        // be intermittently interrupted by a build:* task with:
+        // >> File "release" added.
+        // which may even cause an infinite loop. Seemingly a bug in watch;
+        // possibly limited to Windows/NTFS/msys. Exclusions must be defined
+        // first; all arguments are processed/merged sequentially.
         '!build',
         '!build/**',
         '!release',
