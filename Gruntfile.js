@@ -217,7 +217,7 @@ module.exports = function(grunt) {
     compress: {
       chrome: {
         options: {
-          archive: 'release/chrome-<%= pkg.version %>.zip',
+          archive: 'release/chrome/<%= pkg.name %>.zip',
           mode: 'zip'
         },
         expand: true,
@@ -239,7 +239,10 @@ module.exports = function(grunt) {
         options: {
           "mozilla-addon-sdk": "master",
           extension_dir: "build/firefox",
-          dist_dir: "release"
+          dist_dir: "release/firefox",
+          // --output-file is an experimental option, not guaranteed to exist.
+          // @see https://developer.mozilla.org/en-US/Add-ons/SDK/Tools/cfx#Experimental_Options_3
+          arguments: "--output-file=<%= pkg.name %>.xpi"
         }
       }
     },
@@ -273,19 +276,22 @@ module.exports = function(grunt) {
   // @see https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/
   grunt.registerTask('autoload:ff', "Autoload new XPI extension in Firefox", function () {
     var done = this.async();
+    var xpi = 'release/firefox/' + grunt.template.process('<%= pkg.name %>.xpi');
     grunt.util.spawn({
       cmd: 'wget',
       args: [
-        '--post-file=release/' + grunt.template.process('<%= pkg.name %>.xpi'),
+        '--post-file=' + xpi,
         'http://localhost:8888'
       ],
-      opts: grunt.option('debug') ? { stdio: 'inherit' } : {}
+      opts: !grunt.option('debug') ? {} : {
+        stdio: 'inherit'
+      }
     },
     function (error, result, code) {
-      if(code !== 8) {
-        return grunt.warn('Auto-loading Firefox extension failed: (' + code + ') ' + error);
+      if (code !== 8) {
+        return grunt.warn('Auto-loading ' + xpi + ' failed: (' + code + ') ' + error);
       }
-      grunt.log.ok('Auto-loaded "' + grunt.template.process('<%= pkg.name %>.xpi') + '" into Firefox.');
+      grunt.log.ok('Auto-loaded ' + xpi + ' into Firefox.');
       done();
     });
   });
@@ -297,9 +303,9 @@ module.exports = function(grunt) {
     grunt.util.spawn({
       cmd: 'build-safari-ext',
       args: [
-        grunt.template.process('<%= pkg.name %>-<%= pkg.version %>'),
+        grunt.template.process('<%= pkg.name %>'),
         grunt.template.process(process.cwd() + '/build/<%= pkg.name %>.safariextension'),
-        process.cwd() + '/release'
+        process.cwd() + '/release/safari'
       ],
       fallback: -255
     },
