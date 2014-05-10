@@ -6,7 +6,11 @@ Drupal.behaviors.dreditorIssueMarkAsRead = {
     $('table.project-issue', context).once('dreditor-issuemarkasread', function () {
       var throbber = '<div class="ajax-progress ajax-progress-throbber"><div class="throbber">&nbsp;</div></div>';
       $(throbber).appendTo(this).hide();
-      var $markers = $(this).find('.marker').addClass('clickable');
+
+      // 'a + .marker' accounts for a d.o bug; the HTML markup contains two
+      // span.marker elements, the second being nested inside the first.
+      var $markers = $(this).find('a + .marker').addClass('clickable');
+
       var $markAll = $('<a href="#" class="dreditor-application-toggle">Mark all as read</a>')
         .click(function (e) {
           $(this).append(throbber);
@@ -14,6 +18,10 @@ Drupal.behaviors.dreditorIssueMarkAsRead = {
           e.preventDefault();
           e.stopPropagation();
         });
+      if ($markers.length) {
+        $markAll.prependTo($(this).parent());
+      }
+
       $markers.bind('click.dreditor-markasread', function () {
         var $marker = $(this);
         $marker.append(throbber);
@@ -32,9 +40,6 @@ Drupal.behaviors.dreditorIssueMarkAsRead = {
           }
         });
       });
-      if ($markers.length) {
-        $markAll.prependTo($(this).parent());
-      }
     });
   }
 };
