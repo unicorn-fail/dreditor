@@ -1,1 +1,5 @@
-{}
+[
+  "npm install",
+  "grunt install --stack",
+  "grunt build --stack"
+]
