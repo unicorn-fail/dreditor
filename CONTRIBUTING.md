@@ -1,97 +1,244 @@
 # Contributing
 
-## Directory structure
+Dreditor runs native JavaScript (and [jQuery]) code.  Development and building
+of browser extensions is powered by [Node.js] and [Grunt].
 
-The following directories are important for developing and submitting pull requests:
+## Setup
 
-- `src/js` : dreditor code split into smaller parts like extensions and plugins
-- `src/less` : dreditor styling files.
-- `package.json` : contains version number apart from others
-- `tests/` : contains unit tests
-- `build/` : contains generated items by running `grunt`. See Developer workflow below.
+Setting up a local development environment is simple; it's all automated:
 
-The following directories are important for distributing Dreditor:
+1. Install [Node.js] - ensure to install the bundled Node Package Manager
+   ([npm]), too.
+1. Install [Grunt] by running the following shell command:
 
-- `templates/` : used for generating the browser extensions
-- `release/` : contains the generated packages Dreditor browser extensions.
+    ```sh
+    npm install -g grunt-cli
+    ```
+1. Confirm that the Grunt CLI is installed and works:
 
-Both `build/` and `release/` are added to `.gitignore` so make sure these are not added to any PR.
+    ```sh
+    grunt --version
+    ```
+1. Clone the Dreditor repository:
 
-## Developer workflow
+    ```sh
+    git clone https://github.com/dreditor/dreditor.git
+    ```
+1. Change into the new repository directory and install all dependencies:
 
-### Modifying the code
+    ```sh
+    cd dreditor
+    npm install
+    grunt install
+    ```
+1. Start a first Dreditor build by running:
 
-1. Make sure you have Grunt configured correctly as described below.
-1. Run `grunt watch` to continues rebuild your changes into the build directory or just `grunt` when ready
-1. Configure your browser to use the correct build as described below.
-1. Start coding by
-  1. Create a (new) feature branch. Please don't work in the `1.x` branch directly.
-  1. Fix the code. When debugging use `$.debug()` or 'globals' like `window.console` and `window.alert`.
-  1. Write a test for the new code
-  1. Check the watched output for failing tasks like jslint or tests.
-1. Run `grunt` to ensure code compiles properly. Assuming that you don't see any red, you're ready to go.
-1. Update the documentation to reflect any changes.
-1. Push to your fork's new branch and submit a pull request.
+    ```sh
+    grunt
+    ```
 
-### Code style
+The `Gruntfile.js` in the top-level directory controls the compilation and build
+process.
 
-Regarding code style like indentation and whitespace, **follow the conventions you see used in the source already.**
+To see a list of available grunt tasks, run:
 
-### Writing tests
+```sh
+$ grunt --help
+…
+Available tasks
+…
+           install  Installs dependencies.
+           default  Compiles code.
+            dev:ff  Compiles code to build a Firefox extension. (see watch:ff)
+          watch:ff  Enables real-time development for Firefox.
+              test  Runs tests.
+         travis-ci  Compiles code and runs tests.
+             build  Compiles code and builds all extensions.
+      build:chrome  Builds the Chrome extension.
+     build:firefox  Builds the Firefox extension.
+      build:safari  Builds the Safari extension.
+       autoload:ff  Loads the XPI extension into Firefox.
+```
 
-The `tests/` directory contains *.html files with are configured to belong to the test and qunit tasks.
+For more information about Grunt, see its
+[getting started guide](http://gruntjs.com/getting-started).
 
-More information coming soon.
 
-[grunt and qunit](http://jordankasper.com/blog/2013/04/automated-javascript-tests-using-grunt-phantomjs-and-qunit/)
 
-## Configure your browser
+## Development
+
+All set?  Let's get ready to rumble!
+
+### File Structure
+
+| Directory             | Content
+|:--------------------- |:------------------------------------------------
+| *Main source code:*   |
+| `/src/js/extensions`  | Base components, libraries, and utility functions.
+| `/src/js/plugins`     | Individual features split into one file per feature.
+| `/src/less`           | [Less](http://lesscss.org) CSS.
+| `/tests`              | [QUnit] tests.
+| `/templates`          | Templates for building browser extensions. (rarely touched)
+| —                     |
+| *Build artifacts:*    |
+| `/build`              | Code compiled by grunt; e.g., `dreditor.js`
+| `/release`            | Fully packaged browser extensions.
+
+
+### Hacking
+
+#### Just code
+
+1. Create a new topic/feature branch.  
+   _Please do not work in the `1.x` branch directly._
+
+1. Start watching file changes:
+
+    ```sh
+    $ grunt watch
+    ```
+1. Write code.  
+   _Check the console output for warnings and errors._
+
+1. ~~Write automated tests.~~  
+   _Later… see Automated testing chapter below._
+
+1. Build an extension and manually test your changes.  
+   _See Manual testing chapter below._
+
+1. Push your branch into your fork and create a pull request.
+
+For debugging use `$.debug()` or globals like `window.console` or `window.alert`.
+
+
+#### Live testing
+
+Some browsers have built-in support for automatically refreshing an extension
+via the command line.
+
+→ Check the _Manual testing_ chapter below to set up your browser.
+
+For example, for Firefox, just simply run this:
+
+```sh
+$ grunt watch:ff
+```
+
+This will immediately perform an initial build (to simplify switching between
+branches), and upon any file change, a new extension is immediately built and
+loaded into your browser.
+
+→ Simply reload a page on https://drupal.org/ and your changes are immediately
+active!
+
+_(Just reload, no need to force-refresh!)_
+
+
+### Coding standards
+
+Dreditor mostly follows Drupal's [JavaScript](https://drupal.org/node/172169)
+and [CSS](https://drupal.org/node/1886770) coding standards.  Quick summary:
+
+* Two spaces for indentation. No tabs. Use `"\t"` if you need a literal tab
+  character in a string.  
+  _Exception:_ Markdown uses 4 spaces for indentation for maximum parser
+  compatibility.
+* No trailing white-space.  
+  _Exception:_ Markdown uses 2 trailing spaces to enforce a linebreak.
+* Don't go overboard with white-space.
+* No more than [one assignment](http://benalman.com/news/2012/05/multiple-var-statements-javascript/)
+  per `var` statement.
+* Delimit strings with single-quotes `'`, not double-quotes `"`.
+* Prefer `if` and `else` over non-obvious `? : ` ternary operators and complex
+  `||` or `&&` expressions.
+* Comment your code. Place comments _before_ the line of code, _not_ at the
+  _end_ of the line.
+* **When in doubt, stay consistent.** Follow the conventions you see in the
+  existing code.
+
+
+### Automated testing
+
+When submitting a pull request, [Travis CI] will automatically…
+
+1. Perform an automated build.
+1. [JSHint] all code to check for errors.
+1. Run [Qunit] tests.
+
+_Work In Progress…_ — More information on [qunit testing] coming soon.
+
+
+
+
+## Manual testing
+
+**Note:**
+
+1. Installing a development build of Dreditor will **replace** the extension
+   installed from dreditor.org.
+1. Whenever loading a custom build into your browser, make sure that you have
+   **only one** Dreditor extension enabled at the same time.
 
 ### Chrome
 
-Make sure you only have one version of the Dreditor extension enabled at one time.
-
-1. Navigate to `chrome://extensions`.
-1. Enable Developer mode if you haven't already.
-1. Click on `Load unpacked extension...`.
-1. Browse to the `build/chrome` directory and click `Select`.
-1. Make sure you refresh the extensions page after each code change.
+1. Go to [`chrome://extensions`](chrome://extensions)
+1. Enable _Developer mode_.
+1. Click on _Load unpacked extension…_
+1. Browse to the `/build/chrome` directory and click `Select`.
+1. Manually refresh the extensions page after each code change.
 
 ### Firefox
 
-Note that installing a development version of Dreditor will replace a copy of the Add-on installed from dreditor.org.
+Requires the [Firefox Add-on SDK](https://developer.mozilla.org/en-US/Add-ons/SDK),
+which should have been installed by the initial Setup already.
 
-**Requirements**
+1. Install the [Extension Auto-Installer Add-on](https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/).
 
-1. The [Firefox Add-on SDK](https://developer.mozilla.org/en-US/Add-ons/SDK) must be installed, run `grunt mozilla-addon-sdk`.
-1. The [Extension Auto-Installer Add-on](https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/) Firefox add-on must be installed. This extension requires the `wget` command to be installed (for OSX, `brew|port install wget`).
+1. Ensure that `wget` is installed. (Test with `wget --version`)  
 
-After all requirements have been met, a Firefox extension will be built and auto-loaded by running one of the following commands:
-* `grunt build:firefox`
-* `grunt dev`
-* `grunt watch:dev`
-* `grunt build` (also builds chrome and safari)
+    ```sh
+    # OSX
+    brew|port install wget
+    # Ubuntu
+    sudo apt-get install wget
+    ```
 
-If, for whatever reason, the Firefox extension has not automatically loaded in Firefox you may manually install `release/dreditor-<version>.xpi`. From the `Tools` menu, choose `Add-ons` and drag the .xpi file in or use the gear menu and choose `Install Add-on From File…` and browse to the .xpi file and click `Select`.
+1. Run: `grunt watch:ff`
+
+Alternatively, to manually load a single build without the autoinstaller:
+
+1. From the _Tools_ menu, choose _Add-ons_.
+1. Use the gear menu and choose _Install Add-on From File…_
+1. Browse to `/release/firefox` and select the `dreditor.xpi` file.
+
 
 ### Safari
 
-You'll need a [Safari Developer Certificate](https://developer.apple.com/register/index.action) (free) in order to build/install the Safari extension. Make sure you only have one version of the Dreditor extension enabled at one time.
+Requires a (free) [Safari Developer Certificate](https://developer.apple.com/register/index.action).
 
-1. Enable the `Develop` menu. Open Preferences in the Safari menu, choose the Advanced tab, and check the box marked `Show Develop menu in menu bar`.
-1. From the `Develop` menu, choose `Show Extension Builder`. Click the Plus button in the bottom left corner of the window and choose `Add Extension…`.
-1. Browser to the `build/dreditor.safariextension` directory and click `Select`.
-1. Once the extension has been loaded and assuming you have set up a Safari Developer Certificate, you should see an `Install` button on the top right. If this is the first time using your Safari Developer Certificate you will be asked to grant access.
-1. Make sure you click the `Reload` button in the Extension Builder window after each code change.
+1. Open the _Preferences_ menu, choose the _Advanced_ tab, and enable
+   _Show Develop menu in menu bar_.
+1. From the _Develop_ menu, choose _Show Extension Builder_.
+1. Click the + button in the bottom left corner of the window and choose
+   _Add Extension…_
+1. Browse to the `/build/dreditor.safariextension` **directory** and click
+   _Select_.
+1. Assuming a valid Safari Developer Certificate, click the _Install_ button in
+   the top right.
+    * Upon first use of your Safari Developer Certificate, you will be asked to
+      grant access.
+1. Click the _Reload_ button in the Extension Builder window after each code
+   change.
 
-## Grunt
 
-Grunt helps to continuously test our code and build the browser packages.
 
-First, ensure that you have the latest [Node.js](http://nodejs.org/) and [npm](http://npmjs.org/) installed.
+[jQuery]: http://jquery.com
+[Node.js]: http://nodejs.org
+[npm]: http://npmjs.org
+[Grunt]: http://gruntjs.com
+[Less]: http://lesscss.org
+[QUnit]: http://qunitjs.com
+[Travis CI]: https://travis-ci.org/dreditor/dreditor
+[JSHint]: http://www.jshint.com
+[qunit testing]: http://jordankasper.com/blog/2013/04/automated-javascript-tests-using-grunt-phantomjs-and-qunit/
 
-Test that Grunt's CLI is installed by running `grunt --version`.  If the command isn't found, run `npm install -g grunt-cli`.  For more information about installing Grunt, see the [getting started guide](http://gruntjs.com/getting-started).
-
-1. Fork and clone the repo.
-1. Run `npm install` to install all dependencies (including Grunt).
-1. Run `grunt` to grunt this project.
