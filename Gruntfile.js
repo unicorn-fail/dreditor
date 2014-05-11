@@ -259,22 +259,46 @@ module.exports = function(grunt) {
     },
     'qunit' : {
       all: "tests/**/*.html"
+    },
+    exec: {
+      build_safari_ext: {
+        stdout: false,
+        stderr: false,
+        cmd: function () {
+          var args = [
+            'build-safari-ext',
+            this.template.process('<%= pkg.name %>'),
+            this.template.process(process.cwd() + '/build/<%= pkg.name %>.safariextension'),
+            process.cwd() + '/release/safari'
+          ];
+          return args.join(' ');
+        },
+        callback: function (error) {
+          if (error) {
+            grunt.log.warn('Unable to create ' + String(grunt.template.process('release/safari/<%= pkg.name %>.safariextension')).red);
+          }
+          else {
+            grunt.log.writeln('Created ' + String(grunt.template.process('release/safari/<%= pkg.name %>.safariextension')).cyan);
+          }
+        }
+      }
     }
   });
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-css2js');
+  grunt.loadNpmTasks('grunt-exec');
   grunt.loadNpmTasks('grunt-mozilla-addon-sdk');
-  grunt.loadNpmTasks('grunt-sed');
-  grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-release');
+  grunt.loadNpmTasks('grunt-sed');
 
   // Install tasks.
   grunt.registerTask('install', 'Installs dependencies.',
@@ -324,23 +348,8 @@ module.exports = function(grunt) {
     ['compress:chrome']);
   grunt.registerTask('build:firefox', 'Builds the Firefox extension.',
     ['mozilla-cfx-xpi']);
-  grunt.registerTask('build:safari', 'Builds the Safari extension.', function () {
-    grunt.util.spawn({
-      cmd: 'build-safari-ext',
-      args: [
-        grunt.template.process('<%= pkg.name %>'),
-        grunt.template.process(process.cwd() + '/build/<%= pkg.name %>.safariextension'),
-        process.cwd() + '/release/safari'
-      ],
-      fallback: -255
-    },
-    function (error, result, code) {
-      if (0 !== code) {
-        grunt.log.errorlns(result.stdout);
-        grunt.log.errorlns(result.stderr);
-      }
-    });
-  });
+  grunt.registerTask('build:safari', 'Builds the Safari extension.',
+    ['exec:build_safari_ext']);
 
   // Autoload tasks.
   // Firefox.
