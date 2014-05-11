@@ -3,6 +3,9 @@
  * Checks for Dreditor updates every once in a while.
  */
 Drupal.dreditor.updateCheck = function () {
+  if (window.location.hostname === 'dreditor.org') {
+    return;
+  }
   // Do not update check for any webkit based browsers, they are extensions and
   // are automatically updated.
   if (jQuery.browser.webkit) {
