@@ -181,11 +181,46 @@ _Work In Progress…_ — More information on [qunit testing] coming soon.
 
 ### Chrome
 
+For real-time development:
+
+1. Run: `grunt watch:chrome`
+
+    _**Note:** A development build monitors the extension files for modifications
+    once per second. The extension will automatically reload itself in Chrome.
+    This is an **experimental** workaround, since automatic reloads are not
+    supported by Chrome (yet). — Replace the extension with a stable release to
+    ensure that the development build does not clog your browsing experience._
+
+    _@todo: Alternative approach: (requires custom updateURL + might "spam" other
+    extensions?)_
+
+        chrome --extensions-update-frequency=1
+
+1. Proceed with the steps for manual loading below.
+
+Alternatively, to manually load a single build:
+
 1. Go to [`chrome://extensions`](chrome://extensions)
 1. Enable _Developer mode_.
 1. Click on _Load unpacked extension…_
 1. Browse to the `/build/chrome` directory and click `Select`.
 1. Manually refresh the extensions page after each code change.
+
+To build and package a complete extension:
+
+1. Ensure that `openssl` is installed.
+    * Linux: `sudo apt-get install openssl`
+    * OSX: Should already exist
+    * Windows: http://www.openssl.org/related/binaries.html
+1. Ensure that `ssh-keygen` is installed.
+    * Linux/OSX: Should already exist.
+    * Windows: Bundled with git, if you have `<git-install-dir>\bin` in your PATH
+      you should be set.
+1. Run `crx keygen` or `ssh-keygen`  
+    _@todo Currently assumes `key.pem` in main directory._
+1. Run: `grunt build:chrome`
+1. Load the packed extension in Chrome from `/release/chrome/dreditor.crx`
+
 
 ### Firefox
 

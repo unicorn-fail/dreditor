@@ -17,8 +17,11 @@
     }
   ],
   "permissions": [
-    "*://*.drupal.org/*",
-    "*://*.dreditor.org/*",
-    "*://*.devdrupal.org/*"
-  ]
+    "storage"
+  ],
+  "background": {
+    "scripts": [
+      "autoreload.js"
+    ]
+  }
 }

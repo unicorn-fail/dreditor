@@ -228,6 +228,7 @@ module.exports = function(grunt) {
         '<%= jshint.gruntfile.src %>',
         '<%= jshint.js.src %>',
         '<%= less.files.src %>',
+        'templates/**',
         '<%= qunit.all %>'
       ],
       tasks: ['default'],
@@ -255,6 +256,17 @@ module.exports = function(grunt) {
         cwd: 'build/chrome/',
         src: ['**/*'],
         dest: '/'
+      }
+    },
+    crx: {
+      dev: {
+        src: 'build/chrome/',
+        dest: 'release/chrome/',
+        filename: '<%= pkg.name %>.crx',
+        // @todo Figure this out.
+        // @see https://github.com/oncletom/grunt-crx#documentation
+        baseURL: 'https://dreditor.org/release/chrome/',
+        //privateKey: ''
       }
     },
     "mozilla-addon-sdk": {
@@ -315,6 +327,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-crx');
   grunt.loadNpmTasks('grunt-css2js');
   grunt.loadNpmTasks('grunt-exec');
   grunt.loadNpmTasks('grunt-mozilla-addon-sdk');
@@ -343,6 +356,18 @@ module.exports = function(grunt) {
   // The recommended informal workaround is to dynamically swap out the default
   // config of the watch task ad-hoc.
   // @see https://github.com/gruntjs/grunt-contrib-watch/issues/71#issuecomment-26152333
+  // Chrome.
+  grunt.registerTask('dev:chrome', 'Compiles code to build a Chrome extension. (see watch:chrome)',
+    ['less', 'css2js', 'jshint:js', 'concat', 'copy:chrome', 'sed']);
+  grunt.registerTask('watch:chrome', 'Enables real-time development for Chrome.', function () {
+    var config = grunt.config('watch');
+    config.tasks = ['dev:chrome', 'build:chrome'];
+    // Auto-run once upon invocation.
+    config.options.atBegin = true;
+    config.options.spawn = false;
+    grunt.config('watch', config);
+    grunt.task.run('watch');
+  });
   // Firefox.
   grunt.registerTask('dev:ff', 'Compiles code to build a Firefox extension. (see watch:ff)',
     ['less', 'css2js', 'jshint:js', 'concat', 'copy:firefox', 'sed']);
@@ -366,7 +391,7 @@ module.exports = function(grunt) {
   grunt.registerTask('build', 'Compiles code and builds all extensions.',
     ['default', 'uglify', 'build:chrome', 'build:firefox', 'build:safari']);
   grunt.registerTask('build:chrome', 'Builds the Chrome extension.',
-    ['compress:chrome']);
+    ['crx']);
   grunt.registerTask('build:firefox', 'Builds the Firefox extension.',
     ['mozilla-cfx-xpi']);
   grunt.registerTask('build:safari', 'Builds the Safari extension.',
