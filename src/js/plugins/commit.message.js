@@ -109,16 +109,20 @@ Drupal.behaviors.dreditorCommitMessage = {
         }
 
         // Build title.
-        var title = Drupal.dreditor.issue.getIssueTitle();
+        // Use the text input field value to allow maintainers to adjust it
+        // prior to commit.
+        var title = $('#edit-title').val();
 
         // Add "Added|Fixed " prefix based on issue category.
-        switch ($('#edit-category').val()) {
+        switch ($('#edit-field-issue-category-und').val()) {
           case 'bug':
+          case '1':
             title = title.replace(/^fix\S*\s*/i, '');
             title = 'Fixed ' + title;
             break;
 
           case 'feature':
+          case '3':
             title = title.replace(/^add\S*\s*/i, '');
             title = 'Added ' + title;
             break;
