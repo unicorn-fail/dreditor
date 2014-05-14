@@ -16,7 +16,10 @@ module.exports = function(grunt) {
       ' */\n',
     // Task configuration.
     clean: {
-      files: ['build', 'release']
+      files: [
+        'build/*',
+        'release/*'
+      ]
     },
     less: {
       options: {
@@ -40,7 +43,14 @@ module.exports = function(grunt) {
         stripBanners: true
       },
       build: {
-        src: ['src/js/**/*.js', '!src/js/_banner.header.js', '!src/js/_banner.footer.js', '!src/js/init.js', 'build/<%= pkg.name %>.css.js', 'src/js/init.js'],
+        src: [
+          'src/js/**/*.js',
+          '!src/js/_banner.header.js',
+          '!src/js/_banner.footer.js',
+          '!src/js/init.js',
+          'build/<%= pkg.name %>.css.js',
+          'src/js/init.js'
+        ],
         dest: 'build/<%= pkg.name %>.js'
       }
     },
@@ -117,7 +127,17 @@ module.exports = function(grunt) {
         recursive: true
       }
     },
-    copy:{
+    uglify: {
+      options: {
+        banner: '<%= banner %>',
+        beautify: true
+      },
+      default: {
+        src: '<%= concat.build.dest %>',
+        dest: 'build/<%= pkg.name %>.js'
+      }
+    },
+    copy: {
       chrome: {
         files: [
           {
@@ -293,6 +313,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-css2js');
   grunt.loadNpmTasks('grunt-exec');
@@ -343,7 +364,7 @@ module.exports = function(grunt) {
 
   // Build tasks.
   grunt.registerTask('build', 'Compiles code and builds all extensions.',
-    ['default', 'build:chrome', 'build:firefox', 'build:safari']);
+    ['default', 'uglify', 'build:chrome', 'build:firefox', 'build:safari']);
   grunt.registerTask('build:chrome', 'Builds the Chrome extension.',
     ['compress:chrome']);
   grunt.registerTask('build:firefox', 'Builds the Firefox extension.',
