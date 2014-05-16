@@ -535,7 +535,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       }
     }
     // Colorize comments.
-    if (syntax && line.match(/^.\s*\/\/|^.\s*\/\*[\* ]|^.\s+\*/)) {
+    if (syntax && line.match(/^.\s*\/\/|^.\s*\/\*[\* ]|^.\s+\*|^.\s*#/)) {
       classes.push('comment');
     }
 
