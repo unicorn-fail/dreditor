@@ -61,6 +61,6 @@
     "jshint-stylish": "^0.2.0"
   },
   "optionalDependencies": {
-    "grunt-contrib-qunit": ">=0.2.1",
+    "grunt-contrib-qunit": ">=0.2.1"
   }
 }
