@@ -50,7 +50,6 @@
     "grunt-contrib-copy": "^0.4.1",
     "grunt-contrib-jshint": "^0.7.2",
     "grunt-contrib-less": "^0.8.3",
-    "grunt-contrib-qunit": ">=0.2.1",
     "grunt-contrib-uglify": "^0.2.7",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-css2js": "~0.2.4",
@@ -60,5 +59,8 @@
     "grunt-release": "^0.6.1",
     "grunt-sed": "~0.1.1",
     "jshint-stylish": "^0.2.0"
+  },
+  "optionalDependencies": {
+    "grunt-contrib-qunit": ">=0.2.1",
   }
 }
