@@ -93,11 +93,7 @@ Drupal.behaviors.dreditorCommitMessage = {
           });
         }
         // Build commit message.
-        // @todo Add configuration option for prefix. For now, manually override:
-        //   Drupal.storage.save('commitmessage.prefix', '-');
-        var prefix = Drupal.storage.load('commitmessage.prefix');
-        prefix = (prefix ? prefix : 'Issue');
-
+        var prefix = 'Fix';
         var message = prefix + ' #' + Drupal.dreditor.issue.getNid() + ' ';
         message += 'by ' + submitters.join(', ');
         if (contributors.length) {
@@ -113,16 +109,17 @@ Drupal.behaviors.dreditorCommitMessage = {
         // prior to commit.
         var title = $('#edit-title').val();
 
-        // Add "Added|Fixed " prefix based on issue category.
+        // Adjust title based on issue category.
         switch ($('#edit-field-issue-category-und').val()) {
           case 'bug':
           case '1':
+            // Remove 'fix*' from title to not duplicate initial prefix.
             title = title.replace(/^fix\S*\s*/i, '');
-            title = 'Fixed ' + title;
             break;
 
           case 'feature':
           case '3':
+            // Replace 'add*' with consistent + properly capitalized prefix.
             title = title.replace(/^add\S*\s*/i, '');
             title = 'Added ' + title;
             break;
