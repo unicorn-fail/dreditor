@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+<title>Commit message tests</title>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/qunit/qunit-1.12.0.js"></script>
+<link rel="stylesheet" type="text/css" href="http://code.jquery.com/qunit/qunit-1.12.0.css">
+
+<!-- @todo Move basic setup + extensions into test helper script. -->
+<script>
+Drupal = {
+  behaviors: {}
+};
+
+QUnit.assert.startsWith = function (needle, hayStack) {
+  var actual = hayStack.indexOf(needle) === 0;
+  QUnit.push(actual, hayStack, needle, "'" + hayStack + "' starts with '" + needle + "'");
+};
+QUnit.assert.contains = function (needle, hayStack) {
+  var actual = hayStack.indexOf(needle) > -1;
+  QUnit.push(actual, hayStack, needle, "'" + hayStack + "' contains '" + needle + "'");
+};
+</script>
+
+<script type="text/javascript" src="../../../../src/js/plugins/commit.message.js"></script>
+<script>
+module("dreditorCommitMessage");
+
+test("generateCommitMessage", function (assert) {
+  var unit = Drupal.behaviors.dreditorCommitMessage.generateCommitMessage;
+  var prefix = 'Fix';
+  var id = 123;
+  var submitters = ['sun'], contributors = [];
+
+  var actual, i;
+
+  // Prefix is prepended, followed by a space.
+  actual = unit('Prefix', id, 'title', 'bug', submitters, contributors);
+  assert.startsWith('Prefix ', actual);
+
+  // Issue ID is prefixed with "#".
+  actual = unit('Fix', 123, 'title', 'bug', submitters, contributors);
+  assert.startsWith('Fix #123 ', actual);
+
+  // Submitters are prefixed with "by ".
+  actual = unit('Fix', 123, 'title', 'bug', ['name'], contributors);
+  assert.startsWith('Fix #123 by name: ', actual);
+  // Submitters are listed delimited by comma.
+  actual = unit('', 0, 'title', 'bug', ['first', 'second'], contributors);
+  assert.contains('by first, second:', actual);
+
+  // Contributors are listed delimited by comma.
+  actual = unit('Fix', 1, 'title', 'bug', [], ['name']);
+  assert.contains('by name:', actual);
+  actual = unit('Fix', 1, 'title', 'bug', [], ['first', 'second']);
+  assert.contains('by first, second:', actual);
+
+  // Contributors are separated from submitters.
+  actual = unit('Fix', 1, 'title', 'bug', ['submitter'], ['contributor']);
+  assert.contains('by submitter | contributor:', actual);
+
+  // "Fix*" is removed from title of bug reports.
+  ["Fix", "fix", "Fixes", "fixes", "Fixed", "fixed", "Fixing", "fixing"]
+    .forEach(function (test) {
+      actual = unit('Fix', 1, test + ' something', 'bug', [], []);
+      assert.contains(': something', actual);
+
+      // ...but not from non-bugs.
+      var title = test + ' something';
+      actual = unit('Fix', 1, title, 'task', [], []);
+      title = title[0].toUpperCase() + title.substring(1);
+      assert.contains(': ' + title, actual);
+    });
+
+  // "Add*" is replaced with "Added" in title of feature requests.
+  ["Add", "add", "Adds", "adds", "Added", "added", "Adding", "adding"]
+    .forEach(function (test) {
+      actual = unit('Fix', 1, test + ' something', 'feature', [], []);
+      assert.contains(': Added something', actual);
+
+      // ...but not for non-features.
+      var title = test + ' something';
+      actual = unit('Fix', 1, title, 'task', [], []);
+      title = title[0].toUpperCase() + title.substring(1);
+      assert.contains(': ' + title, actual);
+    });
+
+  // Title is capitalized for non-bug/feature categories.
+  actual = unit('Fix', 1, 'some thing', '-', [], []);
+  assert.contains(': Some thing', actual);
+
+  // Title ends in a period.
+  actual = unit('Fix', 1, 'title', '-', [], []);
+  assert.contains(': Title.', actual);
+
+});
+</script>
+</head>
+<body>
+<div id="qunit"></div> <!-- QUnit results -->
+<div id="qunit-fixture"> <!-- HTML fixtures; reset for each test -->
+
+</div>
+</body>
+</html>
+
