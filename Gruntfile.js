@@ -258,9 +258,9 @@ module.exports = function(grunt) {
       }
     },
     "mozilla-addon-sdk": {
-      'master': {
+      'release': {
         options: {
-          revision: "master",
+          revision: "1.16",
           github: true
         }
       }
@@ -268,7 +268,7 @@ module.exports = function(grunt) {
     "mozilla-cfx-xpi": {
       'release': {
         options: {
-          "mozilla-addon-sdk": "master",
+          "mozilla-addon-sdk": "release",
           extension_dir: "build/firefox",
           dist_dir: "release/firefox",
           // --output-file is an experimental option, not guaranteed to exist.
@@ -307,12 +307,11 @@ module.exports = function(grunt) {
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-compress');
+  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-css2js');
@@ -357,8 +356,10 @@ module.exports = function(grunt) {
   });
 
   // Test tasks.
-  grunt.registerTask('test', 'Runs tests.',
-    ['qunit']);
+  grunt.registerTask('test', 'Runs tests.', function () {
+    grunt.loadNpmTasks('grunt-contrib-qunit');
+    grunt.task.run('qunit');
+  });
   grunt.registerTask('travis-ci', 'Compiles code and runs tests.',
     ['default', 'test']);
 
