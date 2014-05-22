@@ -13,7 +13,7 @@ Drupal.behaviors.dreditorIssueSummaryTemplate = {
       // Create a button to insert the template.
       $('<a/>')
         .attr({
-          class: 'dreditor-button',
+          class: 'dreditor-button dreditor-button--insert-issue-summary',
           href:  '#',
           style: 'margin-left: 10px;'
         })
