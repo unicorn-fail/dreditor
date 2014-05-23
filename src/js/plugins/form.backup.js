@@ -9,29 +9,40 @@
  */
 Drupal.behaviors.dreditorFormBackup = {
   attach: function (context) {
-    $(context).find('#project-issue-node-form').once('dreditor-form-backup', function () {
+    var self = this;
+    $(context).find('form').once('dreditor-form-backup', function () {
       var $form = $(this);
+      var form_id = $form.find('[name="form_id"]').val();
 
-      var $restore = $('<a href="javascript:void()" class="dreditor-application-toggle">Restore previously entered data</a>').click(function () {
-        if (window.confirm('Reset this form to your last submitted values?')) {
-          var values = Drupal.storage.unserialize(Drupal.storage.load('form.backup'));
-          $form.find('[name]').not('[type=hidden]').each(function () {
-            if (typeof values[this.name] !== 'undefined') {
-              $(this).val(values[this.name]);
-            }
-          });
-          // Remove this (restore) button.
-          $(this).fadeOut();
-        }
-        return false;
+      // Save input when any submit button is pressed.
+      // Intentionally not listening to the form's 'submit' event, so as to back
+      // up the values *before* the browser executes the form submission.
+      $form.find('[type="submit"]').bind('click', function () {
+        Drupal.storage.save('form.backup.' + form_id, $form.serialize());
       });
 
-      $form.find('[type="submit"]')
-        .bind('click', function () {
-          Drupal.storage.save('form.backup', $form.serialize());
-        })
-        // @todo Replace with .eq(-1), available in jQuery 1.4+.
-        .filter(':last').after($restore);
+      // Determine whether there is input that can be restored.
+      var lastValues = Drupal.storage.load('form.backup.' + form_id);
+      if (!lastValues) {
+        return;
+      }
+      var $button = $('<a href="#" class="dreditor-application-toggle">Restore last input</a>');
+      $button.bind('click', function (e) {
+        e.preventDefault();
+        if (window.confirm('Reset this form to your last submitted values?')) {
+          self.restore($form, Drupal.storage.unserialize(lastValues));
+          // Remove the button.
+          $(this).fadeOut();
+        }
+      });
+      $button.appendTo($form.find('.form-actions:last'));
+    });
+  },
+  restore: function ($form, values) {
+    $form.find('[name]').not('[type=hidden]').each(function () {
+      if (typeof values[this.name] !== 'undefined') {
+        $(this).val(values[this.name]);
+      }
     });
   }
 };
