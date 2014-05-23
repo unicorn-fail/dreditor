@@ -16,6 +16,6 @@ notifications:
     skip_join: true
   email:
     recipients:
-      - mark.carver@me.com
+      - dreditor@googlegroups.com
     on_success: never
     on_failure: always
