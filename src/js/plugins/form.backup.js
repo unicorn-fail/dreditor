@@ -14,10 +14,8 @@ Drupal.behaviors.dreditorFormBackup = {
       var $form = $(this);
       var form_id = $form.find('[name="form_id"]').val();
 
-      // Save input when any submit button is pressed.
-      // Intentionally not listening to the form's 'submit' event, so as to back
-      // up the values *before* the browser executes the form submission.
-      $form.find('[type="submit"]').bind('click', function () {
+      // Back up the current input whenever the form is submitted.
+      $form.bind('submit', function () {
         Drupal.storage.save('form.backup.' + form_id, $form.serialize());
       });
 
