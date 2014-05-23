@@ -152,6 +152,11 @@ Proceed with publishing the new extension releases:
     $ git push origin master
     ```
 
+6. Deploy changes on the server.
+
+    ```sh
+    $ drush @dreditor.prod exec git pull
+    ```
 
 
 [build page]: https://dreditor.org/development/build#tags
