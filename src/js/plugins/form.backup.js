@@ -10,12 +10,13 @@
 Drupal.behaviors.dreditorFormBackup = {
   attach: function (context) {
     var self = this;
-    $(context).find('form').once('dreditor-form-backup', function () {
+    // Skip HTTP GET forms and exclude all search forms (some are using POST).
+    $(context).find('form:not([method~="GET"]):not([id*="search"])').once('dreditor-form-backup', function () {
       var $form = $(this);
       var form_id = $form.find('[name="form_id"]').val();
 
       // Back up the current input whenever the form is submitted.
-      $form.bind('submit', function () {
+      $form.bind('submit.dreditor.formBackup', function () {
         Drupal.storage.save('form.backup.' + form_id, $form.serialize());
       });
 
