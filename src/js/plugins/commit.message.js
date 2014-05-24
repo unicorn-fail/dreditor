@@ -96,7 +96,7 @@ Drupal.behaviors.dreditorCommitMessage = {
         // @todo Add configuration option for prefix. For now, manually override:
         //   Drupal.storage.save('commitmessage.prefix', '-');
         var prefix = Drupal.storage.load('commitmessage.prefix');
-        prefix = (prefix ? prefix : 'Fix');
+        prefix = (prefix ? prefix : 'Fixed');
         var message = self.generateCommitMessage(
           prefix,
           Drupal.dreditor.issue.getNid(),
