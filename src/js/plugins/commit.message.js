@@ -53,15 +53,13 @@ Drupal.behaviors.dreditorCommitMessage = {
         var submitters = $submitters.countvalues();
 
         // Build list of unique users for commit attribution, keyed by uid.
-        var users = {}, user, uid;
-        for (user in $submitters.get()) {
-          uid = $submitters[user].href.match(/\d+/)[0];
-          users[uid] = {
-            id: uid,
-            name: $submitters[user].textContent,
-            href: $submitters[user].href
+        var users = {};
+        $submitters.each(function () {
+          users[this.textContent] = {
+            name: this.textContent,
+            href: this.href
           };
-        }
+        });
 
         // Retrieve all comments in this issue.
         var $comments = $('section.comments div.comment', context);
@@ -167,7 +165,9 @@ Drupal.behaviors.dreditorCommitMessage = {
             .appendTo($container);
           var $commandInput = $('<input class="dreditor-input" type="text" autocomplete="off" />')
             .val(self.createShellCommand(message));
+
           // Add user list as commit attribution choices.
+          var user;
           for (user in users) {
             var $userLink = $('<a href="#' + users[user].href + '/git-attribution" class="choice">' + users[user].name + '</a>')
               .data('user', users[user]);
