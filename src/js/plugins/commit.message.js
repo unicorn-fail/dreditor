@@ -56,7 +56,7 @@ Drupal.behaviors.dreditorCommitMessage = {
         var users = {};
         $submitters.each(function () {
           users[this.textContent] = {
-            id: this.getAttribute('data-uid'), // unused.
+            id: this.getAttribute('data-uid'),
             name: this.textContent,
             href: this.href
           };
@@ -170,7 +170,7 @@ Drupal.behaviors.dreditorCommitMessage = {
           // Add user list as commit attribution choices.
           var user;
           for (user in users) {
-            var $userLink = $('<a href="#' + users[user].href + '/git-attribution" class="choice">' + users[user].name + '</a>')
+            var $userLink = $('<a href="#/user/' + users[user].id + '/git-attribution" class="choice">' + users[user].name + '</a>')
               .data('user', users[user]);
             $userLink.click(function () {
               var link = this;
