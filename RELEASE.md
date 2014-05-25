@@ -9,21 +9,21 @@ Given a version number `MAJOR.MINOR.PATCH`, increment the:
 * MAJOR version when the new release contains incompatible API changes.
 
   ```diff
-  -1.2.6
+  -1.2.5
   +2.0.0
   ```
 * MINOR version when the new release adds new functionality in a
   backwards-compatible manner.
 
   ```diff
-  -1.2.6
+  -1.2.5
   +1.3.0
   ```
 * PATCH version when the new release contains backwards-compatible bug fixes.
 
   ```diff
-  -1.2.6
-  +1.2.7
+  -1.2.5
+  +1.2.6
   ```
 
 Additional suffixes for pre-releases or build numbers may be appended, separated
@@ -113,13 +113,10 @@ Proceed with publishing the new extension releases:
 
 1. Change to your local clone of [dreditor.org](https://github.com/dreditor/dreditor.org/).
 
-2. Download the packaged Firefox extension from the [build page] to replace the
-   `dreditor.xpi` file in the root directory.
+2. Download the packaged extension for each browser from the [build page] and
+   replace the corresponding `dreditor.*` file in the root directory.
 
-3. Download the packaged Safari extension from the [build page] to replace the
-   `dreditor.safariextz` file in the root directory.
-
-4. Edit the `update.plist` file in the root directory to replace the version
+3. Edit the `update.plist` file in the root directory to replace the version
    with the new version.
 
     ```diff
@@ -144,18 +141,20 @@ Proceed with publishing the new extension releases:
             <key>URL</key>
     ```
 
-5. Commit and push the new releases.
+4. Commit and push the new releases.
 
     ```sh
     $ git add -u
     $ git commit -m "Dreditor 1.2.6"
-    $ git push origin master
+    $ git push origin 7.x
     ```
 
-6. Deploy changes on the server.
+5. Deploy changes on the server.
 
     ```sh
-    $ drush @dreditor.prod exec git pull
+    $ sudo su
+    $ cd /var/www/sites/dreditor.org
+    $ git pull
     ```
 
 
