@@ -15,7 +15,7 @@ Drupal.behaviors.dreditorIssueClone = {
 
           // Open a new window.
           var w = _window.open('/node/add/project-issue/' + project + '#project-issue-node-form', '_blank');
-          $(w).ready(function () {
+          $(w.document).ready(function () {
             w.setTimeout(function () {
               var $oldform = $(context).find('#project-issue-node-form');
               var $newform = $(w.document).find('#project-issue-node-form');
@@ -48,9 +48,9 @@ Drupal.behaviors.dreditorIssueClone = {
               // @todo .ready()/.setTimeout() doesn't work as expected here;
               //   a too small timeout causes the new window's DOM to not be
               //   initialized yet, in turn the new form is not found. Thus,
-              //   using a reasonably high timeout of 2 secs to account for slow
+              //   using a reasonably high timeout of 3 secs to account for slow
               //   connections for now.
-            }, 2000);
+            }, 3000);
           });
         });
     });
