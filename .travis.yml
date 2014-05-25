@@ -8,7 +8,7 @@ notifications:
     channels:
       - "irc.freenode.org#dreditor"
     template:
-      - "#%{build_number}: %{repository}/%{branch}: %{message} → %{build_url}"
+      - "#%{build_number} %{result}: %{repository}/%{branch}: %{build_url}"
     on_success: always
     on_failure: always
     use_notice: true
