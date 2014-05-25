@@ -56,7 +56,6 @@ Drupal.behaviors.dreditorCommitMessage = {
         var users = {};
         $submitters.each(function () {
           users[this.textContent] = {
-            id: this.getAttribute('data-uid'), // unused.
             name: this.textContent,
             href: this.href
           };
