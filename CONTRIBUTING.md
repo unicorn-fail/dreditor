@@ -198,14 +198,17 @@ repository under the following conditions:
 
    Major feature/topic branches SHOULD have a maintainable scope. Therefore,
    they MAY be [criss-]cross-merged selectively into other major feature/topic
-   branches, if necessary.  Sub-topics of major features/topics MAY be developed
-   in public 'child' feature/topic branches, but it is RECOMMENDED to architect
-   and design changes in a way to make them work independently to begin with.
+   branches, if necessary.
+
+   Sub-topics of major features/topics MAY be developed in public 'child'
+   feature/topic branches, but it is RECOMMENDED to architect and design changes
+   in a way to make them work independently to begin with.
 
 In any case, every public feature/topic branch in the Dreditor repository MUST
-have a corresponding pull request that holds the main discussion.  Any public
-feature/topic branch without a corresponding pull request MAY be deleted without
-further notice.
+have a corresponding pull request (or issue) that holds the main discussion.
+A public feature/topic branch without a corresponding pull request (or issue)
+MAY be deleted without further notice.  A public feature/topic branch SHOULD be
+deleted after merging it into the mainline.
 
 
 ## Manual testing
