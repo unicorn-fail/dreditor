@@ -1,5 +1,5 @@
 [
   "npm install --color=always --no-optional",
-  "grunt install",
-  "grunt build"
+  "grunt install --no-optional",
+  "grunt build --no-optional"
 ]
