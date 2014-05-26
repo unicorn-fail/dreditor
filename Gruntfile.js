@@ -2,6 +2,19 @@
 /*global require:false*/
 /*global process:false*/
 module.exports = function(grunt) {
+  // Require normal dependencies.
+  var dependencies = ['dependencies', 'devDependencies'];
+
+  // Add in optionalDependencies if no --no-optional flag is present.
+  var optionalDependencies = !grunt.option('no-optional');
+  if (optionalDependencies) {
+    dependencies.push('optionalDependencies');
+  }
+
+  // Load all grunt tasks matching the `grunt-*` pattern.
+  require('load-grunt-tasks')(grunt, { scope: dependencies });
+
+  // Initialize grunt configuration.
   grunt.initConfig({
     // Metadata.
     pkg: grunt.file.readJSON('package.json'),
@@ -56,7 +69,7 @@ module.exports = function(grunt) {
     },
     jshint: {
       options: {
-        reporter: require('jshint-stylish')
+        reporter: optionalDependencies ? require('jshint-stylish') : undefined
       },
       package: {
         options: {
@@ -305,21 +318,6 @@ module.exports = function(grunt) {
     }
   });
 
-  // These plugins provide necessary tasks.
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-compress');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-css2js');
-  grunt.loadNpmTasks('grunt-exec');
-  grunt.loadNpmTasks('grunt-mozilla-addon-sdk');
-  grunt.loadNpmTasks('grunt-release');
-  grunt.loadNpmTasks('grunt-sed');
-
   // Install tasks.
   grunt.registerTask('install', 'Installs dependencies.',
     ['mozilla-addon-sdk']);
@@ -356,10 +354,8 @@ module.exports = function(grunt) {
   });
 
   // Test tasks.
-  grunt.registerTask('test', 'Runs tests.', function () {
-    grunt.loadNpmTasks('grunt-contrib-qunit');
-    grunt.task.run('qunit');
-  });
+  grunt.registerTask('test', 'Runs tests.',
+    ['qunit']);
   grunt.registerTask('travis-ci', 'Compiles code and runs tests.',
     ['default', 'test']);
 
