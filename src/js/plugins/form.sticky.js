@@ -9,32 +9,35 @@
  */
 Drupal.behaviors.dreditorFormSticky = {
   attach: function (context) {
-    function addButton($wrapper) {
-      if ($wrapper.attr('id')) {
-        return;
-      }
-      var $toggle = $('<a href="javascript:void(0);" class="dreditor-application-toggle">Make sticky</a>');
-      $toggle.click(function () {
-        if ($wrapper.attr('id') === 'dreditor-widget') {
-          $wrapper.removeAttr('id');
-          $toggle.removeClass('sticky-cancel active').text('Make sticky');
-        }
-        else if (!$wrapper.attr('id') && !$('#dreditor-widget').length) {
-          $wrapper.attr('id', 'dreditor-widget');
-          $toggle.addClass('sticky-cancel active').text('Unstick');
-        }
-      });
-      $wrapper.prepend($toggle);
-    }
-    // Comment form textarea.
-    $(context).find('[class*="comment-body"]').once('dreditor-form-sticky', function () {
-      addButton($(this).find('.form-textarea-wrapper'));
+    var self = this;
+    // Comment body textarea form item.
+    $(context).find('form .form-item-nodechanges-comment-body-value').once('dreditor-form-sticky', function () {
+      self.addButton($(this).find('.form-textarea-wrapper'));
     });
-    // Issue summary.
+    // Issue summary body form item.
     // Use the entire form item for the issue summary, so as to include the
     // issue summary template button.
-    $(context).find('#project-issue-node-form #edit-body [class*="form-item-body"]:first').once('dreditor-form-sticky', function () {
-      addButton($(this));
+    $(context).find('#project-issue-node-form .form-item-body-und-0-value').once('dreditor-form-sticky', function () {
+      self.addButton($(this));
     });
+  },
+
+  addButton: function ($wrapper) {
+    if ($wrapper.attr('id')) {
+      return;
+    }
+    var $toggle = $('<a href="#" class="dreditor-application-toggle">Make sticky</a>');
+    $toggle.bind('click', function (e) {
+      e.preventDefault();
+      if ($wrapper.attr('id') === 'dreditor-widget') {
+        $wrapper.removeAttr('id');
+        $toggle.removeClass('sticky-cancel active').text('Make sticky');
+      }
+      else if (!$wrapper.attr('id') && !$('#dreditor-widget').length) {
+        $wrapper.attr('id', 'dreditor-widget');
+        $toggle.addClass('sticky-cancel active').text('Unstick');
+      }
+    });
+    $wrapper.prepend($toggle);
   }
 };
