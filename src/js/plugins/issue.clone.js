@@ -23,8 +23,9 @@ Drupal.behaviors.dreditorIssueClone = {
             // Retrieve the DOM of the newly created window.
             var $document = $(w.document);
             $document.ready(function () {
-              var $oldform = $context.find('#project-issue-node-form');
-              var $newform = $document.contents().find('#project-issue-node-form');
+              var parentNid = Drupal.dreditor.issue.getNid();
+              var $parentForm = $context.find('#project-issue-node-form');
+              var $newForm = $document.contents().find('#project-issue-node-form');
               var selector, selectors = [
                 '#edit-title',
                 '#edit-body-und-0-value',
@@ -37,19 +38,23 @@ Drupal.behaviors.dreditorIssueClone = {
                 '#edit-taxonomy-vocabulary-9-und'
               ];
               for (selector in selectors) {
-                $newform.find(selectors[selector]).val($oldform.find(selectors[selector]).val());
+                $newForm.find(selectors[selector]).val($parentForm.find(selectors[selector]).val());
               }
-              var parentNid = Drupal.dreditor.issue.getNid();
-              if (parentNid) {
-                $newform.find('#edit-field-issue-parent-und-0-target-id')
-                  .val($oldform.find('#edit-title').val() + ' (' + parentNid + ')');
-              }
+
+              // Prepend body with "Follow-up to ..." line.
+              var $body = $newForm.find('#edit-body-und-0-value');
+              $body.val('Follow-up to [#' + parentNid + ']\n\n' + $body.val());
+
+              // Add originating issue was parent issue relationship.
+              $newForm.find('#edit-field-issue-parent-und-0-target-id')
+                .val($parentForm.find('#edit-title').val() + ' (' + parentNid + ')');
+
 
               // Ensure all fieldsets are expanded.
-              $newform.find('.collapsed').removeClass('collapsed');
+              $newForm.find('.collapsed').removeClass('collapsed');
 
               // Focus on the new issue title so users can enter it.
-              $newform.find('#edit-title').focus();
+              $newForm.find('#edit-title').focus();
             });
           }, false);
         });
