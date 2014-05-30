@@ -15,43 +15,48 @@ Drupal.behaviors.dreditorIssueClone = {
 
           // Open a new window.
           var w = _window.open('/node/add/project-issue/' + project + '#project-issue-node-form', '_blank');
-          $(w.document).ready(function () {
-            w.setTimeout(function () {
-              var $oldform = $(context).find('#project-issue-node-form');
-              var $newform = $(w.document).find('#project-issue-node-form');
-              var sel, selectors = [
+          // @todo Revisit this once Dreditor no longer depends on d.o's jQuery.
+          // $(w).bind('load') does not actually bind to the new window "load"
+          // event. This may be on purpose or a bug with the currently used
+          // jQuery version on d.o (1.4.4).
+          w.addEventListener('load', function () {
+            // Retrieve the DOM of the newly created window.
+            var $document = $(w.document);
+            $document.ready(function () {
+              var parentNid = Drupal.dreditor.issue.getNid();
+              var $parentForm = $context.find('#project-issue-node-form');
+              var $newForm = $document.contents().find('#project-issue-node-form');
+              var selector, selectors = [
                 '#edit-title',
+                '#edit-body-und-0-value',
                 '#edit-field-issue-category-und',
                 '#edit-field-issue-priority-und',
                 '#edit-field-issue-status-und',
                 '#edit-field-issue-version-und',
                 '#edit-field-issue-component-und',
                 '#edit-field-issue-assigned-und',
-                '#edit-taxonomy-vocabulary-9-und',
+                '#edit-taxonomy-vocabulary-9-und'
               ];
-              for (sel in selectors) {
-                $newform.find(selectors[sel]).val($oldform.find(selectors[sel]).val());
+              for (selector in selectors) {
+                $newForm.find(selectors[selector]).val($parentForm.find(selectors[selector]).val());
               }
-              sel = '#edit-body-und-0-value';
-              var oldid = Drupal.dreditor.issue.getNid();
-              $newform.find(sel)
-                .val('Follow-up to [#' + oldid + ']\n\n' + $oldform.find(sel).val());
 
-              sel = '#edit-field-issue-parent-und-0-target-id';
-              $newform.find(sel)
-                .val($oldform.find('#edit-title').val() + ' (' + oldid + ')');
+              // Prepend body with "Follow-up to ..." line.
+              var $body = $newForm.find('#edit-body-und-0-value');
+              $body.val('Follow-up to [#' + parentNid + ']\n\n' + $body.val());
+
+              // Add originating issue was parent issue relationship.
+              $newForm.find('#edit-field-issue-parent-und-0-target-id')
+                .val($parentForm.find('#edit-title').val() + ' (' + parentNid + ')');
+
 
               // Ensure all fieldsets are expanded.
-              $newform.find('.collapsed').removeClass('collapsed');
-              $newform.find('#edit-title').focus();
+              $newForm.find('.collapsed').removeClass('collapsed');
 
-              // @todo .ready()/.setTimeout() doesn't work as expected here;
-              //   a too small timeout causes the new window's DOM to not be
-              //   initialized yet, in turn the new form is not found. Thus,
-              //   using a reasonably high timeout of 3 secs to account for slow
-              //   connections for now.
-            }, 3000);
-          });
+              // Focus on the new issue title so users can enter it.
+              $newForm.find('#edit-title').focus();
+            });
+          }, false);
         });
     });
   }
