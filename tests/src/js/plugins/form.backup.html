@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+<title>Form backup tests</title>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/qunit/qunit-1.12.0.js"></script>
+<link rel="stylesheet" type="text/css" href="http://code.jquery.com/qunit/qunit-1.12.0.css">
+
+<!-- @todo Move basic setup + extensions into test helper script. -->
+<script>
+var Drupal = Drupal || { 'settings': {}, 'behaviors': {}, 'locale': {} };
+
+Drupal.attachBehaviors = function (context, settings) {
+  context = context || document;
+  settings = settings || Drupal.settings;
+  // Execute all of them.
+  $.each(Drupal.behaviors, function () {
+    if ($.isFunction(this.attach)) {
+      this.attach(context, settings);
+    }
+  });
+};
+</script>
+<script type="text/javascript" src="https://drupal.org/misc/jquery.once.js"></script>
+<script>
+var $ = jQuery;
+</script>
+<script type="text/javascript" src="../../../../src/js/extensions/storage.js"></script>
+<script type="text/javascript" src="../../../../src/js/plugins/form.backup.js"></script>
+
+<script>
+module('dreditorFormBackup', {
+  setup: function () {
+    this.attach();
+  },
+  attach: function () {
+    Drupal.attachBehaviors($('#qunit-fixture')[0]);
+  }
+});
+
+test('backup', function (assert) {
+  var $form = $('#post');
+  var values = {
+    text: 'text value',
+    password: 'password value',
+    textarea: 'textarea value',
+    select: 'option'
+  };
+  $form
+    .find('[name="text"]').val(values.text).end()
+    .find('[name="password"]').val(values.password).end()
+    .find('[name="textarea"]').val(values.textarea).end()
+    .find('[name="select"]').val(values.select).end();
+
+  // Verify that all values were populated.
+  assert.equal($form.serialize(), 'form_id=post_form&text=text+value&password=password+value&textarea=textarea+value&select=option');
+
+  // Trigger the backup.
+  $form.triggerHandler('submit');
+
+  // @todo QUnit.reset() is deprecated, not sure how to resemble it.
+  // @see http://api.qunitjs.com/QUnit.reset/
+  QUnit.reset();
+  this.attach();
+
+  // Verify that the fixture has been reset.
+  $form = $('#post');
+  assert.equal($form.find('[name="text"]').val(), '');
+  assert.equal($form.find('[name="password"]').val(), '');
+  assert.equal($form.find('[name="textarea"]').val(), '');
+  assert.equal($form.find('[name="select"]').val(), 'default');
+
+  // Overload window.confirm() with always-yes.
+  // @todo Add a proper stub/mock library to verify the confirmation itself.
+  window.confirm = function (question) {
+    return true;
+  };
+
+  // Trigger the restore.
+  $form.find('a:contains("Restore last input")').triggerHandler('click');
+
+  // Verify that expected values have been restored.
+  assert.equal($form.find('[name="text"]').val(), values.text);
+  assert.equal($form.find('[name="password"]').val(), '');
+  assert.equal($form.find('[name="textarea"]').val(), values.textarea);
+  assert.equal($form.find('[name="select"]').val(), values.select);
+});
+</script>
+</head>
+<body>
+<div id="qunit"></div> <!-- QUnit results -->
+<div id="qunit-fixture"> <!-- HTML fixtures; reset for each test -->
+
+<form id="post" method="POST">
+<input type="hidden" name="form_id" value="post_form">
+<input type="text" name="text">
+<input type="password" name="password">
+<textarea name="textarea">
+</textarea>
+<select name="select">
+<option value="default" default>Default value</option>
+<option value="option">Option</option>
+</select>
+<div class="form-actions"></div>
+</form>
+
+</div>
+</body>
+</html>
+
