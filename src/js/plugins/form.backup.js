@@ -17,7 +17,7 @@ Drupal.behaviors.dreditorFormBackup = {
 
       // Back up the current input whenever the form is submitted.
       $form.bind('submit.dreditor.formBackup', function () {
-        Drupal.storage.save('form.backup.' + form_id, $form.serialize());
+        Drupal.storage.save('form.backup.' + form_id, $form.find('input:not([type="password"]), textarea, select').serialize());
       });
 
       // Determine whether there is input that can be restored.

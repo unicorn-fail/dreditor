@@ -47,14 +47,17 @@ test('backup', function (assert) {
   var values = {
     text: 'text value',
     password: 'password value',
-    textarea: 'textarea value'
+    textarea: 'textarea value',
+    select: 'option'
   };
   $form
     .find('[name="text"]').val(values.text).end()
     .find('[name="password"]').val(values.password).end()
-    .find('[name="textarea"]').val(values.textarea).end();
+    .find('[name="textarea"]').val(values.textarea).end()
+    .find('[name="select"]').val(values.select).end();
+
   // Verify that all values were populated.
-  assert.equal($form.serialize(), 'form_id=post_form&text=text+value&password=password+value&textarea=textarea+value');
+  assert.equal($form.serialize(), 'form_id=post_form&text=text+value&password=password+value&textarea=textarea+value&select=option');
 
   // Trigger the backup.
   $form.triggerHandler('submit');
@@ -69,6 +72,7 @@ test('backup', function (assert) {
   assert.equal($form.find('[name="text"]').val(), '');
   assert.equal($form.find('[name="password"]').val(), '');
   assert.equal($form.find('[name="textarea"]').val(), '');
+  assert.equal($form.find('[name="select"]').val(), 'default');
 
   // Overload window.confirm() with always-yes.
   // @todo Add a proper stub/mock library to verify the confirmation itself.
@@ -83,6 +87,7 @@ test('backup', function (assert) {
   assert.equal($form.find('[name="text"]').val(), values.text);
   assert.equal($form.find('[name="password"]').val(), '');
   assert.equal($form.find('[name="textarea"]').val(), values.textarea);
+  assert.equal($form.find('[name="select"]').val(), values.select);
 });
 </script>
 </head>
@@ -96,6 +101,10 @@ test('backup', function (assert) {
 <input type="password" name="password">
 <textarea name="textarea">
 </textarea>
+<select name="select">
+<option value="default" default>Default value</option>
+<option value="option">Option</option>
+</select>
 <div class="form-actions"></div>
 </form>
 
