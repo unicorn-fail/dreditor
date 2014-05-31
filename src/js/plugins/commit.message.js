@@ -5,11 +5,12 @@ Drupal.behaviors.dreditorCommitMessage = {
   attach: function (context) {
     // Attach this behavior only to project_issue nodes. Use a fast selector for
     // the common case, but also support comment/reply/% pages.
-    if (!($('body.node-type-project-issue', context).length || $('div.project-issue', context).length)) {
+    var $context = $(context);
+    if (!($context.find('body.node-type-project-issue').length || $context.find('div.project-issue').length)) {
       return;
     }
     var self = this;
-    $('#project-issue-ajax-form [class*="comment-body"]:first .form-textarea-wrapper', context).once('dreditor-commitmessage', function () {
+    $context.find('#project-issue-ajax-form .form-item-nodechanges-comment-body-value .form-textarea-wrapper').once('dreditor-commitmessage', function () {
       // Prepend commit message button to comment form.
       // @todo Generalize this setup. Somehow.
       var $container = $('<div class="dreditor-actions"></div>');
@@ -47,7 +48,7 @@ Drupal.behaviors.dreditorCommitMessage = {
         });
 
         // Build list of top patch submitters.
-        var $submitters = $('.field-name-field-issue-files table tr:has(a.dreditor-patchreview) a.username', context);
+        var $submitters = $context.find('.field-name-field-issue-files table tr:has(a.dreditor-patchreview) a.username');
 
         // Count and sort by occurrences.
         var submitters = $submitters.countvalues();
@@ -63,7 +64,7 @@ Drupal.behaviors.dreditorCommitMessage = {
         });
 
         // Retrieve all comments in this issue.
-        var $comments = $('section.comments div.comment', context);
+        var $comments = $context.find('section.comments div.comment');
 
         // Build list of top commenters.
         var commenters = $comments.find('div.author a')
@@ -141,7 +142,7 @@ Drupal.behaviors.dreditorCommitMessage = {
         message += ': ' + title;
 
         // Inject a text field.
-        var $input = $('#dreditor-commitmessage-input', context);
+        var $input = $context.find('#dreditor-commitmessage-input');
         if (!$input.length) {
           // Setup first input widget for plain commit message.
           // @todo Revise animation for box-sizing:border-box.
