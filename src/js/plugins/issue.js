@@ -12,14 +12,11 @@ Drupal.dreditor.issue.getNid = function() {
 
 /**
  * Returns the next comment number for the current issue.
- *
- * @todo Use reliable JSON data instead of scraping the DOM (which can change).
- * @see https://drupal.org/node/1710850
  */
 Drupal.dreditor.issue.getNewCommentNumber = function() {
   // Get comment count.
   var lastCommentNumber = $('.comments .comment:last .permalink').text().match(/\d+$/);
-  return lastCommentNumber ? parseInt(lastCommentNumber[0], 10) : undefined;
+  return (lastCommentNumber ? parseInt(lastCommentNumber[0], 10) : 0) + 1;
 };
 
 /**

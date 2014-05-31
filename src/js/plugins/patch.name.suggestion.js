@@ -33,12 +33,7 @@ Drupal.behaviors.dreditorPatchNameSuggestion = {
         if (nid !== 0) {
           patchName += (patchName.length ? '-' : '') + nid;
         }
-
-        var newCommentNumber = Drupal.dreditor.issue.getNewCommentNumber();
-        if (typeof newCommentNumber !== 'undefined') {
-          patchName += '-' + newCommentNumber;
-        }
-
+        patchName += '-' + Drupal.dreditor.issue.getNewCommentNumber();
         patchName += '.patch';
 
         window.prompt("Please use this value", patchName);
