@@ -9,7 +9,7 @@ Drupal.behaviors.dreditorCommitMessage = {
       return;
     }
     var self = this;
-    $('#project-issue-ajax-form [class*="comment-body"]:first .form-textarea-wrapper', context).once('dreditor-commitmessage', function () {
+    $('#project-issue-ajax-form .form-item-nodechanges-comment-body-value .form-textarea-wrapper', context).once('dreditor-commitmessage', function () {
       // Prepend commit message button to comment form.
       // @todo Generalize this setup. Somehow.
       var $container = $('<div class="dreditor-actions"></div>');
