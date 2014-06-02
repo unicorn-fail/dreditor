@@ -2,9 +2,11 @@
 [![Built with NodeJS](http://pixel-cookers.github.io/built-with-badges/node/node-short.png)](http://nodejs.org/)
 [![Built with Grunt](http://pixel-cookers.github.io/built-with-badges/grunt/grunt-short.png)](http://gruntjs.com/)
 [![Build Status](https://travis-ci.org/dreditor/dreditor.svg?branch=1.x)](https://travis-ci.org/dreditor/dreditor)
+[![Code Climate](http://img.shields.io/codeclimate/github/dreditor/dreditor.svg)](https://codeclimate.com/github/dreditor/dreditor)
+
 [![Dependency Status](https://david-dm.org/dreditor/dreditor.svg)](https://david-dm.org/dreditor/dreditor)
 [![devDependency Status](https://david-dm.org/dreditor/dreditor/dev-status.svg)](https://david-dm.org/dreditor/dreditor#info=devDependencies)
-[![Code Climate](http://img.shields.io/codeclimate/github/dreditor/dreditor.svg)](https://codeclimate.com/github/dreditor/dreditor)
+[![optionalDependency Status](https://david-dm.org/dreditor/dreditor/optional-status.svg)](https://david-dm.org/dreditor/dreditor#info=optionalDependencies)
 
 A web browser extension for Drupal.org that enhances user experience and
 functionality.
