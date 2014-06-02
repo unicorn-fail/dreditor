@@ -9,6 +9,6 @@
 Drupal.behaviors.dreditorCommentNumber = {
   attach: function (context) {
     $(context).find('#block-project-issue-issue-edit h2')
-      .append(' #' + Drupal.dreditor.issue.getNewCommentNumber());
+      .append(' <strong>#' + Drupal.dreditor.issue.getNewCommentNumber() + '</strong>');
   }
 };
