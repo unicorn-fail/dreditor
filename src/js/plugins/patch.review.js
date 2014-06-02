@@ -483,6 +483,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     else if (line.match(/^((?!\-\-\-$|\-\-$)\-.*)$/)) {
       classes.push('old');
       diffstat.deletions++;
+      syntax = true;
       if (ln1) {
         ln2o = false;
         ln1++;
@@ -521,10 +522,6 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       line = '<span class="error eof">' + line + '</span>';
     }
     else {
-      // @todo Also colorizing unchanged lines makes added comments almost
-      // invisible. Although we could use .new.comment as CSS selector, the
-      // question of a sane color scheme remains.
-      // syntax = true;
       if (ln1 && ln1o) {
         ln1++;
       }
