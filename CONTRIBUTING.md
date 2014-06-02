@@ -169,6 +169,47 @@ _Work In Progress…_ — More information on [qunit testing] coming soon.
 
 
 
+### Feature Branches and Pull Requests
+
+Normally, branches and PRs are created from user-specific forks/repositories.
+
+However, the maintainers MAY create public feature branches in the Dreditor
+repository under the following conditions:
+
+1. The code is known to be incomplete and needs more work.
+
+   In this case, a public feature/topic branch in the Dreditor repository
+   _explicitly encourages_ co-maintainers to liberally improve the code through
+   additional commits.  However:
+
+   Commits MUST NOT be amended and the branch MUST NOT be rebased.  Contributors
+   MAY create PRs against the branch.
+
+1. The branch represents a major refactoring/rewrite feature/topic on Dreditor's
+   roadmap.
+
+   In this case, the public feature/topic branch exists in order to be developed
+   in parallel to the current stable/mainline.  If/when merged into the mainline,
+   the merge of the feature/topic branch will denote a new major or minor
+   version (e.g., v1 → v2).
+
+   Maintainers and contributors SHOULD create PRs against such major refactoring
+   branches, since each change proposal SHOULD be reviewed independently.
+
+   Major feature/topic branches SHOULD have a maintainable scope. Therefore,
+   they MAY be [criss-]cross-merged selectively into other major feature/topic
+   branches, if necessary.
+
+   Sub-topics of major features/topics MAY be developed in public 'child'
+   feature/topic branches, but it is RECOMMENDED to architect and design changes
+   in a way to make them work independently to begin with.
+
+In any case, every public feature/topic branch in the Dreditor repository MUST
+have a corresponding pull request (or issue) that holds the main discussion.
+A public feature/topic branch without a corresponding pull request (or issue)
+MAY be deleted without further notice.  A public feature/topic branch SHOULD be
+deleted after merging it into the mainline.
+
 
 ## Manual testing
 
