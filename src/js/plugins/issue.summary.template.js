@@ -41,7 +41,7 @@ Drupal.behaviors.dreditorIssueSummaryTemplate = {
       // On node view, simply replace @username with the existing link to the
       // original author.
       else if (!location.href.match(/^.*node\/[^\/]*\/edit/)) {
-        var $profileLink = $('div.node > div.submitted a').clone();
+        var $profileLink = $('.node .submitted a.username').clone();
         if ($profileLink.length) {
           $profileLink.text('@' + $profileLink.text());
         }

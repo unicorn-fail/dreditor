@@ -67,11 +67,12 @@ Drupal.behaviors.dreditorCommitMessage = {
         var $comments = $context.find('section.comments div.comment');
 
         // Build list of top commenters.
+        // @todo Rethink algorithm for crediting top commenters.
         var commenters = $comments.find('div.author a')
           // Skip test bot.
           .not(':contains("System Message")')
           // Add original poster.
-          .add('div.node div.submitted a')
+          .add('.node .submitted a.username')
           // Count and sort by occurrences.
           .countvalues();
         // Compile a list of top commenters (max. 10% of # of all follow-ups).
