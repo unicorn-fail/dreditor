@@ -2,7 +2,7 @@
   "name": "dreditor",
   "title": "Dreditor",
   "description": "An extension for Drupal.org that enhances user experience and functionality. Original author: Daniel F. Kudwien (sun).",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "homepage": "https://dreditor.org",
   "author": {
     "name": "Mark Carver",
