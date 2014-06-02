@@ -448,7 +448,6 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   for (var n in code) {
     var ln1o = true;
     var ln2o = true;
-    var prettify_line = true;
     var line = code[n];
 
     // Build file menu links.
@@ -479,7 +478,6 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       classes.push('file');
       ln1o = false;
       ln2o = false;
-      prettify_line = false;
     }
     // Colorize old code, but skip file diff lines.
     else if (line.match(/^((?!\-\-\-$|\-\-$)\-.*)$/)) {
