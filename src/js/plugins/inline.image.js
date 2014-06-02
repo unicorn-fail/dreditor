@@ -6,7 +6,8 @@ Drupal.behaviors.dreditorInlineImage = {
     var $context = $(context);
     var $comment = $(':input[name="nodechanges_comment_body[value]"]');
 
-    $context.find('.file').once('dreditor-inlineimage').find('> a').each(function () {
+    // @todo .file clashes with patchReviewer tr.file + a.file markup.
+    $context.find('span.file').once('dreditor-inlineimage').find('> a').each(function () {
       var $link = $(this);
 
       // Remove protocol + drupal.org
