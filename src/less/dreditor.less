@@ -196,6 +196,10 @@
   background-color: #fffbfb;
   color: #c00;
 }
+#dreditor #code tr.old.comment {
+  //background-color: #fbf3f3;
+  color: #c33;
+}
 #dreditor #code tr.old a {
   color: #c00;
 }
@@ -205,13 +209,15 @@
 }
 #dreditor #code tr.new {
   background-color: #fbfffb;
-  color: #008503;
+  //color: #070;
+  color: #00a;
   float: none;
   font-size: 100%;
   font-weight: normal;
 }
-#dreditor #code tr.new .pre {
-  color: #00a;
+#dreditor #code tr.new.comment {
+  //background-color: #f3fbf3;
+  color: #070;
 }
 #dreditor #code tr.new a {
   color: #0a0;
@@ -219,9 +225,6 @@
 #dreditor #code tr.new .ln {
   background-color: #ceffce;
   border-color: #b4e2b4;
-}
-#dreditor #code tr.new.comment .pre {
-  color: #070;
 }
 tr.selected td {
   background: transparent;
