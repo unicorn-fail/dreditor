@@ -31,29 +31,32 @@ by a dash/hyphen.
 
 ## Release Process
 
-Examples assume that current version is `1.2.5` and new version is `1.2.6`.
+Examples assume that:
+* Current version is `1.2.5` and new version is `1.2.6`.
+* `origin` refers to [dreditor/dreditor]
 
-1. Ensure that you have the latest + clean code.
+1. Ensure that you have the latest code and HEAD is clean:
 
     ```sh
     $ git checkout 1.x
     $ git reset --hard
-    $ git pull origin
+    $ git pull origin 1.x
     ```
 
-2. Confirm that Dreditor works correctly.
+1. Confirm that Dreditor works correctly:
 
     ```sh
-    $ grunt build test
+    $ grunt build
+    $ grunt test
     ```
 
-3. Change the version number.
+1. Increase the version number:
 
     ```sh
     $ grunt release
     ```
 
-   This bumps the PATCH version in `package.json`. Alternatively:
+    This bumps the PATCH version in `package.json`. Alternatively:
 
     * To bump the MINOR version: `grunt release:minor`
     * To bump the MAJOR version: `grunt release:major`
@@ -69,33 +72,40 @@ Examples assume that current version is `1.2.5` and new version is `1.2.6`.
     +  "version": "1.2.6",
     ```
 
-4. Commit the version change.
+1. Commit the version change:
 
     ```sh
     $ git add package.json
     $ git commit -m "Dreditor 1.2.6"
     ```
 
-5. Create an annotated tag for the release.
+1. Create an annotated tag for the release:
 
     ```sh
     $ git tag -m 1.2.6 1.2.6
     ```
 
-6. Push the new version and tag:
+1. Push the new version commit and tag:
 
     ```sh
-    $ git push origin --tags
+    $ git push origin 1.x --tags
     ```
 
-7. Verify that the new release and all builds appear on the [build page].
+1. Verify that the new release and all builds appear on the [build page].
 
-8. Test whether the new release installs and works correctly in each browser.
+1. Test whether the new release installs and works correctly in each browser.
 
 All performed operations up till here can be reverted in case something went
 wrong.
 
-Proceed with publishing the new extension releases:
+## Publishing releases
+
+Proceed with publishing the newly built extensions.
+
+Examples assume that:
+* Current version is `1.2.5` and new version is `1.2.6`.
+* `origin` refers to [dreditor/dreditor.org]
+
 
 ### Chrome
 
@@ -111,12 +121,20 @@ Proceed with publishing the new extension releases:
 
 ### Firefox and Safari
 
-1. Change to your local clone of [dreditor.org](https://github.com/dreditor/dreditor.org/).
+1. Change to your local clone of [dreditor/dreditor.org].
 
-2. Download the packaged extension for each browser from the [build page] and
+1. Ensure that you have the latest code and HEAD is clean:
+
+    ```sh
+    $ git checkout 7.x
+    $ git reset --hard
+    $ git pull origin 7.x
+    ```
+
+1. Download the packaged extension for each browser from the [build page] and
    replace the corresponding `dreditor.*` file in the root directory.
 
-3. Edit the `update.plist` file in the root directory to replace the version
+1. Edit the `update.plist` file in the root directory to replace the version
    with the new version.
 
     ```diff
@@ -141,7 +159,7 @@ Proceed with publishing the new extension releases:
             <key>URL</key>
     ```
 
-4. Commit and push the new releases.
+1. Commit and push the new releases to [dreditor/dreditor.org]:
 
     ```sh
     $ git add -u
@@ -149,7 +167,7 @@ Proceed with publishing the new extension releases:
     $ git push origin 7.x
     ```
 
-5. Deploy changes on the server.
+1. Deploy changes on the server:
 
     ```sh
     $ sudo su
@@ -159,3 +177,5 @@ Proceed with publishing the new extension releases:
 
 
 [build page]: https://dreditor.org/development/build#tags
+[dreditor/dreditor]: https://github.com/dreditor/dreditor
+[dreditor/dreditor.org]: https://github.com/dreditor/dreditor.org
