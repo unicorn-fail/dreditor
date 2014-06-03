@@ -474,10 +474,17 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
 
     var classes = [], syntax = false;
     // Colorize file diff lines.
-    if (line.match(/^((index|===|RCS|new file mode|deleted file mode|retrieving|diff|\-\-\-\s|\-\-\s|\+\+\+\s|@@\s).*)$/i)) {
+    if (line.match(/^((index|===|RCS|new file mode|deleted file mode|similarity|rename|copy|retrieving|diff|\-\-\-\s|\-\-\s|\+\+\+\s|@@\s).*)$/i)) {
       classes.push('file');
       ln1o = false;
       ln2o = false;
+      // Renames and copies are easy to miss; colorize them.
+      if (line.match(/^rename from|^copy from/)) {
+        classes.push('old');
+      }
+      else if (line.match(/^rename to|^copy to/)) {
+        classes.push('new');
+      }
     }
     // Colorize old code, but skip file diff lines.
     else if (line.match(/^((?!\-\-\-$|\-\-$)\-.*)$/)) {
