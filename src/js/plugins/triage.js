@@ -145,7 +145,8 @@ Drupal.dreditor.triage = {
     $li = $('<li>');
     $li.appendTo($ul);
     var $action = $('<a>')
-      .attr('href', '#').text('Reset')
+      .attr('href', '#')
+      .text('Clear triage cache.')
       .appendTo($li)
       .click(function() {
         Drupal.cache.clear('triage');
@@ -181,7 +182,8 @@ Drupal.dreditor.triage = {
     $li = $('<li>');
     $li.appendTo($ul);
     $action = $('<a>')
-      .attr('href', '#').text('Set custom source')
+      .attr('href', '#')
+      .text('Set custom source')
       .appendTo($li)
       .click(function() {
         var custom = window.prompt('Give the URL of your custom DL tree.' +
