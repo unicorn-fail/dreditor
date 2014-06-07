@@ -52,44 +52,44 @@ Drupal.dreditor.macro = {
    */
   fields: {
     title: {
-      id: "edit-title",
+      id: "#edit-title",
       type: 'text'
     },
     project_title: {
       label: 'Project:',
-      id: "edit-project-info-project-title",
+      id: "#edit-field-project-und-0-target-id",
       type: 'text',
       hasAjax: true,
       setFocus: "edit-title"
     },
     version: {
       label: 'Version:',
-      id: "edit-project-info-rid",
+      id: "#edit-field-issue-version-und",
       type: 'select'
     },
     assigned: {
       label: 'Assigned:',
-      id: "edit-project-info-assigned",
+      id: "#edit-field-issue-assigned-und",
       type: 'select'
     },
     component: {
       label: 'Component:',
-      id: 'edit-project-info-component',
+      id: '#edit-field-issue-component-und',
       type: 'select'
     },
     category: {
       label: 'Category:',
-      id: "edit-category",
+      id: "#edit-field-issue-category-und",
       type: 'select'
     },
     priority: {
       label: 'Priority:',
-      id: "edit-priority",
+      id: "#edit-field-issue-priority-und",
       type: 'select'
     },
     status: {
       label: 'Status:',
-      id: "edit-sid",
+      id: "#edit-field-issue-status-und",
       type: 'select'
     },
     comment: {
@@ -98,8 +98,9 @@ Drupal.dreditor.macro = {
     },
     tags: {
       label: 'Tags:',
-      id: "edit-taxonomy-tags-9",
-      type: 'tags'
+      id: "#edit-taxonomy-vocabulary-9-und",
+      type: 'tags',
+      hasAjax: true
     }
   },
   set: function(name, value) {
