@@ -287,6 +287,9 @@ Drupal.dreditor.triage = {
             .attr('href', src = sources[source].url)
             .attr('title', 'View the ' + label + ' set of templates and macros.')
             .attr('target', '_blank')
+            .click(function(){
+               window.open($(this).attr('href'));
+            })
             .appendTo($linkT)
           ;
           $('<span> or </span>').appendTo($linkT);
@@ -296,6 +299,9 @@ Drupal.dreditor.triage = {
             .attr('href', src = sources[source].url + '/edit')
             .attr('title', 'Edit the ' + label + ' set of templates and macros.')
             .attr('target', '_blank')
+            .click(function(){
+              window.open($(this).attr('href'));
+            })
             .appendTo($linkT)
           ;
         };
