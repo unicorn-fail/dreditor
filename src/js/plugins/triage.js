@@ -93,7 +93,7 @@ Drupal.dreditor.triage = {
   getTriageRoot : function() {
     return {
       id : 'node-1120672',
-      url : "//www.drupal.org/node/1120672",
+      url : "/node/1120672",
       description : 'The root for all triage nodes'
     };
   },
