@@ -193,7 +193,7 @@ Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.html = {
  */
 Drupal.dreditor.syntaxAutocomplete.prototype.suggestions.issue = function (needle) {
   var matches;
-  if (matches = needle.match('^https?://drupal.org/node/([0-9]+)')) {
+  if (matches = needle.match('^https?://www.drupal.org/node/([0-9]+)')) {
     return '[#' + matches[1] + ']^';
   }
   return false;
