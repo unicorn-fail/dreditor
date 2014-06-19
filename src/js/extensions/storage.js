@@ -1,7 +1,7 @@
 /**
  * Drupal HTML5 storage handler.
  *
- * @see http://drupal.org/node/65578
+ * @see https://www.drupal.org/node/65578
  */
 Drupal.storage = {};
 

@@ -1,7 +1,5 @@
 /**
  * Suggest a filename for patches to upload in an issue.
- *
- * Developed in issue: http://drupal.org/node/1294662
  */
 Drupal.behaviors.dreditorPatchNameSuggestion = {
   attach: function (context) {
