@@ -306,12 +306,12 @@ Drupal.dreditor.macro = {
           }
           else if (cmd === 'duplicate_project') {
             msg = "Please give project name";
-            pattern = 'http://drupal.org/project/@';
+            pattern = 'http://www.drupal.org/project/@';
             def = 'dreditor';
           }
           else if (cmd === 'user_link') {
             msg = "Please give user ID";
-            pattern = 'http://drupal.org/user/@';
+            pattern = 'http://www.drupal.org/user/@';
             def = '0';
           }
           else {

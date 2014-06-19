@@ -93,7 +93,7 @@ Drupal.dreditor.triage = {
   getTriageRoot : function() {
     return {
       id : 'node-1120672',
-      url : "//drupal.org/node/1120672",
+      url : "//www.drupal.org/node/1120672",
       description : 'The root for all triage nodes'
     };
   },
@@ -187,7 +187,7 @@ Drupal.dreditor.triage = {
       .appendTo($li)
       .click(function() {
         var custom = window.prompt('Give the URL of your custom DL tree.' +
-          "\n\n" + 'This URL must point to a location on http://drupal.org' +
+          "\n\n" + 'This URL must point to a location on http://www.drupal.org' +
           "\n\n" + 'See http://en.wikipedia.org/wiki/Same_origin_policy', Drupal.storage.load('triage-custom'));
         if (custom) {
           Drupal.storage.save('triage-custom', custom);
@@ -354,7 +354,7 @@ Drupal.dreditor.triage = {
         var source = {
           id: $this.attr('href').replace(/^\//,'').replace(/\//g,'-'),
           url: $this.attr('href'),
-          // Cleanup description per http://drupal.org/node/1287934
+          // Cleanup description per http://www.drupal.org/node/1287934
           description: $this.text().replace(/\s*\[.*/, '').replace('dreditor_' , '')
         };
         sources.push(source);
@@ -473,7 +473,7 @@ Drupal.dreditor.triage = {
         if (!Drupal.dreditor.triage.bannerInjected) {
           Drupal.dreditor.triage.bannerInjected = true;
           // We reuse the DT text for generating a stock response
-          var stockResponse = '[Stock response from <a href="http://drupal.org/node/1120672">Dreditor templates and macros</a>.]';
+          var stockResponse = '[Stock response from <a href="http://www.drupal.org/node/1120672">Dreditor templates and macros</a>.]';
           actions.push('@comment(' + stockResponse + ')');
         }
         // Grab all actions up the tree
