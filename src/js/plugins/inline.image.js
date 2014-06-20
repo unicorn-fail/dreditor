@@ -11,7 +11,7 @@ Drupal.behaviors.dreditorInlineImage = {
       var $link = $(this);
 
       // Remove protocol + drupal.org
-      var url = $link.attr('href').replace(/^https\:\/\/drupal\.org/, '');
+      var url = $link.attr('href').replace(/^https\:\/\/(?:www\.)?drupal\.org/, '');
 
       // Only process image attachments.
       if (!$comment.length || !url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
