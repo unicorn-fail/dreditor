@@ -4,7 +4,12 @@
 Drupal.behaviors.dreditorInlineImage = {
   attach: function (context) {
     var $context = $(context);
-    var $comment = $(':input[name="nodechanges_comment_body[value]"]');
+    // Comment body textarea form item.
+    var $target = $(':input[name="nodechanges_comment_body[value]"]');
+    if (!$target.length) {
+      // Issue summary body textarea form item.
+      $target = $(':input[name="body[und][0][value]"]');
+    }
 
     // @todo .file clashes with patchReviewer tr.file + a.file markup.
     $context.find('span.file').once('dreditor-inlineimage').find('> a').each(function () {
@@ -14,7 +19,7 @@ Drupal.behaviors.dreditorInlineImage = {
       var url = $link.attr('href').replace(/^https\:\/\/(?:www\.)?drupal\.org/, '');
 
       // Only process image attachments.
-      if (!$comment.length || !url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
+      if (!$target.length || !url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
         return;
       }
 
@@ -29,10 +34,10 @@ Drupal.behaviors.dreditorInlineImage = {
         .bind('click', function (e) {
           // Focus comment textarea.
           $('html, body').animate({
-            scrollTop: $comment.offset().top
+            scrollTop: $target.offset().top
           }, 300);
           // Insert image tag to URL in comment textarea.
-          $comment.focus().val($comment.val() + "\n<img src=\"" + url + "\" alt=\"\" />\n");
+          $target.focus().val($target.val() + "\n<img src=\"" + url + "\" alt=\"\" />\n");
           e.preventDefault();
         });
     });
