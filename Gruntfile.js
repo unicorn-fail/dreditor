@@ -388,9 +388,9 @@ module.exports = function(grunt) {
     function (error, result, code) {
       if (code !== 8) {
         var plugin = "https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/";
-        return grunt.warn('Auto-loading ' + xpi + ' failed: (' + code + ') ' +
-          error +
-          "\n\nAre you sure you have installed the Firefox addon:\n- " + plugin);
+        return grunt.warn('Auto-loading ' + xpi + ' failed: (' + code + ') ' + error +
+          "\n\nAre you sure you have installed the Firefox addon:\n" +
+          "- " + plugin + "\n\n");
       }
       grunt.log.ok('Auto-loaded ' + xpi + ' into Firefox.');
       done();
