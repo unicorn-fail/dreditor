@@ -387,7 +387,11 @@ module.exports = function(grunt) {
     },
     function (error, result, code) {
       if (code !== 8) {
-        return grunt.warn('Auto-loading ' + xpi + ' failed: (' + code + ') ' + error);
+        return grunt.warn('Auto-loading ' + xpi + ' failed:\n\n' +
+          code + ': ' + error + '\n\n' +
+          'Ensure you have the AutoInstaller extension installed in Firefox:\n' +
+          'https://addons.mozilla.org/en-US/firefox/addon/autoinstaller/\n\n'
+        );
       }
       grunt.log.ok('Auto-loaded ' + xpi + ' into Firefox.');
       done();
