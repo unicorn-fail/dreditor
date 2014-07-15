@@ -23,7 +23,7 @@ if (window.jQuery !== undefined && window.jQuery.fn.jquery >= '1.4.4' && window.
 
 jQuery(document).ready(function () {
   // If we are on a Drupal 7 site (i.e: not localize.drupal.org)
-  if (Drupal.ajax) {
+  if (Drupal.detachBehaviors) {
     Drupal.attachBehaviors(this);
   }
 });
