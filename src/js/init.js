@@ -22,7 +22,10 @@ if (window.jQuery !== undefined && window.jQuery.fn.jquery >= '1.4.4' && window.
 }
 
 jQuery(document).ready(function () {
-  Drupal.attachBehaviors(this);
+  // If we are on a Drupal 7 site (i.e: not localize.drupal.org)
+  if (Drupal.ajax) {
+    Drupal.attachBehaviors(this);
+  }
 });
 
 // Invoke Dreditor update check once.
