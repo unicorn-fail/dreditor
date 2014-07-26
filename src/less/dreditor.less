@@ -10,21 +10,42 @@
   height: 100%;
   background-color: #fff;
   border: 1px solid #ccc;
+  &.resizing {
+    cursor: ew-resize;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
 #dreditor #bar, #dreditor-actions {
   padding: 0 10px;
   font: 10px/18px sans-serif, verdana, tahoma, arial;
   min-width: 230px;
-  position: absolute;
 }
 #dreditor #bar {
+  float: left;
   height: 100%;
+  position: relative;
+  .resizer {
+    bottom: 0;
+    cursor: ew-resize;
+    display: block;
+    position: absolute;
+    right: -1px;
+    top: 0;
+    width: 6px;
+    z-index: 9999;
+    &:hover, &.resizing {
+      background: rgba(0,0,0,.1);
+    }
+  }
 }
 #dreditor-actions {
   bottom: 0;
   left: -5px;
   padding-top: 5px;
   padding-bottom: 5px;
+  position: absolute;
 }
 .dreditor-button, .dreditor-button:link, .dreditor-button:visited, #page a.dreditor-button {
   background: rgb(122,188,255);
@@ -113,7 +134,6 @@
   margin: 0 0 9px;
 }
 #dreditor-content {
-  margin-left: 250px;
   border-left: 1px solid #ccc;
   overflow: scroll;
   height: 100%;

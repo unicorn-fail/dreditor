@@ -22,34 +22,16 @@ Drupal.dreditor = {
     Drupal.dreditor.context = self.$dreditor.get(0);
 
     // Add sidebar.
-    var $bar = $('<div id="bar"></div>').prependTo(self.$dreditor);
+    var $bar = $('<div id="bar"><div class="resizer"></div></div>').prependTo(self.$dreditor);
     // Add ul#menu to sidebar by default for convenience.
     $('<h3>Diff outline</h3>').appendTo($bar);
     $('<ul id="menu"></ul>').appendTo($bar);
 
-    // Add content region.
-    var $content = $('<div id="dreditor-content"></div>').appendTo(self.$dreditor);
+    // Allow bar to be resizable.
+    self.resizable($bar);
 
-    // Do not check for updates if the user just installed Dreditor.
-    var barWidth = Drupal.storage.load('barWidth');
-    if (barWidth === null) {
-      Drupal.storage.save('barWidth', $bar.width());
-    }
-
-    $bar.css('width', barWidth);
-    $content.css('marginLeft', ($bar.outerWidth() - 1));
-
-    // Make bar/content resizeable
-    $bar.resizable({
-      handles: 'e',
-      minWidth: 230,
-      resize: function(e, ui) {
-        $content.css('marginLeft', (ui.element.outerWidth() - 1));
-      },
-      stop: function(e, ui) {
-        Drupal.storage.save('barWidth', ui.element.width());
-      }
-    });
+    // Add the content region.
+    $('<div id="dreditor-content"></div>').appendTo(self.$dreditor);
 
     // Add global Dreditor buttons container.
     var $actions = $('<div id="dreditor-actions"></div>');
@@ -88,6 +70,62 @@ Drupal.dreditor = {
 
     // Display Dreditor.
     self.show();
+  },
+
+  resizable: function ($bar) {
+    var self = this;
+    var $resizer = $bar.find('.resizer');
+    var minWidth = 230;
+    var maxWidth = self.$dreditor.width() / 2;
+    var currentWidth = Drupal.storage.load('barWidth') || minWidth;
+    var resizing = false;
+
+    // Ensure that the maximum width is calculated on window resize.
+    $(window).bind('resize', function () {
+      maxWidth = self.$dreditor.width() / 2;
+    });
+
+    // Limit widths to minimum and current maximum.
+    var checkWidth = function (width) {
+      if (width < minWidth) {
+        width = minWidth;
+      }
+      if (width > maxWidth) {
+        width = maxWidth;
+      }
+      return width;
+    };
+
+    // Initialize the current width of the bar.
+    $bar.width(checkWidth(currentWidth));
+
+    // Bind the trigger for actually instantiating a resize event.
+    $resizer
+      .bind('mousedown', function () {
+        if (!resizing) {
+          resizing = true;
+          $resizer.addClass('resizing');
+          self.$dreditor.addClass('resizing');
+        }
+      });
+
+    // Bind the mouse movements to the entire $dreditor div to accommodate
+    // fast mouse movements.
+    self.$dreditor
+      .bind('mousemove', function (e) {
+        if (resizing) {
+          currentWidth = checkWidth(e.clientX);
+          $bar.width(currentWidth);
+        }
+      })
+      .bind('mouseup', function () {
+        if (resizing) {
+          resizing = false;
+          $resizer.removeClass('resizing');
+          self.$dreditor.removeClass('resizing');
+          Drupal.storage.save('barWidth', currentWidth);
+        }
+      });
   },
 
   tearDown: function (animate) {
