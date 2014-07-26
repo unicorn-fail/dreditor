@@ -274,7 +274,6 @@ module.exports = function(grunt) {
       'release': {
         options: {
           revision: "1.16",
-          github: true
         }
       }
     },
