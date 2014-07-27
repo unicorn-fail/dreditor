@@ -273,8 +273,7 @@ module.exports = function(grunt) {
     "mozilla-addon-sdk": {
       'release': {
         options: {
-          revision: "1.16",
-          github: true
+          revision: "1.16"
         }
       }
     },
