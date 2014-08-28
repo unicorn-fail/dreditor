@@ -35,7 +35,7 @@ Drupal.behaviors.dreditorCommitMessage = {
               temp.push([ counts[key], key ]);
             }
             temp.sort(function (a, b) {
-              return a[0] > b[0];
+              return a[0] - b[0];
             });
             // Return the list of values, ordered by counts (descending).
             var result = [];
