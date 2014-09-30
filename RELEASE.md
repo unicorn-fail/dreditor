@@ -134,6 +134,9 @@ Examples assume that:
 1. Download the packaged extension for each browser from the [build page] and
    replace the corresponding `dreditor.*` file in the root directory.
 
+1. Create a new "release" on https://github.com/dreditor/dreditor/releases for the tag created
+   above and upload the same binary files to that tagged release.
+
 1. Edit the `update.plist` file in the root directory to replace the version
    with the new version.
 
