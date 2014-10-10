@@ -5,7 +5,7 @@
  *   $.debug(var [, name]);
  *   $variable.debug( [name] );
  */
-jQuery.extend({
+jQuery.fn.extend({
   debug: function () {
     // Initialize window.debug storage, to make debug data accessible later
     // (e.g., via browser console). Although we are going to possibly store
@@ -32,5 +32,3 @@ jQuery.extend({
     return this;
   }
 });
-// @todo Is this the right way?
-jQuery.fn.debug = jQuery.debug;
