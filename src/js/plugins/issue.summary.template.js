@@ -20,12 +20,12 @@ Drupal.behaviors.dreditorIssueSummaryTemplate = {
           self.insertSummaryTemplate($textarea);
         });
 
-      // Add a button to insert novice tasks.
-      $('<a href="#" class="dreditor-button" style="margin-left: 10px;">Insert novice tasks</a>')
+      // Add a button to insert tasks.
+      $('<a href="#" class="dreditor-button" style="margin-left: 10px;">Insert tasks</a>')
         .appendTo($label)
         .bind('click', function (e) {
           e.preventDefault();
-          self.insertNoviceTasks($textarea);
+          self.insertTasks($textarea);
         });
     });
   },
@@ -79,7 +79,7 @@ Drupal.behaviors.dreditorIssueSummaryTemplate = {
       $textarea.val(template + $textarea.val());
     });
   },
-  insertNoviceTasks: function ($textarea) {
+  insertTasks: function ($textarea) {
     $.get('/node/2272209', function (data) {
       // Retrieve the template.
       var $template = $('<div/>').html($(data).find('#node-2272209 code').text());
