@@ -86,10 +86,7 @@ Drupal.behaviors.dreditorIssueSummaryTemplate = {
 
       // Add missing newlines.
       var template = $template.html()
-        .replace(/-->/g, "-->\n\n")
-        .replace(/<ul>/g, "<ul>\n\n")
-        // Only adjust the first list item.
-        .replace(/<\/li>/, "</li>\n\n");
+        .replace(/-->/g, "-->\n\n");
 
       // Insert the template at the cursor if possible.
       var pos = $textarea[0].selectionStart;
