@@ -97,50 +97,17 @@ Drupal.behaviors.dreditorCommitMessage = {
         // @todo Add configuration option for prefix. For now, manually override:
         //   Drupal.storage.save('commitmessage.prefix', '-');
         var prefix = Drupal.storage.load('commitmessage.prefix');
-        prefix = (prefix ? prefix : 'Issue');
-
-        var message = prefix + ' #' + Drupal.dreditor.issue.getNid() + ' ';
-        message += 'by ' + submitters.join(', ');
-        if (contributors.length) {
-          if (submitters.length) {
-            message += ' | ';
-          }
-          // Add a separator between patch submitters and commenters.
-          message += contributors.join(', ');
-        }
-
-        // Build title.
-        // Use the text input field value to allow maintainers to adjust it
-        // prior to commit.
-        var title = $('#edit-title').val();
-
-        // Add "Added|Fixed " prefix based on issue category.
-        switch ($('#edit-field-issue-category-und').val()) {
-          case 'bug':
-          case '1':
-            title = title.replace(/^fix\S*\s*/i, '');
-            title = 'Fixed ' + title;
-            break;
-
-          case 'feature':
-          case '3':
-            title = title.replace(/^add\S*\s*/i, '');
-            title = 'Added ' + title;
-            break;
-
-          default:
-            // For anything else, we just ensure proper capitalization.
-            if (title[0].toLowerCase() === title[0]) {
-              title = title[0].toUpperCase() + title.substring(1);
-            }
-            break;
-        }
-
-        // Add a period (full-stop).
-        if (title[title.length - 1] !== '.') {
-          title += '.';
-        }
-        message += ': ' + title;
+        prefix = (prefix ? prefix : 'Fixed');
+        var message = self.generateCommitMessage(
+          prefix,
+          Drupal.dreditor.issue.getNid(),
+          // Use the text input field value to allow maintainers to adjust it
+          // prior to commit.
+          $('#edit-title').val(),
+          $('#edit-field-issue-category-und').val(),
+          submitters,
+          contributors
+        );
 
         // Inject a text field.
         var $input = $context.find('#dreditor-commitmessage-input');
@@ -224,5 +191,65 @@ Drupal.behaviors.dreditorCommitMessage = {
       });
       $link.prependTo($container);
     });
+  },
+
+  /**
+   * Generates a commit message string.
+   *
+   * @param string prefix
+   *   The message prefix; e.g., "Fix".
+   * @param int|string issueID
+   *   The ID of the issue (without "#").
+   * @param string title
+   *   The issue title.
+   * @param string category
+   *   The issue category; one of: 'bug' (1), 'feature' (3), 'task' (2).
+   * @param array submitters
+   *   Ordered list of usernames who submitted patches.
+   * @param array contributors
+   *   Ordered list of usernames who contributed. May be empty.
+   */
+  generateCommitMessage: function (prefix, issueID, title, category, submitters, contributors) {
+    var message = prefix + ' #' + issueID + ' ';
+
+    message += 'by ' + submitters.join(', ');
+    if (contributors.length) {
+      // Add a separator between patch submitters and commenters.
+      if (submitters.length) {
+        message += ' | ';
+      }
+      message += contributors.join(', ');
+    }
+
+    // Adjust title based on issue category.
+    switch (category) {
+      case 'bug':
+      case '1':
+        // Remove 'fix*' from title to not duplicate initial prefix.
+        title = title.replace(/^fix\S*\s*/i, '');
+        break;
+
+      case 'feature':
+      case '3':
+        // Replace 'add*' with consistent + properly capitalized prefix.
+        title = title.replace(/^add\S*\s*/i, '');
+        title = 'Added ' + title;
+        break;
+
+      default:
+        // For anything else, we just ensure proper capitalization.
+        if (title[0].toLowerCase() === title[0]) {
+          title = title[0].toUpperCase() + title.substring(1);
+        }
+        break;
+    }
+
+    // Add a period (full-stop).
+    if (title[title.length - 1] !== '.') {
+      title += '.';
+    }
+    message += ': ' + title;
+
+    return message;
   }
 };
