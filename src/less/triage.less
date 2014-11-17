@@ -1,0 +1,81 @@
+#dreditor-triage {
+  margin: 2px;
+  width: 95%;
+}
+.triage-in-context {
+  font-weight: bolder;
+}
+.triage-hide-irrelevant .triage-not-in-context {
+  display:none;
+}
+#dreditor-triage ul {
+  overflow: visible;
+}
+#dreditor-triage-list {
+  margin: 0;
+  z-index: 10;
+  font-size: 1.2em;
+}
+#dreditor-triage-list ul {
+  margin: 0;
+  padding: 0;
+  background-color: #53b0eb;
+  width: 130px;
+}
+#dreditor-triage-list li {
+  background-color: white;
+  border: 1px solid black;
+}
+#dreditor-triage-list li {
+  border-top: none;
+}
+#dreditor-triage-list li:first-child {
+  border-top: 1px solid black;
+}
+#dreditor-triage-list ul > a {
+  width: auto;
+}
+#dreditor-triage-list li {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+#dreditor-triage-list ul ul li {
+  margin: 0;
+}
+#dreditor-triage-list ul ul {
+  position: absolute;
+  top: -1px;
+  left: 128px;
+}
+#dreditor-triage-list li > ul {
+  display:none;
+}
+#dreditor-triage-list li:hover > ul {
+  display: block;
+}
+#dreditor-triage-list li a {
+  display: block;
+  padding: 0.25em;
+  text-decoration: none;
+  color: black;
+}
+#dreditor-triage-list li.source {
+  text-align: right;
+  font-size: smaller;
+  background-color: #EEE;
+  border-top:1px dashed;
+}
+#dreditor-triage-list li.source a {
+  display: inline;
+}
+#dreditor-triage-list lli:hover {
+  background-color: #28D;
+}
+#dreditor-triage-list li:hover > a {
+  background-color: #0678be;
+}
+#dreditor-triage-list li.collapsed {
+  background-color: #53b0eb;
+}

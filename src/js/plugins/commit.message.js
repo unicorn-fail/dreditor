@@ -165,7 +165,7 @@ Drupal.behaviors.dreditorCommitMessage = {
             return command;
           };
           var $commandContainer = $('<div id="dreditor-commitmessage-command" style="clear: both; padding: 1em 0;" />')
-            .appendTo($container);
+            .appendTo($root);
           var $commandInput = $('<input class="dreditor-input" type="text" autocomplete="off" />')
             .val(self.createShellCommand(message));
 
@@ -222,7 +222,23 @@ Drupal.behaviors.dreditorCommitMessage = {
         }
         return false;
       });
-      $link.prependTo($container);
+
+      var tabs = Drupal.dreditor.ux.tabs;
+      tabs.createTabContainer($container);
+      tabs.addTab($container, 'Macro &amp; Templates', 'dreditor-triage-root', $('<p>').text('Replaced by sub tabs'));
+      tabs.addTab($container, 'Commit message', 'dreditor-commit-message-root', $('<p>').text('Replaced by sub tabs'));
+      tabs.init();
+      tabs.bind();
+
+      // Zap the div
+      var $root = $('.dreditor-tab-content.dreditor-commit-message-root').empty();
+      $link.prependTo($root);
+      // Fix for floating link.
+      $link.wrap('<div>').css('float', 'none');
+      var $commit = $link.parent();
+      $commit.css('text-align', 'right');
+
+      Drupal.dreditor.triage.setup($container);
     });
   }
 };
