@@ -27,6 +27,17 @@ Drupal.behaviors.dreditorIssueSummaryTemplate = {
           e.preventDefault();
           self.insertTasks($textarea);
         });
+
+      var project = Drupal.dreditor.issue.getProjectShortName();
+      if (project === 'drupal') {
+        // Add a button to insert beta evaluation criteria.
+        $('<a href="#" class="dreditor-button" style="margin-left: 10px;">Insert beta evaluation</a>')
+          .appendTo($label)
+          .bind('click', function (e) {
+            e.preventDefault();
+            self.insertBetaEvaluation($textarea);
+          });
+      }
     });
   },
   insertSummaryTemplate: function ($textarea) {
@@ -83,6 +94,21 @@ Drupal.behaviors.dreditorIssueSummaryTemplate = {
     $.get('/node/2272209', function (data) {
       // Retrieve the template.
       var $template = $('<div/>').html($(data).find('#node-2272209 code').text());
+
+      // Add missing newlines.
+      var template = $template.html()
+        .replace(/-->/g, "-->\n\n");
+
+      // Insert the template at the cursor if possible.
+      var pos = $textarea[0].selectionStart;
+      var bodyValue = $textarea.val();
+      $textarea.val(bodyValue.substring(0, pos) + template + bodyValue.substring(pos));
+    });
+  },
+  insertBetaEvaluation: function ($textarea) {
+    $.get('/node/2373483', function (data) {
+      // Retrieve the template.
+      var $template = $('<div/>').html($(data).find('#node-2373483 code').text());
 
       // Add missing newlines.
       var template = $template.html()
