@@ -479,7 +479,7 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
       ln1o = false;
       ln2o = false;
       // Renames and copies are easy to miss; colorize them.
-      if (line.match(/^rename from|^copy from/)) {
+      if (line.match(/^rename from|^copy from|^deleted file/)) {
         classes.push('old');
       }
       else if (line.match(/^rename to|^copy to/)) {
