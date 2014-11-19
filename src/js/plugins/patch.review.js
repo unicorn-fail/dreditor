@@ -224,6 +224,11 @@ Drupal.dreditor.patchReview = {
         return true;
       }
       var $elements = $(this.elements);
+      // Skip comments with no corresponding lines.
+      var firstLine = $elements.get(0);
+      if (!firstLine) {
+        return true;
+      }
       var markup = '<code>\n';
       // Add file information.
       var lastfile = $elements.eq(0).prevAll('tr.file:has(a.file)').get(0);
@@ -236,7 +241,7 @@ Drupal.dreditor.patchReview = {
         markup += lasthunk.textContent + '\n';
       }
 
-      var lastline = $elements.get(0).previousSibling;
+      var lastline = firstLine.previousSibling;
       var lastfileNewlineAdded;
 
       $elements.each(function () {
