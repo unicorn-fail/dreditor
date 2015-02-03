@@ -8,7 +8,7 @@
  */
 Drupal.behaviors.dreditorCommentNumber = {
   attach: function (context) {
-    $(context).find('#block-project-issue-issue-edit h2')
+    $(context).find('#project-issue-ajax-form h2:first')
       .append(' <strong>#' + Drupal.dreditor.issue.getNewCommentNumber() + '</strong>');
   }
 };
