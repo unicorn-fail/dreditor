@@ -30,8 +30,6 @@ Drupal.behaviors.dreditorIssueClone = {
                 '#edit-title',
                 '#edit-body-und-0-value',
                 '#edit-field-issue-category-und',
-                '#edit-field-issue-priority-und',
-                '#edit-field-issue-status-und',
                 '#edit-field-issue-version-und',
                 '#edit-field-issue-component-und',
                 '#edit-field-issue-assigned-und',
