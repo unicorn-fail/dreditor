@@ -11,7 +11,7 @@ Drupal.behaviors.dreditorFormSticky = {
   attach: function (context) {
     var self = this;
     // Comment body textarea form item.
-    $(context).find('form .form-item-nodechanges-comment-body-value').once('dreditor-form-sticky', function () {
+    $(context).find('#edit-nodechanges-comment .form-type-textarea').once('dreditor-form-sticky', function () {
       self.addButton($(this).find('.form-textarea-wrapper'));
     });
     // Issue summary body form item.
