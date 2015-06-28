@@ -5,7 +5,7 @@ Drupal.behaviors.dreditorInlineImage = {
   attach: function (context) {
     var $context = $(context);
     // Comment body textarea form item.
-    var $target = $(':input[name="nodechanges_comment_body[value]"]');
+    var $target = $(':input[name="nodechanges_comment[comment_body][und][0][value]"]');
     if (!$target.length) {
       // Issue summary body textarea form item.
       $target = $(':input[name="body[und][0][value]"]');
