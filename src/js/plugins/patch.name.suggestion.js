@@ -14,7 +14,8 @@ Drupal.behaviors.dreditorPatchNameSuggestion = {
       var $link = $('<a class="dreditor-application-toggle dreditor-patchsuggestion" href="#">Patchname suggestion</a>');
       $link.prependTo($container);
       $link.click(function() {
-        var patchName = '';
+        var project = Drupal.dreditor.issue.getProjectShortName();
+        var patchName = project ? project + '-' : '';
 
         function truncateString (str, n,useWordBoundary){
           var toLong = str.length>n,
