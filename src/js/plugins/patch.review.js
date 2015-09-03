@@ -448,8 +448,8 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
   var ln2 = '';
   var ln1content = '';
   var ln2content = '';
-  var maxGutter = 0;
-  var gutter, maxln1, maxln2;
+  var maxln1 = 0;
+  var maxln2 = 0;
   for (var n in code) {
     var ln1o = true;
     var ln2o = true;
@@ -552,13 +552,13 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
     classes = (classes.length ? ' class="' + classes.join(' ') + '"' : '');
     line = '<tr' + classes + '><td class="ln" data-line-number="' + ln1content + '"></td><td class="ln" data-line-number="' + ln2content + '"></td><td><span class="pre">' + line + '</span></td></tr>';
 
-    // Calculate the longest combination of line numbers in the gutter, used
+    // Calculate the largest line numbers in the gutter, used
     // for determining the position of the 80 character ruler.
-    gutter = ("" + ln1content + ln2content);
-    if (gutter.length > maxGutter) {
+    if (ln1content > maxln1) {
       maxln1 = ln1content;
+    }
+    if (ln2content > maxln2) {
       maxln2 = ln2content;
-      maxGutter = gutter.length;
     }
 
     // Append line to parsed code.
