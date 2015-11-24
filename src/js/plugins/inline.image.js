@@ -39,7 +39,7 @@ Drupal.behaviors.dreditorInlineImage = {
         .bind('click', function (e) {
           // Find the last selected.
           var $target = $textareas.filter(function () {
-            return $(this).data("last-focused") == true;
+            return $(this).data("last-focused") === true;
           });
 
           if (!$target.length) {
