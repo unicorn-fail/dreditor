@@ -5,10 +5,8 @@ Drupal.behaviors.dreditorInlineImage = {
   attach: function (context) {
     var $context = $(context);
 
-    // Collect all the textareas we care about.
-    var $new_comment = $('textarea[name="nodechanges_comment[comment_body][und][0][value]"]');
-    var $issue_summary = $('textarea[name="body[und][0][value]"]');
-    var $textareas = $().add($new_comment).add($issue_summary);
+    // Collect all the textareas we can put HTML into.
+    var $textareas = $('textarea.text-full');
 
     // Keep track of last textarea in focus.
     $textareas.bind('focus', function () {
@@ -44,7 +42,7 @@ Drupal.behaviors.dreditorInlineImage = {
 
           if (!$target.length) {
             // Issue summary body textarea form item.
-            $target = $issue_summary;
+            $target = $textareas.last();
           }
 
           if (!$target.length) {
