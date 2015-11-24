@@ -4,12 +4,17 @@
 Drupal.behaviors.dreditorInlineImage = {
   attach: function (context) {
     var $context = $(context);
-    // Comment body textarea form item.
-    var $target = $(':input[name="nodechanges_comment_body[value]"]');
-    if (!$target.length) {
-      // Issue summary body textarea form item.
-      $target = $(':input[name="body[und][0][value]"]');
-    }
+
+    // Collect all the textareas we care about.
+    var $new_comment = $('textarea[name="nodechanges_comment[comment_body][und][0][value]"]');
+    var $issue_summary = $('textarea[name="body[und][0][value]"]');
+    var $textareas = $().add($new_comment).add($issue_summary);
+
+    // Keep track of last textarea in focus.
+    $textareas.bind('focus', function () {
+      $textareas.data('last-focused', false);
+      $(this).data('last-focused', true);
+    });
 
     // @todo .file clashes with patchReviewer tr.file + a.file markup.
     $context.find('span.file').once('dreditor-inlineimage').find('> a').each(function () {
@@ -19,7 +24,7 @@ Drupal.behaviors.dreditorInlineImage = {
       var url = $link.attr('href').replace(/^https\:\/\/(?:www\.)?drupal\.org/, '');
 
       // Only process image attachments.
-      if (!$target.length || !url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
+      if (!url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
         return;
       }
 
@@ -32,6 +37,21 @@ Drupal.behaviors.dreditorInlineImage = {
       // Override click event.
       $button
         .bind('click', function (e) {
+          // Find the last selected.
+          var $target = $textareas.filter(function () {
+            return $(this).data("last-focused") == true;
+          });
+
+          if (!$target.length) {
+            // Issue summary body textarea form item.
+            $target = $issue_summary;
+          }
+
+          if (!$target.length) {
+            // Well we tried, guess this page doesn't have the textareas we want.
+            return;
+          }
+
           // Focus comment textarea.
           $('html, body').animate({
             scrollTop: $target.offset().top
