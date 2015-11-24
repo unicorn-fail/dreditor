@@ -9,9 +9,9 @@ Drupal.behaviors.dreditorInlineImage = {
     var $textareas = $('textarea.text-full');
 
     // Keep track of last textarea in focus.
+    var $target = $textareas.last();
     $textareas.bind('focus', function () {
-      $textareas.data('last-focused', false);
-      $(this).data('last-focused', true);
+      $target = $(this);
     });
 
     // @todo .file clashes with patchReviewer tr.file + a.file markup.
@@ -35,18 +35,8 @@ Drupal.behaviors.dreditorInlineImage = {
       // Override click event.
       $button
         .bind('click', function (e) {
-          // Find the last selected.
-          var $target = $textareas.filter(function () {
-            return $(this).data("last-focused") === true;
-          });
-
           if (!$target.length) {
-            // Issue summary body textarea form item.
-            $target = $textareas.last();
-          }
-
-          if (!$target.length) {
-            // Well we tried, guess this page doesn't have the textareas we want.
+            // Well we tried, guess the page doesn't have the textareas we want.
             return;
           }
 
