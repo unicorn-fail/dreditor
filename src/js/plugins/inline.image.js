@@ -4,12 +4,15 @@
 Drupal.behaviors.dreditorInlineImage = {
   attach: function (context) {
     var $context = $(context);
-    // Comment body textarea form item.
-    var $target = $(':input[name="nodechanges_comment_body[value]"]');
-    if (!$target.length) {
-      // Issue summary body textarea form item.
-      $target = $(':input[name="body[und][0][value]"]');
-    }
+
+    // Collect all the textareas we can put HTML into.
+    var $textareas = $('textarea.text-full');
+
+    // Keep track of last textarea in focus.
+    var $target = $textareas.last();
+    $textareas.bind('focus', function () {
+      $target = $(this);
+    });
 
     // @todo .file clashes with patchReviewer tr.file + a.file markup.
     $context.find('span.file').once('dreditor-inlineimage').find('> a').each(function () {
@@ -19,7 +22,7 @@ Drupal.behaviors.dreditorInlineImage = {
       var url = $link.attr('href').replace(/^https\:\/\/(?:www\.)?drupal\.org/, '');
 
       // Only process image attachments.
-      if (!$target.length || !url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
+      if (!url.match(/\.png$|\.jpg$|\.jpeg$|\.gif$/)) {
         return;
       }
 
@@ -32,6 +35,11 @@ Drupal.behaviors.dreditorInlineImage = {
       // Override click event.
       $button
         .bind('click', function (e) {
+          if (!$target.length) {
+            // Well we tried, guess the page doesn't have the textareas we want.
+            return;
+          }
+
           // Focus comment textarea.
           $('html, body').animate({
             scrollTop: $target.offset().top
