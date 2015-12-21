@@ -1,4 +1,6 @@
 # Dreditor [![GitHub version](https://badge.fury.io/gh/dreditor%2Fdreditor.svg)](http://badge.fury.io/gh/dreditor%2Fdreditor) [![Show some love](http://img.shields.io/gittip/Dreditor.svg)](https://www.gittip.com/Dreditor)
+
+[![Join the chat at https://gitter.im/unicorn-fail/dreditor](https://badges.gitter.im/unicorn-fail/dreditor.svg)](https://gitter.im/unicorn-fail/dreditor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Built with NodeJS](http://pixel-cookers.github.io/built-with-badges/node/node-short.png)](http://nodejs.org/)
 [![Built with Grunt](http://pixel-cookers.github.io/built-with-badges/grunt/grunt-short.png)](http://gruntjs.com/)
 [![Build Status](https://travis-ci.org/dreditor/dreditor.svg?branch=1.x)](https://travis-ci.org/dreditor/dreditor)
