@@ -13,7 +13,7 @@
         "*://*.dreditor.org/*",
         "*://*.devdrupal.org/*"
       ],
-      "js": ["%PKG.NAME%.js"]
+      "js": ["jquery.js", "%PKG.NAME%.js"]
     }
   ],
   "permissions": [
