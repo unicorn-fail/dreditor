@@ -51,15 +51,12 @@ module.exports = function(grunt) {
     },
     concat: {
       options: {
-        banner: '<%= banner %>' + grunt.file.read('src/js/_banner.header.js'),
-        footer: grunt.file.read('src/js/_banner.footer.js'),
+        banner: '<%= banner %>',
         stripBanners: true
       },
       build: {
         src: [
           'src/js/**/*.js',
-          '!src/js/_banner.header.js',
-          '!src/js/_banner.footer.js',
           '!src/js/init.js',
           'build/<%= pkg.name %>.css.js',
           'src/js/init.js'
