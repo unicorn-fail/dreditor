@@ -518,6 +518,27 @@ Drupal.dreditor.patchReview.behaviors.setup = function (context, code) {
         ln2++;
       }
     }
+    // Colorize word diffs.
+    else if (line.match(/\[-.*-]/)) {
+      // Replace git word wrappers with spans.
+      line = line.replace(/(\[-)/, '<span class="old">');
+      line = line.replace(/(-])/, '</span>');
+      line = line.replace(/(\{\+)/, '<span class="new">');
+      line = line.replace(/(\+})/, '</span>');
+      // Expose tabs.
+      line = line.replace(/(\t+)/, '<span class="error tab">$1</span>');
+      // Wrap trailing white-space with a SPAN to expose them during patch
+      // review. Also add a hidden end-of-line character that will only appear
+      // in the pasted code.
+      line = line.replace(/^(.*\S)(\s+)$/, '$1<span class="error whitespace">$2</span><span class="hidden">¶</span>');
+
+      diffstat.insertions++;
+      syntax = true;
+      if (ln2) {
+        ln1o = false;
+        ln2++;
+      }
+    }
     // Replace line with a space (so ruler shows up).
     else if (!line.length) {
       line = '&nbsp;';

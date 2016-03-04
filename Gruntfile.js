@@ -36,7 +36,7 @@ module.exports = function(grunt) {
     },
     less: {
       options: {
-        cleancss: true
+        cleancss: false
       },
       files: {
         src: 'src/less/**/*.less',

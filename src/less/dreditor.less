@@ -211,9 +211,11 @@
   background-color: #DAEAF3;
   border-color: #BFD4EE;
 }
-#dreditor #code tr.old {
-  background-color: #fdd;
-  color: #c00;
+#dreditor #code {
+  tr.old, span.old {
+    background-color: #fdd;
+    color: #c00;
+  }
 }
 #dreditor #code tr.old a {
   color: #c00;
@@ -222,12 +224,14 @@
   background-color: #f7c8c8;
   border-color: #e9aeae;
 }
-#dreditor #code tr.new {
-  background-color: #dfd;
-  color: #008503;
-  float: none;
-  font-size: 100%;
-  font-weight: normal;
+#dreditor #code {
+  tr.new, span.new {
+    background-color: #dfd;
+    color: #008503;
+    float: none;
+    font-size: 100%;
+    font-weight: normal;
+  }
 }
 #dreditor #code tr.new a {
   color: #008503;
