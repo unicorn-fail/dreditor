@@ -33,7 +33,7 @@ by a dash/hyphen.
 
 Examples assume that:
 * Current version is `1.2.5` and new version is `1.2.6`.
-* `origin` refers to [dreditor/dreditor]
+* `origin` refers to [unicorn-fail/dreditor]
 
 1. Ensure that you have the latest code and HEAD is clean:
 
@@ -104,7 +104,7 @@ Proceed with publishing the newly built extensions.
 
 Examples assume that:
 * Current version is `1.2.5` and new version is `1.2.6`.
-* `origin` refers to [dreditor/dreditor.org]
+* `origin` refers to [unicorn-fail/dreditor.org]
 
 
 ### Chrome
@@ -121,7 +121,7 @@ Examples assume that:
 
 ### Firefox and Safari
 
-1. Change to your local clone of [dreditor/dreditor.org].
+1. Change to your local clone of [unicorn-fail/dreditor.org].
 
 1. Ensure that you have the latest code and HEAD is clean:
 
@@ -134,7 +134,7 @@ Examples assume that:
 1. Download the packaged extension for each browser from the [build page] and
    replace the corresponding `dreditor.*` file in the root directory.
 
-1. Create a new "release" on https://github.com/dreditor/dreditor/releases for the tag created
+1. Create a new "release" on https://github.com/unicorn-fail/dreditor/releases for the tag created
    above and upload the same binary files to that tagged release.
 
 1. Edit the `update.plist` file in the root directory to replace the version
@@ -162,7 +162,7 @@ Examples assume that:
             <key>URL</key>
     ```
 
-1. Commit and push the new releases to [dreditor/dreditor.org]:
+1. Commit and push the new releases to [unicorn-fail/dreditor.org]:
 
     ```sh
     $ git add -u
@@ -180,5 +180,5 @@ Examples assume that:
 
 
 [build page]: https://dreditor.org/development/build#tags
-[dreditor/dreditor]: https://github.com/dreditor/dreditor
-[dreditor/dreditor.org]: https://github.com/dreditor/dreditor.org
+[unicorn-fail/dreditor]: https://github.com/unicorn-fail/dreditor
+[unicorn-fail/dreditor.org]: https://github.com/unicorn-fail/dreditor.org

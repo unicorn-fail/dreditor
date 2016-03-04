@@ -3,12 +3,12 @@
 [![Join the chat at https://gitter.im/unicorn-fail/dreditor](https://badges.gitter.im/unicorn-fail/dreditor.svg)](https://gitter.im/unicorn-fail/dreditor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Built with NodeJS](http://pixel-cookers.github.io/built-with-badges/node/node-short.png)](http://nodejs.org/)
 [![Built with Grunt](http://pixel-cookers.github.io/built-with-badges/grunt/grunt-short.png)](http://gruntjs.com/)
-[![Build Status](https://travis-ci.org/dreditor/dreditor.svg?branch=1.x)](https://travis-ci.org/dreditor/dreditor)
-[![Code Climate](http://img.shields.io/codeclimate/github/dreditor/dreditor.svg)](https://codeclimate.com/github/dreditor/dreditor)
+[![Build Status](https://travis-ci.org/unicorn-fail/dreditor.svg?branch=1.x)](https://travis-ci.org/unicorn-fail/dreditor)
+[![Code Climate](http://img.shields.io/codeclimate/github/unicorn-fail/dreditor.svg)](https://codeclimate.com/github/unicorn-fail/dreditor)
 
-[![Dependency Status](https://david-dm.org/dreditor/dreditor.svg)](https://david-dm.org/dreditor/dreditor)
-[![devDependency Status](https://david-dm.org/dreditor/dreditor/dev-status.svg)](https://david-dm.org/dreditor/dreditor#info=devDependencies)
-[![optionalDependency Status](https://david-dm.org/dreditor/dreditor/optional-status.svg)](https://david-dm.org/dreditor/dreditor#info=optionalDependencies)
+[![Dependency Status](https://david-dm.org/unicorn-fail/dreditor.svg)](https://david-dm.org/unicorn-fail/dreditor)
+[![devDependency Status](https://david-dm.org/unicorn-fail/dreditor/dev-status.svg)](https://david-dm.org/unicorn-fail/dreditor#info=devDependencies)
+[![optionalDependency Status](https://david-dm.org/unicorn-fail/dreditor/optional-status.svg)](https://david-dm.org/unicorn-fail/dreditor#info=optionalDependencies)
 
 A web browser extension for Drupal.org that enhances user experience and
 functionality.

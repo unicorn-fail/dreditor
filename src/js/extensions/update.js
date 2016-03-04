@@ -40,7 +40,7 @@ Drupal.dreditor.updateCheck = function () {
 
   var latestVersion, installedVersion = Drupal.dreditor.version;
   // Determine the latest tagged release from GitHub API.
-  $.getJSON('https://api.github.com/repos/dreditor/dreditor/tags', function (json) {
+  $.getJSON('https://api.github.com/repos/unicorn-fail/dreditor/tags', function (json) {
     for (var i = 0; i < json.length; i++) {
       // Find the latest stable release (no "rc", "beta" or "dev" releases).
       if (json[i].name.indexOf('rc') === -1 && json[i].name.indexOf('beta') === -1 && json[i].name.indexOf('dev') === -1) {

@@ -22,7 +22,7 @@ Setting up a local development environment is simple; it's all automated:
 1. Clone the Dreditor repository:
 
     ```sh
-    git clone https://github.com/dreditor/dreditor.git
+    git clone https://github.com/unicorn-fail/dreditor.git
     ```
 1. Change into the new repository directory and install all dependencies:
 
@@ -279,7 +279,7 @@ Requires a (free) [Safari Developer Certificate](https://developer.apple.com/reg
 [Grunt]: http://gruntjs.com
 [Less]: http://lesscss.org
 [QUnit]: http://qunitjs.com
-[Travis CI]: https://travis-ci.org/dreditor/dreditor
+[Travis CI]: https://travis-ci.org/unicorn-fail/dreditor
 [JSHint]: http://www.jshint.com
 [qunit testing]: http://jordankasper.com/blog/2013/04/automated-javascript-tests-using-grunt-phantomjs-and-qunit/
 

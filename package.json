@@ -25,13 +25,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:dreditor/dreditor.git"
+    "url": "git@github.com:unicorn-fail/dreditor.git"
   },
-  "bugs": "https://github.com/dreditor/dreditor/issues",
+  "bugs": "https://github.com/unicorn-fail/dreditor/issues",
   "licenses": [
     {
       "type": "GPL-2.0",
-      "url": "https://github.com/dreditor/dreditor/blob/2.x/LICENSE-GPL-2.0"
+      "url": "https://github.com/unicorn-fail/dreditor/blob/2.x/LICENSE-GPL-2.0"
     }
   ],
   "keywords": [],
