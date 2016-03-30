@@ -15,7 +15,7 @@ Drupal.dreditor.issue.getNid = function() {
  */
 Drupal.dreditor.issue.getNewCommentNumber = function() {
   // Get comment count.
-  var lastCommentNumber = $('.comments .comment:last .permalink').text().match(/\d+$/);
+  var lastCommentNumber = $('.comments div.comment:last .permalink').text().match(/\d+$/);
   return (lastCommentNumber ? parseInt(lastCommentNumber[0], 10) : 0) + 1;
 };
 
