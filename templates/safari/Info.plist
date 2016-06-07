@@ -27,6 +27,7 @@
 		<dict>
 			<key>End</key>
 			<array>
+				<string>jquery.js</string>
 				<string>%PKG.NAME%.js</string>
 			</array>
 		</dict>
