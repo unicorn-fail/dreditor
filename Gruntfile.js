@@ -57,9 +57,8 @@ module.exports = function(grunt) {
       build: {
         src: [
           'src/js/extensions/drupal.js',
-          'src/js/extensions/jquery.once.js',
+          'lib/jquery.once/jquery.once.js',
           'src/js/**/*.js',
-          '!src/js/extensions/jquery.js',
           '!src/js/init.js',
           'build/<%= pkg.name %>.css.js',
           'src/js/init.js'
@@ -89,8 +88,6 @@ module.exports = function(grunt) {
         },
         src: [
           'src/js/**/*.js',
-          '!src/js/extensions/jquery.js',
-          '!src/js/extensions/jquery.once.js'
         ]
       }
     },
@@ -171,7 +168,7 @@ module.exports = function(grunt) {
           },
           {
             expand: true,
-            cwd: 'src/js/extensions/',
+            cwd: 'lib/jquery/',
             src: ['jquery.js'],
             dest: 'build/chrome/'
           },
@@ -199,7 +196,7 @@ module.exports = function(grunt) {
           },
           {
             expand: true,
-            cwd: 'src/js/extensions/',
+            cwd: 'lib/jquery/',
             src: ['jquery.js'],
             dest: 'build/firefox/data/'
           },
@@ -233,7 +230,7 @@ module.exports = function(grunt) {
           },
           {
             expand: true,
-            cwd: 'src/js/extensions/',
+            cwd: 'lib/jquery/',
             src: ['jquery.js'],
             dest: 'build/<%= pkg.name %>.safariextension/'
           },
