@@ -8,6 +8,9 @@ if (window.location.href.match('dreditor.org')) {
   document.body.appendChild(isInstalledNode);
 }
 
+// Initialize communications with the page.
+Drupal.dreditor.comms.init();
+
 // Initialize all the plugins.
 Drupal.attachBehaviors(document);
 
