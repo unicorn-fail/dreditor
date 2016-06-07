@@ -56,6 +56,8 @@ module.exports = function(grunt) {
       },
       build: {
         src: [
+          'src/js/extensions/drupal.js',
+          'src/js/extensions/jquery.once.js',
           'src/js/**/*.js',
           '!src/js/extensions/jquery.js',
           '!src/js/init.js',
@@ -87,7 +89,8 @@ module.exports = function(grunt) {
         },
         src: [
           'src/js/**/*.js',
-          '!src/js/extensions/jquery.js'
+          '!src/js/extensions/jquery.js',
+          '!src/js/extensions/jquery.once.js'
         ]
       }
     },
