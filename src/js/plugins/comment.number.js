@@ -6,9 +6,15 @@
  * "Add new comment" heading of the issue comment/update form (block), so that
  * contributors do not have to manually make the math.
  */
-Drupal.behaviors.dreditorCommentNumber = {
-  attach: function (context) {
-    $(context).find('#project-issue-ajax-form h2:first')
+var commentNumber = (function() {
+  var bind = function() {
+    $('#project-issue-ajax-form h2:first')
       .append(' <strong>#' + Drupal.dreditor.issue.getNewCommentNumber() + '</strong>');
-  }
-};
+  };
+
+  return {
+    bind: bind,
+  };
+})();
+
+Drupal.dreditor.plugins.register(commentNumber);

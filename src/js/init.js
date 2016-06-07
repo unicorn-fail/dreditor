@@ -12,7 +12,8 @@ if (window.location.href.match('dreditor.org')) {
 Drupal.dreditor.comms.init();
 
 // Initialize all the plugins.
-Drupal.attachBehaviors(document);
+Drupal.dreditor.plugins.notify('init');
+Drupal.dreditor.plugins.notify('bind');
 
 // Invoke Dreditor update check once.
 Drupal.dreditor.updateCheck();
