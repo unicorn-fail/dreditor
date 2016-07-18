@@ -11,7 +11,7 @@ Drupal.behaviors.dreditorIssueClone = {
         .find('button')
         .bind('click.dreditor-clone', function () {
           // Retrieve the current issue's project shortname.
-          var project = /[^/]*$/.exec($('div.breadcrumb').find('a').attr('href'))[0];
+          var project = /[^/]*$/.exec($('nav.breadcrumb').find('a').attr('href'))[0];
 
           // Open a new window.
           var w = _window.open('/node/add/project-issue/' + project + '#project-issue-node-form', '_blank');
