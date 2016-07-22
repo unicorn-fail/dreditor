@@ -51,15 +51,14 @@ module.exports = function(grunt) {
     },
     concat: {
       options: {
-        banner: '<%= banner %>' + grunt.file.read('src/js/_banner.header.js'),
-        footer: grunt.file.read('src/js/_banner.footer.js'),
+        banner: '<%= banner %>',
         stripBanners: true
       },
       build: {
         src: [
+          'src/js/extensions/drupal.js',
+          'lib/jquery.once/jquery.once.js',
           'src/js/**/*.js',
-          '!src/js/_banner.header.js',
-          '!src/js/_banner.footer.js',
           '!src/js/init.js',
           'build/<%= pkg.name %>.css.js',
           'src/js/init.js'
@@ -87,7 +86,9 @@ module.exports = function(grunt) {
         options: {
           jshintrc: '.jshintrc'
         },
-        src: 'src/js/**/*.js'
+        src: [
+          'src/js/**/*.js',
+        ]
       }
     },
     sed: {
@@ -167,6 +168,12 @@ module.exports = function(grunt) {
           },
           {
             expand: true,
+            cwd: 'lib/jquery/',
+            src: ['jquery.js'],
+            dest: 'build/chrome/'
+          },
+          {
+            expand: true,
             cwd: 'build/',
             src: ['<%= pkg.name %>.js'],
             dest: 'build/chrome/'
@@ -186,6 +193,12 @@ module.exports = function(grunt) {
             cwd: 'src/',
             src: ['icon.png'],
             dest: 'build/firefox/'
+          },
+          {
+            expand: true,
+            cwd: 'lib/jquery/',
+            src: ['jquery.js'],
+            dest: 'build/firefox/data/'
           },
           {
             expand: true,
@@ -213,6 +226,12 @@ module.exports = function(grunt) {
             expand: true,
             cwd: 'src/',
             src: ['icon.png'],
+            dest: 'build/<%= pkg.name %>.safariextension/'
+          },
+          {
+            expand: true,
+            cwd: 'lib/jquery/',
+            src: ['jquery.js'],
             dest: 'build/<%= pkg.name %>.safariextension/'
           },
           {
