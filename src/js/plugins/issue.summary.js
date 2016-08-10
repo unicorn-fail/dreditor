@@ -40,27 +40,13 @@ Drupal.behaviors.dreditorIssueSummary = {
           // Flatten issue summary, input format, and revision info fielsets.
           // Blatantly remove all other fieldsets. :)
           $widget.find('fieldset')
-            .not(':has(#edit-body, .tips, #edit-log)')
+            .not(':has(#edit-body, .tips)')
             .removeClass('collapsible').hide();
           // Visually remove top-level fieldsets, except text format.
-          $widget.find('fieldset:has(#edit-body, #edit-log)')
+          $widget.find('fieldset:has(#edit-body)')
             .removeClass('collapsible').addClass('fieldset-flat');
           // Remove needless spacing between summary and revision elements.
           $widget.find('.fieldset-flat:eq(0)').css('marginBottom', 0);
-
-          // Hide revision checkbox (only visible for admins, can't be disabled)
-          // and revision log message description.
-          $widget.find('#edit-revision-wrapper, #edit-log-wrapper .description').hide();
-          // Convert revision log message textarea into textfield and prepopulate it.
-          var $textarea = $widget.find('#edit-log');
-          var $textfield = $('<input type="text" size="60" style="width: 95%;" />');
-          $.each($textarea[0].attributes, function (index, attr) {
-            $textfield.attr(attr.name, attr.value);
-          });
-          // Enforced log message doesn't really make sense for power users.
-          // We're not crafting an encyclopedia with issues.
-          $textfield.val('Updated issue summary.');
-          $textarea.replaceWith($textfield);
 
           // Remove "Preview changes" and "Delete" buttons.
           $widget.find('#edit-preview-changes').remove();
