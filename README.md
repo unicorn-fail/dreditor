@@ -1,43 +1,9 @@
-# Dreditor [![GitHub version](https://badge.fury.io/gh/unicorn-fail%2Fdreditor.svg)](http://badge.fury.io/gh/dreditor%2Fdreditor) [![Show some love](http://img.shields.io/gittip/Dreditor.svg)](https://www.gittip.com/Dreditor)
+Dreditor is being decommissioned due to the lack of availability of current maintainers and the fact that Drupal.org is becoming more feature rich at a much faster rate than Dreditor itself now.
 
-[![Join the chat at https://gitter.im/unicorn-fail/dreditor](https://badges.gitter.im/unicorn-fail/dreditor.svg)](https://gitter.im/unicorn-fail/dreditor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Built with NodeJS](http://pixel-cookers.github.io/built-with-badges/node/node-short.png)](http://nodejs.org/)
-[![Built with Grunt](http://pixel-cookers.github.io/built-with-badges/grunt/grunt-short.png)](http://gruntjs.com/)
-[![Build Status](https://travis-ci.org/unicorn-fail/dreditor.svg?branch=1.x)](https://travis-ci.org/unicorn-fail/dreditor)
-[![Code Climate](http://img.shields.io/codeclimate/github/unicorn-fail/dreditor.svg)](https://codeclimate.com/github/unicorn-fail/dreditor)
+This decision was also partially made due to the amount of work (complete rewrite) it would take to create an "official" Firefox extension (#256).
 
-[![Dependency Status](https://david-dm.org/unicorn-fail/dreditor.svg)](https://david-dm.org/unicorn-fail/dreditor)
-[![devDependency Status](https://david-dm.org/unicorn-fail/dreditor/dev-status.svg)](https://david-dm.org/unicorn-fail/dreditor#info=devDependencies)
-[![optionalDependency Status](https://david-dm.org/unicorn-fail/dreditor/optional-status.svg)](https://david-dm.org/unicorn-fail/dreditor#info=optionalDependencies)
+If you already have the extension installed, it should continue working for a while until, inevitably,  the markup on Drupal.org changes. It will no longer be updated.
 
-A web browser extension for Drupal.org that enhances user experience and
-functionality.
+We understand that many of you love this extension, as do we. This isn't the end, in fact, it's a much brighter beginning. All the things we love about Dreditor can, and should, be moved into Drupal.org natively.
 
-## Installation
-
-To install Dreditor in your browser, visit https://dreditor.org
-
-## Development
-
-### Contributing
-
-Dreditor is powered by native JavaScript code.  Simple.
-
-The development process is powered by [Node.js](http://nodejs.org) and
-[Grunt](http://gruntjs.com).  Sounds complex, but is trivial!
-
-Setting up a local development environment just takes a few minutes; it's all
-automated.
-
-Check the [Contributing](https://dreditor.org/development/contributing) page to
-learn more.
-
-
-### Maintainers
-
-* [Mark Carver](https://drupal.org/user/501638)
-* [Scott Reeves (Cottser)](https://drupal.org/user/1167326)
-* [Daniel F. Kudwien (sun)](https://drupal.org/user/54136)
-
-Original author: [Daniel F. Kudwien (sun)](https://drupal.org/user/54136).
-
+For more information, please follow: https://www.drupal.org/node/2779729
