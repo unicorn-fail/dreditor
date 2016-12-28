@@ -152,6 +152,7 @@
 #dreditor #code .ln {
   width: 1px;
   border-right: 1px solid #e5e5e5;
+  color: #888;
   text-align: right;
 }
 #dreditor #code .ln:before {
@@ -160,7 +161,7 @@
 #dreditor #code tr {
   background-color: transparent;
   border: 0;
-  color: #888;
+  color: #666;
   margin: 0;
   padding: 0;
 }
@@ -201,8 +202,8 @@
   display: none;
 }
 #dreditor #code tr.file {
-  background-color: #E8F1F6;
-  color: #064A6F;
+  background-color: #f9f9fc;
+  color: #666;
 }
 #dreditor #code tr.file a {
   color: #064A6F;
@@ -212,8 +213,12 @@
   border-color: #BFD4EE;
 }
 #dreditor #code tr.old {
-  background-color: #fdd;
+  background-color: #fffbfb;
   color: #c00;
+}
+#dreditor #code tr.old.comment {
+  //background-color: #fbf3f3;
+  color: #c33;
 }
 #dreditor #code tr.old a {
   color: #c00;
@@ -223,21 +228,23 @@
   border-color: #e9aeae;
 }
 #dreditor #code tr.new {
-  background-color: #dfd;
-  color: #008503;
+  background-color: #fbfffb;
+  //color: #070;
+  color: #00a;
   float: none;
   font-size: 100%;
   font-weight: normal;
 }
+#dreditor #code tr.new.comment {
+  //background-color: #f3fbf3;
+  color: #070;
+}
 #dreditor #code tr.new a {
-  color: #008503;
+  color: #0a0;
 }
 #dreditor #code tr.new .ln {
   background-color: #ceffce;
   border-color: #b4e2b4;
-}
-#dreditor #code .comment {
-  color: #070;
 }
 tr.selected td {
   background: transparent;
