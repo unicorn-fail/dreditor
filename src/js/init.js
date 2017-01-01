@@ -8,9 +8,12 @@ if (window.location.href.match('dreditor.org')) {
   document.body.appendChild(isInstalledNode);
 }
 
-jQuery(document).ready(function () {
-  Drupal.attachBehaviors(this);
-});
+// Initialize communications with the page.
+Drupal.dreditor.comms.init();
+
+// Initialize all the plugins.
+Drupal.dreditor.plugins.notify('init');
+Drupal.dreditor.plugins.notify('bind');
 
 // Invoke Dreditor update check once.
 Drupal.dreditor.updateCheck();
