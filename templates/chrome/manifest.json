@@ -20,5 +20,10 @@
     "*://*.drupal.org/*",
     "*://*.dreditor.org/*",
     "*://*.devdrupal.org/*"
-  ]
+  ],
+  "applications": {
+    "gecko": {
+      "id": "%PKG.NAME%@%PKG.NAME%.org"
+    }
+  }
 }
