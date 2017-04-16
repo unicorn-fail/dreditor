@@ -9,7 +9,10 @@ if (window.location.href.match('dreditor.org')) {
 }
 
 jQuery(document).ready(function () {
-  Drupal.attachBehaviors(this);
+  // If we are on a Drupal 7 site (i.e: not localize.drupal.org)
+  if (Drupal.detachBehaviors) {
+    Drupal.attachBehaviors(this);
+  }
 });
 
 // Invoke Dreditor update check once.
