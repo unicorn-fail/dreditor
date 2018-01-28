@@ -3,7 +3,7 @@ Drupal.dreditor.issue = {};
  * Gets the issue node id.
  */
 Drupal.dreditor.issue.getNid = function() {
-  var href = $('#tabs a:first').attr('href');
+  var href = $("link[rel='shortlink']").attr("href");
   if (href.length) {
     return href.match(/(?:node|comment\/reply)\/(\d+)/)[1];
   }
