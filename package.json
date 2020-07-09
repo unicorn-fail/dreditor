@@ -42,7 +42,7 @@
     "test": "grunt travis-ci --verbose"
   },
   "dependencies": {
-    "clean-css": "2.0.8",
+    "clean-css": "4.2.3",
     "grunt": "0.4.2",
     "grunt-contrib-clean": "0.5.0",
     "grunt-contrib-compress": "0.9.1",
