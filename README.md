@@ -1,43 +1,27 @@
-# Dreditor [![GitHub version](https://badge.fury.io/gh/unicorn-fail%2Fdreditor.svg)](http://badge.fury.io/gh/dreditor%2Fdreditor) [![Show some love](http://img.shields.io/gittip/Dreditor.svg)](https://www.gittip.com/Dreditor)
+## ABANDONED PROJECT
 
-[![Join the chat at https://gitter.im/unicorn-fail/dreditor](https://badges.gitter.im/unicorn-fail/dreditor.svg)](https://gitter.im/unicorn-fail/dreditor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Built with NodeJS](http://pixel-cookers.github.io/built-with-badges/node/node-short.png)](http://nodejs.org/)
-[![Built with Grunt](http://pixel-cookers.github.io/built-with-badges/grunt/grunt-short.png)](http://gruntjs.com/)
-[![Build Status](https://travis-ci.org/unicorn-fail/dreditor.svg?branch=1.x)](https://travis-ci.org/unicorn-fail/dreditor)
-[![Code Climate](http://img.shields.io/codeclimate/github/unicorn-fail/dreditor.svg)](https://codeclimate.com/github/unicorn-fail/dreditor)
+> See: <https://www.drupal.org/project/drupalorg/issues/1673278>
 
-[![Dependency Status](https://david-dm.org/unicorn-fail/dreditor.svg)](https://david-dm.org/unicorn-fail/dreditor)
-[![devDependency Status](https://david-dm.org/unicorn-fail/dreditor/dev-status.svg)](https://david-dm.org/unicorn-fail/dreditor#info=devDependencies)
-[![optionalDependency Status](https://david-dm.org/unicorn-fail/dreditor/optional-status.svg)](https://david-dm.org/unicorn-fail/dreditor#info=optionalDependencies)
+Dreditor has been decommissioned due to the lack of availability of current maintainers and the fact that Drupal.org
+itself is becoming more feature rich at a much faster rate than Dreditor itself now.
 
-A web browser extension for Drupal.org that enhances user experience and
-functionality.
+This decision was primarily made due to the (original) effort it would take to create an "official" Firefox extension
+([#256](https://github.com/unicorn-fail/dreditor/issues/256)) amongst a few major issues that were not solvable as a
+browser extension and/or would require a complete rewrite anyway:
 
-## Installation
+- No mobile support (mobile browsers don't have extensions).
+- Extremely inefficient (large patch files could cause browser to hang).
+- Newer, more frequent, Drupal.org deployments often break assumptions of expected markup made by this project causing
+  maintainers to live in an unrealistic state of having to "drop everything to hotfix and release".
 
-To install Dreditor in your browser, visit https://dreditor.org
+If you already have the extension installed, it may continue working for a while until (inevitably) the markup on
+Drupal.org changes enough that the extension is unable to function.
 
-## Development
+We understand that many of you love this extension, we did too. This isn't the end, in fact, it's a much brighter
+beginning. All the things we love about Dreditor can, and should, be moved into Drupal.org natively.
 
-### Contributing
+To reiterate: this project is dead and should remain dead. This project's code will no longer be updated, nor will
+anymore releases be made.
 
-Dreditor is powered by native JavaScript code.  Simple.
-
-The development process is powered by [Node.js](http://nodejs.org) and
-[Grunt](http://gruntjs.com).  Sounds complex, but is trivial!
-
-Setting up a local development environment just takes a few minutes; it's all
-automated.
-
-Check the [Contributing](https://dreditor.org/development/contributing) page to
-learn more.
-
-
-### Maintainers
-
-* [Mark Carver](https://drupal.org/user/501638)
-* [Scott Reeves (Cottser)](https://drupal.org/user/1167326)
-* [Daniel F. Kudwien (sun)](https://drupal.org/user/54136)
-
-Original author: [Daniel F. Kudwien (sun)](https://drupal.org/user/54136).
-
+Any and all effort to "add features" or "fix" things should be done on Drupal.org itself by searching for existing
+issues or creating a new issue in the Drupal.org issue queue: <https://www.drupal.org/project/issues/drupalorg>
